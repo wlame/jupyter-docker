@@ -16,7 +16,7 @@ cd /path/to/jupy2
 docker build -t datascience-notebook .
 ```
 
-**Note:** First build takes 5-10 minutes to download and install all dependencies. uv is significantly faster than pip.
+**Note:** First build takes 5-10 minutes to download and install all dependencies.
 
 ## Run the Container
 
@@ -108,7 +108,7 @@ uv run python script.py
 uv run jupyter lab
 
 # Check installed packages
-uv pip list
+uv tree
 ```
 
 ### Adding Packages at Runtime
