@@ -2,6 +2,8 @@
 
 A comprehensive, Dockerized Jupyter Notebook environment pre-configured with Python 3.13 and essential data science libraries for statistics, analysis, and visualization tasks.
 
+**Package Manager**: [uv](https://docs.astral.sh/uv/) - Fast Python package manager from Astral
+
 ## Quick Start
 
 ### Build the Docker Image
@@ -145,10 +147,10 @@ Inside the container:
 
 ```bash
 # Run an example script
-python examples/01_numpy_scipy_basics.py
+uv run python examples/01_numpy_scipy_basics.py
 
 # Or run all examples
-for f in examples/*.py; do python "$f"; done
+for f in examples/*.py; do uv run python "$f"; done
 ```
 
 ## Verifying Installation
@@ -157,7 +159,7 @@ The container includes a verification script to check all package imports:
 
 ```bash
 # Inside the container
-python scripts/verify_imports.py
+uv run python scripts/verify_imports.py
 ```
 
 ## Docker Commands Reference
@@ -216,7 +218,7 @@ docker logs jupyter
 docker exec -it jupyter bash
 
 # Execute Python in container
-docker exec -it jupyter python -c "import numpy; print(numpy.__version__)"
+docker exec -it jupyter uv run python -c "import numpy; print(numpy.__version__)"
 ```
 
 ### Cleanup
@@ -237,7 +239,12 @@ docker image prune
 ```
 .
 ├── Dockerfile              # Container definition
+├── pyproject.toml          # Project dependencies (uv)
+├── uv.lock                  # Lock file (generated)
 ├── README.md               # This file
+├── INSTRUCTIONS.md         # Quick start guide
+├── notebooks/              # Your Jupyter notebooks (mounted)
+├── data/                   # Your datasets (mounted)
 ├── examples/               # Example scripts
 │   ├── output/             # Generated visualizations
 │   ├── 01_numpy_scipy_basics.py
@@ -256,20 +263,30 @@ docker image prune
 ## Container Details
 
 - **Base Image**: `python:3.13-slim-bookworm`
+- **Package Manager**: `uv` (https://docs.astral.sh/uv/)
 - **User**: `jupyter` (non-root)
 - **Working Directory**: `/home/jupyter`
 - **Exposed Port**: `8888`
-- **Default Command**: `jupyter lab --ip=0.0.0.0 --port=8888 --no-browser`
+- **Default Command**: `uv run jupyter lab --ip=0.0.0.0 --port=8888 --no-browser`
 
 ## Customization
 
 ### Adding More Packages
 
-To add additional packages, edit the Dockerfile and rebuild:
+To add additional packages, edit `pyproject.toml` and rebuild:
 
-```dockerfile
-# Add to the appropriate section in Dockerfile
-RUN pip install your-package-here
+```toml
+# Add to the dependencies list in pyproject.toml
+dependencies = [
+    # ... existing packages ...
+    "your-package-here",
+]
+```
+
+Then rebuild the image:
+
+```bash
+docker build -t datascience-notebook .
 ```
 
 ### Using a Password
@@ -279,7 +296,7 @@ For production use, set a password:
 ```bash
 docker run -p 8888:8888 \
   -e JUPYTER_TOKEN=your-secret-token \
-  datascience-notebook jupyter lab --ip=0.0.0.0 --NotebookApp.token='your-secret-token'
+  datascience-notebook uv run jupyter lab --ip=0.0.0.0 --IdentityProvider.token='your-secret-token'
 ```
 
 ### GPU Support
@@ -305,16 +322,12 @@ lsof -i :8888
 
 Run the verification script to identify issues:
 ```bash
-docker exec -it jupyter python scripts/verify_imports.py
+docker exec -it jupyter uv run python scripts/verify_imports.py
 ```
 
 ### Out of Memory
 
 Increase Docker memory limit in Docker Desktop settings or use `--memory` flag.
-
-### Slow Package Installation
-
-Use `--no-cache-dir` in pip commands (already configured in Dockerfile).
 
 ## License
 

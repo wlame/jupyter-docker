@@ -1,0 +1,114 @@
+[project]
+name = "datascience-notebook"
+version = "1.0.0"
+description = "Comprehensive Data Science Jupyter Notebook Environment"
+readme = "README.md"
+requires-python = ">=3.13"
+
+dependencies = [
+    # Core Scientific Computing
+    "numpy",
+    "scipy",
+    "pandas",
+    "ipython",
+    "jupyter",
+    "jupyterlab",
+    "notebook",
+    "ipywidgets",
+    "jupyterlab-widgets",
+
+    # Visualization
+    "matplotlib",
+    "seaborn",
+    "plotly",
+    "bokeh",
+    "holoviews",
+    "hvplot",
+    "panel",
+    "altair",
+
+    # Geospatial
+    "cartopy",
+    "geopandas",
+    "shapely",
+    "pyproj",
+    "folium",
+    "geoviews",
+
+    # Time Series
+    "tsfresh",
+    "sktime",
+    "statsmodels",
+    "pmdarima",
+    "prophet",
+
+    # Machine Learning
+    "scikit-learn",
+    "xgboost",
+    "lightgbm",
+
+    # JSON handling
+    "orjson",
+    "ujson",
+    "simplejson",
+
+    # XML parsing
+    "lxml",
+    "xmltodict",
+    "beautifulsoup4",
+
+    # YAML
+    "pyyaml",
+
+    # Excel support
+    "openpyxl",
+    "xlrd",
+
+    # Parquet and Arrow
+    "pyarrow",
+    "fastparquet",
+
+    # HDF5
+    "h5py",
+    "tables",
+
+    # HTTP clients
+    "requests",
+    "httpx",
+    "aiohttp",
+    "urllib3",
+
+    # Date/time handling
+    "python-dateutil",
+    "pytz",
+    "pendulum",
+
+    # Data validation
+    "pydantic",
+
+    # Progress bars
+    "tqdm",
+
+    # Logging
+    "loguru",
+
+    # Environment variables
+    "python-dotenv",
+
+    # Caching
+    "joblib",
+
+    # Functional programming utilities
+    "toolz",
+    "more-itertools",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "ruff",
+]
+
+[dependency-groups]
+dev = []

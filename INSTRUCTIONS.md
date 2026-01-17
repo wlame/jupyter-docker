@@ -16,7 +16,7 @@ cd /path/to/jupy2
 docker build -t datascience-notebook .
 ```
 
-**Note:** First build takes 10-15 minutes to download and install all dependencies.
+**Note:** First build takes 5-10 minutes to download and install all dependencies. uv is significantly faster than pip.
 
 ## Run the Container
 
@@ -73,17 +73,17 @@ Then access at: **http://localhost:9999**
 Test that all packages are installed correctly:
 
 ```bash
-docker run --rm datascience-notebook python /home/jupyter/scripts/verify_imports.py
+docker run --rm datascience-notebook uv run python /home/jupyter/scripts/verify_imports.py
 ```
 
 ## Run Example Scripts
 
 ```bash
 # Run a specific example
-docker run --rm datascience-notebook python /home/jupyter/examples/01_numpy_scipy_basics.py
+docker run --rm datascience-notebook uv run python /home/jupyter/examples/01_numpy_scipy_basics.py
 
 # Run inside running container
-docker exec -it jupyter python /home/jupyter/examples/01_numpy_scipy_basics.py
+docker exec -it jupyter uv run python /home/jupyter/examples/01_numpy_scipy_basics.py
 ```
 
 ## Access Container Shell
@@ -96,6 +96,31 @@ docker exec -it jupyter bash
 docker run --rm -it datascience-notebook bash
 ```
 
+## Package Management with uv
+
+This container uses [uv](https://docs.astral.sh/uv/) for package management. All Python commands should be run with `uv run`:
+
+```bash
+# Run Python
+uv run python script.py
+
+# Run Jupyter
+uv run jupyter lab
+
+# Check installed packages
+uv pip list
+```
+
+### Adding Packages at Runtime
+
+To add packages temporarily in a running container:
+
+```bash
+docker exec -it jupyter uv add package-name
+```
+
+For permanent changes, edit `pyproject.toml` and rebuild the image.
+
 ## Security Note
 
 The default configuration has **no authentication** for convenience in local development. For production or shared environments, use a token:
@@ -104,7 +129,7 @@ The default configuration has **no authentication** for convenience in local dev
 docker run -p 8888:8888 \
   -e JUPYTER_TOKEN=your-secret-token \
   datascience-notebook \
-  jupyter lab --ip=0.0.0.0 --IdentityProvider.token='your-secret-token'
+  uv run jupyter lab --ip=0.0.0.0 --IdentityProvider.token='your-secret-token'
 ```
 
 ## Troubleshooting

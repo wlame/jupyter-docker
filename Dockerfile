@@ -5,6 +5,7 @@
 # analysis, and visualization tasks.
 #
 # Python: 3.13 (latest stable with full ecosystem support)
+# Package Manager: uv (https://docs.astral.sh/uv/)
 # Base: Debian Bookworm (slim)
 # =============================================================================
 
@@ -19,10 +20,12 @@ LABEL version="1.0"
 # =============================================================================
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
     JUPYTER_ENABLE_LAB=yes \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    # uv configuration
+    UV_SYSTEM_PYTHON=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
 # =============================================================================
 # System Dependencies
@@ -62,6 +65,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # =============================================================================
+# Install uv via pip (then use uv for everything else)
+# =============================================================================
+RUN pip install --no-cache-dir uv
+
+# =============================================================================
 # Create Working Directory and Non-Root User
 # =============================================================================
 RUN useradd -m -s /bin/bash jupyter && \
@@ -71,123 +79,13 @@ RUN useradd -m -s /bin/bash jupyter && \
 WORKDIR /home/jupyter
 
 # =============================================================================
-# Python Package Installation
+# Python Package Installation with uv
 # =============================================================================
-# Upgrade pip and install build tools
-RUN pip install --upgrade pip setuptools wheel
+# Copy project definition
+COPY --chown=jupyter:jupyter pyproject.toml /home/jupyter/
 
-# -----------------------------------------------------------------------------
-# Core Scientific Computing
-# -----------------------------------------------------------------------------
-RUN pip install \
-    numpy \
-    scipy \
-    pandas \
-    # IPython and Jupyter
-    ipython \
-    jupyter \
-    jupyterlab \
-    notebook \
-    ipywidgets \
-    # Enable widgets in JupyterLab
-    jupyterlab-widgets
-
-# -----------------------------------------------------------------------------
-# Visualization Libraries
-# -----------------------------------------------------------------------------
-RUN pip install \
-    matplotlib \
-    seaborn \
-    plotly \
-    bokeh \
-    holoviews \
-    hvplot \
-    panel \
-    altair
-
-# -----------------------------------------------------------------------------
-# Geospatial and Mapping
-# -----------------------------------------------------------------------------
-RUN pip install \
-    cartopy \
-    geopandas \
-    shapely \
-    pyproj \
-    folium \
-    geoviews
-
-# -----------------------------------------------------------------------------
-# Time Series Analysis
-# -----------------------------------------------------------------------------
-RUN pip install \
-    tsfresh \
-    sktime \
-    statsmodels \
-    pmdarima \
-    prophet
-
-# -----------------------------------------------------------------------------
-# Machine Learning and Statistics
-# -----------------------------------------------------------------------------
-RUN pip install \
-    scikit-learn \
-    xgboost \
-    lightgbm
-
-# -----------------------------------------------------------------------------
-# Data I/O and Serialization
-# -----------------------------------------------------------------------------
-RUN pip install \
-    # JSON handling
-    orjson \
-    ujson \
-    simplejson \
-    # XML parsing
-    lxml \
-    xmltodict \
-    beautifulsoup4 \
-    # YAML
-    pyyaml \
-    # Excel support
-    openpyxl \
-    xlrd \
-    # Parquet and Arrow
-    pyarrow \
-    fastparquet \
-    # HDF5
-    h5py \
-    tables
-
-# -----------------------------------------------------------------------------
-# HTTP and API Clients
-# -----------------------------------------------------------------------------
-RUN pip install \
-    requests \
-    httpx \
-    aiohttp \
-    urllib3
-
-# -----------------------------------------------------------------------------
-# Utilities
-# -----------------------------------------------------------------------------
-RUN pip install \
-    # Date/time handling
-    python-dateutil \
-    pytz \
-    pendulum \
-    # Data validation
-    pydantic \
-    # Progress bars
-    tqdm \
-    # Logging
-    loguru \
-    # Environment variables
-    python-dotenv \
-    # Caching
-    joblib \
-    # Functional programming utilities
-    toolz \
-    more-itertools
+# Initialize uv project and install dependencies
+RUN uv lock && uv sync
 
 # =============================================================================
 # Copy Example Files
@@ -206,7 +104,7 @@ RUN chmod +x /home/jupyter/scripts/*.py
 USER jupyter
 
 # Configure Jupyter
-RUN jupyter lab --generate-config && \
+RUN uv run jupyter lab --generate-config && \
     echo "c.ServerApp.ip = '0.0.0.0'" >> /home/jupyter/.jupyter/jupyter_lab_config.py && \
     echo "c.ServerApp.port = 8888" >> /home/jupyter/.jupyter/jupyter_lab_config.py && \
     echo "c.ServerApp.open_browser = False" >> /home/jupyter/.jupyter/jupyter_lab_config.py && \
@@ -218,4 +116,4 @@ RUN jupyter lab --generate-config && \
 EXPOSE 8888
 
 # Set default command
-CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
+CMD ["uv", "run", "jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
