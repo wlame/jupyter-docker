@@ -47,6 +47,25 @@ dependencies = [
     "xgboost",
     "lightgbm",
 
+    # Deep Learning Frameworks
+    "torch",
+    "torchvision",
+    "torchaudio",
+    "tensorflow",
+    "keras",
+
+    # Image Processing
+    "pillow",
+    "opencv-python-headless",
+    "scikit-image",
+    "imageio",
+    "imageio-ffmpeg",
+
+    # Object Detection
+    "ultralytics",
+    # Note: mediapipe excluded - no Linux ARM64 support
+    # Note: py-feat excluded - dependency conflicts with Python 3.13
+
     # JSON handling
     "orjson",
     "ujson",

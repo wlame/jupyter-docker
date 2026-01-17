@@ -56,6 +56,29 @@ packages = [
     ("xgboost", "XGBoost"),
     ("lightgbm", "LightGBM"),
 
+    # Deep Learning Frameworks
+    ("torch", "PyTorch"),
+    ("torch.nn", "PyTorch NN"),
+    ("torchvision", "TorchVision"),
+    ("torchvision.models", "TorchVision Models"),
+    ("torchaudio", "TorchAudio"),
+    ("tensorflow", "TensorFlow"),
+    ("tensorflow.keras", "TensorFlow Keras"),
+    ("keras", "Keras"),
+
+    # Image Processing
+    ("PIL", "Pillow"),
+    ("PIL.Image", "Pillow Image"),
+    ("cv2", "OpenCV"),
+    ("skimage", "scikit-image"),
+    ("skimage.io", "scikit-image IO"),
+    ("skimage.filters", "scikit-image Filters"),
+    ("skimage.feature", "scikit-image Feature"),
+    ("imageio", "imageio"),
+
+    # Object Detection
+    ("ultralytics", "Ultralytics YOLO"),
+
     # Data I/O - JSON
     ("orjson", "orjson"),
     ("ujson", "ujson"),

@@ -11,7 +11,7 @@
 
 FROM python:3.13-slim-bookworm
 
-LABEL maintainer="Data Engineering Team"
+LABEL maintainer="wlame"
 LABEL description="Comprehensive Data Science Jupyter Notebook Environment"
 LABEL version="1.0"
 
@@ -44,6 +44,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfreetype6-dev \
     libpng-dev \
     libjpeg-dev \
+    # Required for OpenCV
+    libgl1 \
+    libglib2.0-0 \
     # Required for Cartopy and geospatial libraries
     libgeos-dev \
     libproj-dev \

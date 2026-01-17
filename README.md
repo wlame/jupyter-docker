@@ -84,6 +84,26 @@ docker run -p 8888:8888 \
 | **XGBoost** | Latest | Optimized gradient boosting library | [Website](https://xgboost.readthedocs.io/) \| [Docs](https://xgboost.readthedocs.io/en/stable/) |
 | **LightGBM** | Latest | Fast gradient boosting framework | [Website](https://lightgbm.readthedocs.io/) \| [Docs](https://lightgbm.readthedocs.io/en/latest/) |
 
+### Deep Learning Frameworks
+
+| Library | Version | Description | Links |
+|---------|---------|-------------|-------|
+| **PyTorch** | Latest | Deep learning framework with dynamic computation graphs | [Website](https://pytorch.org/) \| [Docs](https://pytorch.org/docs/stable/) |
+| **TorchVision** | Latest | Image datasets, transforms, and models for PyTorch | [Website](https://pytorch.org/vision/) \| [Docs](https://pytorch.org/vision/stable/) |
+| **TorchAudio** | Latest | Audio processing and datasets for PyTorch | [Website](https://pytorch.org/audio/) \| [Docs](https://pytorch.org/audio/stable/) |
+| **TensorFlow** | Latest | End-to-end machine learning platform | [Website](https://tensorflow.org/) \| [Docs](https://tensorflow.org/api_docs) |
+| **Keras** | Latest | High-level neural networks API | [Website](https://keras.io/) \| [Docs](https://keras.io/api/) |
+
+### Image Processing
+
+| Library | Version | Description | Links |
+|---------|---------|-------------|-------|
+| **Pillow** | Latest | Python Imaging Library (PIL) fork for image processing | [Website](https://pillow.readthedocs.io/) \| [Docs](https://pillow.readthedocs.io/en/stable/) |
+| **OpenCV** | Latest | Computer vision and image processing library (headless) | [Website](https://opencv.org/) \| [Docs](https://docs.opencv.org/) |
+| **scikit-image** | Latest | Image processing algorithms for SciPy | [Website](https://scikit-image.org/) \| [Docs](https://scikit-image.org/docs/stable/) |
+| **imageio** | Latest | Read/write images in various formats | [Website](https://imageio.readthedocs.io/) \| [Docs](https://imageio.readthedocs.io/en/stable/) |
+| **Ultralytics YOLO** | Latest | State-of-the-art object detection (YOLOv8+) | [Website](https://ultralytics.com/) \| [Docs](https://docs.ultralytics.com/) |
+
 ### Data I/O and Serialization
 
 | Library | Version | Description | Links |
@@ -140,6 +160,10 @@ The `examples/` directory contains boilerplate scripts demonstrating library usa
 | `07_timeseries_analysis.py` | Time series decomposition, ARIMA, feature extraction |
 | `08_data_io_serialization.py` | JSON, XML, YAML, Parquet, HDF5 I/O |
 | `09_machine_learning.py` | Classification, regression, clustering |
+| `10_deep_learning_pytorch.py` | PyTorch tensors, autograd, neural networks, TorchVision, TorchAudio |
+| `11_deep_learning_tensorflow.py` | TensorFlow tensors, Keras models, training loops, callbacks |
+| `12_image_processing.py` | PIL, OpenCV, scikit-image, imageio operations |
+| `13_object_detection_yolo.py` | Ultralytics YOLOv8 object detection |
 
 ### Running Examples
 
@@ -255,7 +279,11 @@ docker image prune
 │   ├── 06_geospatial.py
 │   ├── 07_timeseries_analysis.py
 │   ├── 08_data_io_serialization.py
-│   └── 09_machine_learning.py
+│   ├── 09_machine_learning.py
+│   ├── 10_deep_learning_pytorch.py
+│   ├── 11_deep_learning_tensorflow.py
+│   ├── 12_image_processing.py
+│   └── 13_object_detection_yolo.py
 └── scripts/
     └── verify_imports.py   # Package verification script
 ```
