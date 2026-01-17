@@ -33,117 +33,117 @@ docker run -p 8888:8888 \
 
 ### Core Scientific Computing
 
-| Library | Version | Description | Links |
-|---------|---------|-------------|-------|
-| **NumPy** | Latest | Fundamental package for numerical computing with N-dimensional arrays | [Website](https://numpy.org/) \| [Docs](https://numpy.org/doc/stable/) |
-| **SciPy** | Latest | Scientific computing library for optimization, integration, interpolation, and more | [Website](https://scipy.org/) \| [Docs](https://docs.scipy.org/doc/scipy/) |
-| **Pandas** | Latest | Data manipulation and analysis with DataFrames | [Website](https://pandas.pydata.org/) \| [Docs](https://pandas.pydata.org/docs/) |
-| **IPython** | Latest | Enhanced interactive Python shell | [Website](https://ipython.org/) \| [Docs](https://ipython.readthedocs.io/) |
-| **Jupyter** | Latest | Interactive notebook environment | [Website](https://jupyter.org/) \| [Docs](https://docs.jupyter.org/) |
-| **JupyterLab** | Latest | Next-generation web-based interface for Jupyter | [Website](https://jupyterlab.readthedocs.io/) |
+| Library | Description | Links |
+|---------|-------------|-------|
+| **NumPy** | Fundamental package for numerical computing with N-dimensional arrays | [Website](https://numpy.org/) \| [Docs](https://numpy.org/doc/stable/) |
+| **SciPy** | Scientific computing library for optimization, integration, interpolation, and more | [Website](https://scipy.org/) \| [Docs](https://docs.scipy.org/doc/scipy/) |
+| **Pandas** | Data manipulation and analysis with DataFrames | [Website](https://pandas.pydata.org/) \| [Docs](https://pandas.pydata.org/docs/) |
+| **IPython** | Enhanced interactive Python shell | [Website](https://ipython.org/) \| [Docs](https://ipython.readthedocs.io/) |
+| **Jupyter** | Interactive notebook environment | [Website](https://jupyter.org/) \| [Docs](https://docs.jupyter.org/) |
+| **JupyterLab** | Next-generation web-based interface for Jupyter | [Website](https://jupyterlab.readthedocs.io/) |
 
 ### Visualization Libraries
 
-| Library | Version | Description | Links |
-|---------|---------|-------------|-------|
-| **Matplotlib** | Latest | Comprehensive 2D/3D plotting library | [Website](https://matplotlib.org/) \| [Gallery](https://matplotlib.org/stable/gallery/) |
-| **Seaborn** | Latest | Statistical data visualization based on Matplotlib | [Website](https://seaborn.pydata.org/) \| [Gallery](https://seaborn.pydata.org/examples/) |
-| **Plotly** | Latest | Interactive graphing library for web-based visualizations | [Website](https://plotly.com/python/) \| [Docs](https://plotly.com/python/getting-started/) |
-| **Bokeh** | Latest | Interactive visualization library for modern web browsers | [Website](https://bokeh.org/) \| [Gallery](https://docs.bokeh.org/en/latest/docs/gallery.html) |
-| **HoloViews** | Latest | Declarative data visualization | [Website](https://holoviews.org/) \| [Gallery](https://holoviews.org/gallery/) |
-| **hvPlot** | Latest | High-level plotting API for Pandas, Dask, and more | [Website](https://hvplot.holoviz.org/) |
-| **Panel** | Latest | Build interactive dashboards and apps | [Website](https://panel.holoviz.org/) |
-| **Altair** | Latest | Declarative statistical visualization | [Website](https://altair-viz.github.io/) \| [Gallery](https://altair-viz.github.io/gallery/) |
+| Library | Description | Links |
+|---------|-------------|-------|
+| **Matplotlib** | Comprehensive 2D/3D plotting library | [Website](https://matplotlib.org/) \| [Gallery](https://matplotlib.org/stable/gallery/) |
+| **Seaborn** | Statistical data visualization based on Matplotlib | [Website](https://seaborn.pydata.org/) \| [Gallery](https://seaborn.pydata.org/examples/) |
+| **Plotly** | Interactive graphing library for web-based visualizations | [Website](https://plotly.com/python/) \| [Docs](https://plotly.com/python/getting-started/) |
+| **Bokeh** | Interactive visualization library for modern web browsers | [Website](https://bokeh.org/) \| [Gallery](https://docs.bokeh.org/en/latest/docs/gallery.html) |
+| **HoloViews** | Declarative data visualization | [Website](https://holoviews.org/) \| [Gallery](https://holoviews.org/gallery/) |
+| **hvPlot** | High-level plotting API for Pandas, Dask, and more | [Website](https://hvplot.holoviz.org/) |
+| **Panel** | Build interactive dashboards and apps | [Website](https://panel.holoviz.org/) |
+| **Altair** | Declarative statistical visualization | [Website](https://altair-viz.github.io/) \| [Gallery](https://altair-viz.github.io/gallery/) |
 
 ### Geospatial Libraries
 
-| Library | Version | Description | Links |
-|---------|---------|-------------|-------|
-| **Cartopy** | Latest | Geospatial data processing and map projections | [Website](https://scitools.org.uk/cartopy/) \| [Gallery](https://scitools.org.uk/cartopy/docs/latest/gallery/) |
-| **GeoPandas** | Latest | Extends Pandas for geospatial data | [Website](https://geopandas.org/) \| [Docs](https://geopandas.org/en/stable/docs.html) |
-| **Shapely** | Latest | Manipulation and analysis of geometric objects | [Website](https://shapely.readthedocs.io/) |
-| **PyProj** | Latest | Cartographic projections and coordinate transformations | [Website](https://pyproj4.github.io/pyproj/) |
-| **Folium** | Latest | Interactive Leaflet.js maps | [Website](https://python-visualization.github.io/folium/) |
-| **GeoViews** | Latest | Geographic data visualization with HoloViews | [Website](https://geoviews.org/) |
+| Library | Description | Links |
+|---------|-------------|-------|
+| **Cartopy** | Geospatial data processing and map projections | [Website](https://scitools.org.uk/cartopy/) \| [Gallery](https://scitools.org.uk/cartopy/docs/latest/gallery/) |
+| **GeoPandas** | Extends Pandas for geospatial data | [Website](https://geopandas.org/) \| [Docs](https://geopandas.org/en/stable/docs.html) |
+| **Shapely** | Manipulation and analysis of geometric objects | [Website](https://shapely.readthedocs.io/) |
+| **PyProj** | Cartographic projections and coordinate transformations | [Website](https://pyproj4.github.io/pyproj/) |
+| **Folium** | Interactive Leaflet.js maps | [Website](https://python-visualization.github.io/folium/) |
+| **GeoViews** | Geographic data visualization with HoloViews | [Website](https://geoviews.org/) |
 
 ### Time Series Analysis
 
-| Library | Version | Description | Links |
-|---------|---------|-------------|-------|
-| **tsfresh** | Latest | Automatic time series feature extraction | [Website](https://tsfresh.readthedocs.io/) \| [Docs](https://tsfresh.readthedocs.io/en/latest/) |
-| **sktime** | Latest | Unified framework for time series ML | [Website](https://www.sktime.net/) \| [Docs](https://www.sktime.net/en/stable/) |
-| **Statsmodels** | Latest | Statistical models, hypothesis tests, and data exploration | [Website](https://www.statsmodels.org/) \| [Docs](https://www.statsmodels.org/stable/index.html) |
-| **pmdarima** | Latest | Auto-ARIMA and statistical analysis | [Website](https://alkaline-ml.com/pmdarima/) |
-| **Prophet** | Latest | Forecasting tool by Meta for time series with seasonality | [Website](https://facebook.github.io/prophet/) |
+| Library | Description | Links |
+|---------|-------------|-------|
+| **tsfresh** | Automatic time series feature extraction | [Website](https://tsfresh.readthedocs.io/) \| [Docs](https://tsfresh.readthedocs.io/en/latest/) |
+| **sktime** | Unified framework for time series ML | [Website](https://www.sktime.net/) \| [Docs](https://www.sktime.net/en/stable/) |
+| **Statsmodels** | Statistical models, hypothesis tests, and data exploration | [Website](https://www.statsmodels.org/) \| [Docs](https://www.statsmodels.org/stable/index.html) |
+| **pmdarima** | Auto-ARIMA and statistical analysis | [Website](https://alkaline-ml.com/pmdarima/) |
+| **Prophet** | Forecasting tool by Meta for time series with seasonality | [Website](https://facebook.github.io/prophet/) |
 
 ### Machine Learning
 
-| Library | Version | Description | Links |
-|---------|---------|-------------|-------|
-| **Scikit-learn** | Latest | Machine learning algorithms and tools | [Website](https://scikit-learn.org/) \| [Docs](https://scikit-learn.org/stable/documentation.html) |
-| **XGBoost** | Latest | Optimized gradient boosting library | [Website](https://xgboost.readthedocs.io/) \| [Docs](https://xgboost.readthedocs.io/en/stable/) |
-| **LightGBM** | Latest | Fast gradient boosting framework | [Website](https://lightgbm.readthedocs.io/) \| [Docs](https://lightgbm.readthedocs.io/en/latest/) |
+| Library | Description | Links |
+|---------|-------------|-------|
+| **Scikit-learn** | Machine learning algorithms and tools | [Website](https://scikit-learn.org/) \| [Docs](https://scikit-learn.org/stable/documentation.html) |
+| **XGBoost** | Optimized gradient boosting library | [Website](https://xgboost.readthedocs.io/) \| [Docs](https://xgboost.readthedocs.io/en/stable/) |
+| **LightGBM** | Fast gradient boosting framework | [Website](https://lightgbm.readthedocs.io/) \| [Docs](https://lightgbm.readthedocs.io/en/latest/) |
 
 ### Deep Learning Frameworks
 
-| Library | Version | Description | Links |
-|---------|---------|-------------|-------|
-| **PyTorch** | Latest | Deep learning framework with dynamic computation graphs | [Website](https://pytorch.org/) \| [Docs](https://pytorch.org/docs/stable/) |
-| **TorchVision** | Latest | Image datasets, transforms, and models for PyTorch | [Website](https://pytorch.org/vision/) \| [Docs](https://pytorch.org/vision/stable/) |
-| **TorchAudio** | Latest | Audio processing and datasets for PyTorch | [Website](https://pytorch.org/audio/) \| [Docs](https://pytorch.org/audio/stable/) |
-| **TensorFlow** | Latest | End-to-end machine learning platform | [Website](https://tensorflow.org/) \| [Docs](https://tensorflow.org/api_docs) |
-| **Keras** | Latest | High-level neural networks API | [Website](https://keras.io/) \| [Docs](https://keras.io/api/) |
+| Library | Description | Links |
+|---------|-------------|-------|
+| **PyTorch** | Deep learning framework with dynamic computation graphs | [Website](https://pytorch.org/) \| [Docs](https://pytorch.org/docs/stable/) |
+| **TorchVision** | Image datasets, transforms, and models for PyTorch | [Website](https://pytorch.org/vision/) \| [Docs](https://pytorch.org/vision/stable/) |
+| **TorchAudio** | Audio processing and datasets for PyTorch | [Website](https://pytorch.org/audio/) \| [Docs](https://pytorch.org/audio/stable/) |
+| **TensorFlow** | End-to-end machine learning platform | [Website](https://tensorflow.org/) \| [Docs](https://tensorflow.org/api_docs) |
+| **Keras** | High-level neural networks API | [Website](https://keras.io/) \| [Docs](https://keras.io/api/) |
 
 ### Image Processing
 
-| Library | Version | Description | Links |
-|---------|---------|-------------|-------|
-| **Pillow** | Latest | Python Imaging Library (PIL) fork for image processing | [Website](https://pillow.readthedocs.io/) \| [Docs](https://pillow.readthedocs.io/en/stable/) |
-| **OpenCV** | Latest | Computer vision and image processing library (headless) | [Website](https://opencv.org/) \| [Docs](https://docs.opencv.org/) |
-| **scikit-image** | Latest | Image processing algorithms for SciPy | [Website](https://scikit-image.org/) \| [Docs](https://scikit-image.org/docs/stable/) |
-| **imageio** | Latest | Read/write images in various formats | [Website](https://imageio.readthedocs.io/) \| [Docs](https://imageio.readthedocs.io/en/stable/) |
-| **Ultralytics YOLO** | Latest | State-of-the-art object detection (YOLOv8+) | [Website](https://ultralytics.com/) \| [Docs](https://docs.ultralytics.com/) |
+| Library | Description | Links |
+|---------|-------------|-------|
+| **Pillow** | Python Imaging Library (PIL) fork for image processing | [Website](https://pillow.readthedocs.io/) \| [Docs](https://pillow.readthedocs.io/en/stable/) |
+| **OpenCV** | Computer vision and image processing library (headless) | [Website](https://opencv.org/) \| [Docs](https://docs.opencv.org/) |
+| **scikit-image** | Image processing algorithms for SciPy | [Website](https://scikit-image.org/) \| [Docs](https://scikit-image.org/docs/stable/) |
+| **imageio** | Read/write images in various formats | [Website](https://imageio.readthedocs.io/) \| [Docs](https://imageio.readthedocs.io/en/stable/) |
+| **Ultralytics YOLO** | State-of-the-art object detection (YOLOv8+) | [Website](https://ultralytics.com/) \| [Docs](https://docs.ultralytics.com/) |
 
 ### Data I/O and Serialization
 
-| Library | Version | Description | Links |
-|---------|---------|-------------|-------|
-| **orjson** | Latest | Fast JSON library (10x faster than stdlib) | [GitHub](https://github.com/ijl/orjson) |
-| **ujson** | Latest | Ultra-fast JSON encoder/decoder | [GitHub](https://github.com/ultrajson/ultrajson) |
-| **simplejson** | Latest | JSON encoder/decoder with extra features | [GitHub](https://github.com/simplejson/simplejson) |
-| **lxml** | Latest | Fast XML and HTML processing | [Website](https://lxml.de/) |
-| **xmltodict** | Latest | Work with XML like JSON | [GitHub](https://github.com/martinblech/xmltodict) |
-| **BeautifulSoup4** | Latest | HTML/XML parsing and scraping | [Docs](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) |
-| **PyYAML** | Latest | YAML parser and emitter | [Website](https://pyyaml.org/) |
-| **openpyxl** | Latest | Read/write Excel 2010+ files | [Docs](https://openpyxl.readthedocs.io/) |
-| **xlrd** | Latest | Read Excel files | [GitHub](https://github.com/python-excel/xlrd) |
-| **PyArrow** | Latest | Apache Arrow for columnar data | [Website](https://arrow.apache.org/docs/python/) |
-| **fastparquet** | Latest | Parquet format support | [GitHub](https://github.com/dask/fastparquet) |
-| **h5py** | Latest | HDF5 binary data format | [Website](https://www.h5py.org/) |
-| **PyTables** | Latest | HDF5 with advanced indexing | [Website](https://www.pytables.org/) |
+| Library | Description | Links |
+|---------|-------------|-------|
+| **orjson** | Fast JSON library (10x faster than stdlib) | [GitHub](https://github.com/ijl/orjson) |
+| **ujson** | Ultra-fast JSON encoder/decoder | [GitHub](https://github.com/ultrajson/ultrajson) |
+| **simplejson** | JSON encoder/decoder with extra features | [GitHub](https://github.com/simplejson/simplejson) |
+| **lxml** | Fast XML and HTML processing | [Website](https://lxml.de/) |
+| **xmltodict** | Work with XML like JSON | [GitHub](https://github.com/martinblech/xmltodict) |
+| **BeautifulSoup4** | HTML/XML parsing and scraping | [Docs](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) |
+| **PyYAML** | YAML parser and emitter | [Website](https://pyyaml.org/) |
+| **openpyxl** | Read/write Excel 2010+ files | [Docs](https://openpyxl.readthedocs.io/) |
+| **xlrd** | Read Excel files | [GitHub](https://github.com/python-excel/xlrd) |
+| **PyArrow** | Apache Arrow for columnar data | [Website](https://arrow.apache.org/docs/python/) |
+| **fastparquet** | Parquet format support | [GitHub](https://github.com/dask/fastparquet) |
+| **h5py** | HDF5 binary data format | [Website](https://www.h5py.org/) |
+| **PyTables** | HDF5 with advanced indexing | [Website](https://www.pytables.org/) |
 
 ### HTTP and API Clients
 
-| Library | Version | Description | Links |
-|---------|---------|-------------|-------|
-| **Requests** | Latest | HTTP library for humans | [Website](https://requests.readthedocs.io/) |
-| **HTTPX** | Latest | Modern HTTP client with async support | [Website](https://www.python-httpx.org/) |
-| **aiohttp** | Latest | Async HTTP client/server | [Website](https://docs.aiohttp.org/) |
+| Library | Description | Links |
+|---------|-------------|-------|
+| **Requests** | HTTP library for humans | [Website](https://requests.readthedocs.io/) |
+| **HTTPX** | Modern HTTP client with async support | [Website](https://www.python-httpx.org/) |
+| **aiohttp** | Async HTTP client/server | [Website](https://docs.aiohttp.org/) |
 
 ### Utilities
 
-| Library | Version | Description | Links |
-|---------|---------|-------------|-------|
-| **Pydantic** | Latest | Data validation using Python type hints | [Website](https://docs.pydantic.dev/) |
-| **tqdm** | Latest | Progress bars for loops | [GitHub](https://github.com/tqdm/tqdm) |
-| **Loguru** | Latest | Simple and powerful logging | [GitHub](https://github.com/Delgan/loguru) |
-| **python-dotenv** | Latest | Read .env files | [GitHub](https://github.com/theskumar/python-dotenv) |
-| **joblib** | Latest | Efficient serialization and parallelism | [Website](https://joblib.readthedocs.io/) |
-| **toolz** | Latest | Functional programming utilities | [Website](https://toolz.readthedocs.io/) |
-| **more-itertools** | Latest | Extended iteration tools | [Website](https://more-itertools.readthedocs.io/) |
-| **python-dateutil** | Latest | Powerful date/time utilities | [Website](https://dateutil.readthedocs.io/) |
-| **pytz** | Latest | Timezone definitions | [Website](https://pythonhosted.org/pytz/) |
-| **pendulum** | Latest | Easy datetime manipulation | [Website](https://pendulum.eustace.io/) |
+| Library | Description | Links |
+|---------|-------------|-------|
+| **Pydantic** | Data validation using Python type hints | [Website](https://docs.pydantic.dev/) |
+| **tqdm** | Progress bars for loops | [GitHub](https://github.com/tqdm/tqdm) |
+| **Loguru** | Simple and powerful logging | [GitHub](https://github.com/Delgan/loguru) |
+| **python-dotenv** | Read .env files | [GitHub](https://github.com/theskumar/python-dotenv) |
+| **joblib** | Efficient serialization and parallelism | [Website](https://joblib.readthedocs.io/) |
+| **toolz** | Functional programming utilities | [Website](https://toolz.readthedocs.io/) |
+| **more-itertools** | Extended iteration tools | [Website](https://more-itertools.readthedocs.io/) |
+| **python-dateutil** | Powerful date/time utilities | [Website](https://dateutil.readthedocs.io/) |
+| **pytz** | Timezone definitions | [Website](https://pythonhosted.org/pytz/) |
+| **pendulum** | Easy datetime manipulation | [Website](https://pendulum.eustace.io/) |
 
 ## Example Files
 
