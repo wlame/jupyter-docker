@@ -5,16 +5,61 @@ description = "Scientific computing with NumPy, SciPy, and Pandas"
 requires-python = ">=3.13"
 
 dependencies = [
+    # ========================================
+    # BASE dependencies
+    # ========================================
+    # Interactive Python
+    "ipython==9.9.0",
+    "jupyter==1.1.1",
+    "jupyterlab==4.5.2",
+
+    # JSON libraries
+    "orjson==3.11.5",
+    "ujson==5.11.0",
+    "simplejson==3.20.2",
+
+    # XML/HTML processing
+    "lxml==6.0.2",
+    "xmltodict==1.0.2",
+    "beautifulsoup4==4.14.3",
+
+    # YAML
+    "pyyaml==6.0.3",
+
+    # HTTP clients
+    "requests==2.32.5",
+    "httpx==0.28.1",
+    "aiohttp==3.13.3",
+
+    # Data validation
+    "pydantic==2.12.5",
+
+    # Utilities
+    "tqdm==4.67.1",
+    "loguru==0.7.3",
+    "python-dotenv==1.2.1",
+    "joblib==1.5.3",
+    "toolz==1.1.0",
+    "more-itertools==10.8.0",
+
+    # Date/time
+    "python-dateutil==2.9.0.post0",
+    "pytz==2025.2",
+    "pendulum==3.1.0",
+
+    # ========================================
+    # SCIENTIFIC dependencies
+    # ========================================
     # Core scientific computing
-    "numpy>=1.26.0",
-    "scipy>=1.11.0",
-    "pandas>=2.1.0",
+    "numpy==2.4.1",
+    "scipy==1.17.0",
+    "pandas==2.3.3",
 
     # Statistical modeling
-    "statsmodels>=0.14.0",
+    "statsmodels==0.14.6",
 
     # Symbolic mathematics
-    "sympy>=1.12.0",
+    "sympy==1.14.0",
 ]
 
 [build-system]

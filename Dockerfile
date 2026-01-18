@@ -114,12 +114,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Merge pyproject.toml dependencies
-COPY --chown=jupyter:jupyter targets/scientific/pyproject.toml /home/jupyter/pyproject-scientific.toml
+# Replace pyproject.toml with scientific version (includes all base + scientific deps)
+COPY --chown=jupyter:jupyter targets/scientific/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/scientific/verify_imports.py /home/jupyter/scripts/verify_scientific.py
 
-# Install scientific packages on top of base
-RUN uv pip install --python /home/jupyter/.venv/bin/python numpy scipy pandas statsmodels sympy
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 USER jupyter
 
@@ -139,11 +139,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --chown=jupyter:jupyter targets/visualization/pyproject.toml /home/jupyter/pyproject-visualization.toml
+# Replace pyproject.toml with visualization version (includes all base + visualization deps)
+COPY --chown=jupyter:jupyter targets/visualization/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/visualization/verify_imports.py /home/jupyter/scripts/verify_visualization.py
 
-# Install visualization packages
-RUN uv pip install --python /home/jupyter/.venv/bin/python matplotlib seaborn plotly bokeh holoviews hvplot panel altair
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 USER jupyter
 
@@ -161,11 +162,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --chown=jupyter:jupyter targets/dataio/pyproject.toml /home/jupyter/pyproject-dataio.toml
+# Replace pyproject.toml with dataio version (includes all base + dataio deps)
+COPY --chown=jupyter:jupyter targets/dataio/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/dataio/verify_imports.py /home/jupyter/scripts/verify_dataio.py
 
-# Install dataio packages
-RUN uv pip install --python /home/jupyter/.venv/bin/python pyarrow fastparquet h5py tables openpyxl xlrd sqlalchemy
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 USER jupyter
 
@@ -177,11 +179,12 @@ FROM scientific AS ml
 
 USER root
 
-COPY --chown=jupyter:jupyter targets/ml/pyproject.toml /home/jupyter/pyproject-ml.toml
+# Replace pyproject.toml with ml version (includes all base + scientific + ml deps)
+COPY --chown=jupyter:jupyter targets/ml/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/ml/verify_imports.py /home/jupyter/scripts/verify_ml.py
 
-# Install ML packages
-RUN uv pip install --python /home/jupyter/.venv/bin/python scikit-learn xgboost lightgbm imbalanced-learn optuna
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 USER jupyter
 
@@ -193,11 +196,12 @@ FROM ml AS deeplearn
 
 USER root
 
-COPY --chown=jupyter:jupyter targets/deeplearn/pyproject.toml /home/jupyter/pyproject-deeplearn.toml
+# Replace pyproject.toml with deeplearn version (includes all base + scientific + ml + deeplearn deps)
+COPY --chown=jupyter:jupyter targets/deeplearn/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/deeplearn/verify_imports.py /home/jupyter/scripts/verify_deeplearn.py
 
-# Install deep learning packages
-RUN uv pip install --python /home/jupyter/.venv/bin/python torch torchvision tensorflow keras
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 USER jupyter
 
@@ -222,11 +226,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --chown=jupyter:jupyter targets/vision/pyproject.toml /home/jupyter/pyproject-vision.toml
+# Replace pyproject.toml with vision version (includes all base + vision deps)
+COPY --chown=jupyter:jupyter targets/vision/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/vision/verify_imports.py /home/jupyter/scripts/verify_vision.py
 
-# Install vision packages (numpy needed by opencv/scikit-image)
-RUN uv pip install --python /home/jupyter/.venv/bin/python numpy pillow opencv-python-headless scikit-image imageio ultralytics
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 USER jupyter
 
@@ -248,11 +253,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --chown=jupyter:jupyter targets/audio/pyproject.toml /home/jupyter/pyproject-audio.toml
+# Replace pyproject.toml with audio version (includes all base + audio deps)
+COPY --chown=jupyter:jupyter targets/audio/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/audio/verify_imports.py /home/jupyter/scripts/verify_audio.py
 
-# Install audio packages (torch needed by torchaudio)
-RUN uv pip install --python /home/jupyter/.venv/bin/python numpy torch torchaudio librosa soundfile pydub audioread
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 USER jupyter
 
@@ -277,11 +283,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --chown=jupyter:jupyter targets/geospatial/pyproject.toml /home/jupyter/pyproject-geospatial.toml
+# Replace pyproject.toml with geospatial version (includes all deps)
+COPY --chown=jupyter:jupyter targets/geospatial/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/geospatial/verify_imports.py /home/jupyter/scripts/verify_geospatial.py
 
-# Install geospatial packages
-RUN uv pip install --python /home/jupyter/.venv/bin/python matplotlib cartopy geopandas shapely pyproj folium geoviews
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 USER jupyter
 
@@ -293,11 +300,12 @@ FROM scientific AS timeseries
 
 USER root
 
-COPY --chown=jupyter:jupyter targets/timeseries/pyproject.toml /home/jupyter/pyproject-timeseries.toml
+# Replace pyproject.toml with timeseries version (includes all deps)
+COPY --chown=jupyter:jupyter targets/timeseries/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/timeseries/verify_imports.py /home/jupyter/scripts/verify_timeseries.py
 
-# Install timeseries packages
-RUN uv pip install --python /home/jupyter/.venv/bin/python tsfresh sktime pmdarima prophet
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 USER jupyter
 
@@ -317,11 +325,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --chown=jupyter:jupyter targets/nlp/pyproject.toml /home/jupyter/pyproject-nlp.toml
+# Replace pyproject.toml with nlp version (includes all deps)
+COPY --chown=jupyter:jupyter targets/nlp/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/nlp/verify_imports.py /home/jupyter/scripts/verify_nlp.py
 
-# Install NLP packages (torch needed by transformers)
-RUN uv pip install --python /home/jupyter/.venv/bin/python numpy torch spacy nltk transformers sentence-transformers tokenizers
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 USER jupyter
 
