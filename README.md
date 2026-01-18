@@ -15,19 +15,35 @@ docker build -t datascience-notebook .
 ### Run the Container
 
 ```bash
-docker run -p 8888:8888 -v $(pwd)/notebooks:/home/jupyter/notebooks datascience-notebook
+docker run -p 8888:8888 \
+  -v $(pwd)/notebooks:/home/jupyter/notebooks \
+  -v $(pwd)/examples:/home/jupyter/examples \
+  -v $(pwd)/data:/home/jupyter/data \
+  datascience-notebook
 ```
 
 Access Jupyter Lab at: **http://localhost:8888**
 
-### Run with Persistent Data
+This mounts local directories into the container, so:
+- Changes made outside the container are immediately visible inside
+- Work created inside the container persists after the container stops
+- No rebuild needed when you modify files
+
+### Directory Mounts Explained
+
+| Local Directory | Container Path | Purpose |
+|-----------------|----------------|---------|
+| `./notebooks` | `/home/jupyter/notebooks` | Your Jupyter notebooks |
+| `./examples` | `/home/jupyter/examples` | Example scripts and notebooks |
+| `./data` | `/home/jupyter/data` | Data files for analysis |
+
+### Minimal Run (No Persistence)
 
 ```bash
-docker run -p 8888:8888 \
-  -v $(pwd)/notebooks:/home/jupyter/notebooks \
-  -v $(pwd)/data:/home/jupyter/data \
-  datascience-notebook
+docker run -p 8888:8888 datascience-notebook
 ```
+
+**Note**: Without volume mounts, all work is lost when the container stops.
 
 ## Installed Libraries
 
@@ -147,33 +163,39 @@ docker run -p 8888:8888 \
 
 ## Example Files
 
-The `examples/` directory contains boilerplate scripts demonstrating library usage:
+The `examples/` directory contains both Python scripts (`.py`) and Jupyter notebooks (`.ipynb`) demonstrating library usage:
 
-| File | Description |
-|------|-------------|
-| `01_numpy_scipy_basics.py` | NumPy arrays, SciPy statistics and optimization |
-| `02_pandas_data_analysis.py` | DataFrame operations, grouping, time series |
-| `03_matplotlib_seaborn_viz.py` | Static visualizations and statistical plots |
-| `04_plotly_interactive.py` | Interactive charts, 3D plots, animations |
-| `05_bokeh_holoviews.py` | Bokeh dashboards, HoloViews declarative viz |
-| `06_geospatial.py` | Cartopy maps, GeoPandas, Folium interactive maps |
-| `07_timeseries_analysis.py` | Time series decomposition, ARIMA, feature extraction |
-| `08_data_io_serialization.py` | JSON, XML, YAML, Parquet, HDF5 I/O |
-| `09_machine_learning.py` | Classification, regression, clustering |
-| `10_deep_learning_pytorch.py` | PyTorch tensors, autograd, neural networks, TorchVision, TorchAudio |
-| `11_deep_learning_tensorflow.py` | TensorFlow tensors, Keras models, training loops, callbacks |
-| `12_image_processing.py` | PIL, OpenCV, scikit-image, imageio operations |
-| `13_object_detection_yolo.py` | Ultralytics YOLOv8 object detection |
+| Example | Description |
+|---------|-------------|
+| `01_numpy_scipy_basics` | NumPy arrays, SciPy statistics and optimization |
+| `02_pandas_data_analysis` | DataFrame operations, grouping, time series |
+| `03_matplotlib_seaborn_viz` | Static visualizations and statistical plots |
+| `04_plotly_interactive` | Interactive charts, 3D plots, animations |
+| `05_bokeh_holoviews` | Bokeh dashboards, HoloViews declarative viz |
+| `06_geospatial` | Cartopy maps, GeoPandas, Folium interactive maps |
+| `07_timeseries_analysis` | Time series decomposition, ARIMA, feature extraction |
+| `08_data_io_serialization` | JSON, XML, YAML, Parquet, HDF5 I/O |
+| `09_machine_learning` | Classification, regression, clustering |
+| `10_deep_learning_pytorch` | PyTorch tensors, autograd, neural networks, TorchVision, TorchAudio |
+| `11_deep_learning_tensorflow` | TensorFlow tensors, Keras models, training loops, callbacks |
+| `12_image_processing` | PIL, OpenCV, scikit-image, imageio operations |
+| `13_object_detection_yolo` | Ultralytics YOLOv8 object detection |
+
+Each example is available in two formats:
+- **`.py`** - Python script (can be run from command line)
+- **`.ipynb`** - Jupyter notebook (interactive, with documentation)
 
 ### Running Examples
 
-Inside the container:
+**In Jupyter Lab** (recommended): Open any `.ipynb` file from the examples folder.
+
+**From command line** (inside container):
 
 ```bash
-# Run an example script
+# Run a Python script
 uv run python examples/01_numpy_scipy_basics.py
 
-# Or run all examples
+# Or run all Python examples
 for f in examples/*.py; do uv run python "$f"; done
 ```
 
@@ -195,30 +217,48 @@ docker build --no-cache -t datascience-notebook .
 # Test that all packages are installed correctly:
 docker run --rm datascience-notebook uv run python /home/jupyter/scripts/verify_imports.py
 
-# Basic run
-docker run -p 8888:8888 datascience-notebook
-
-# With volume mounts for persistence
+# Recommended: Run with all volume mounts (live file updates)
 docker run -p 8888:8888 \
   -v $(pwd)/notebooks:/home/jupyter/notebooks \
+  -v $(pwd)/examples:/home/jupyter/examples \
   -v $(pwd)/data:/home/jupyter/data \
   datascience-notebook
 
-# Run in detached mode
-docker run -d -p 8888:8888 --name jupyter datascience-notebook
+# Run in detached mode with volume mounts
+docker run -d -p 8888:8888 --name jupyter \
+  -v $(pwd)/notebooks:/home/jupyter/notebooks \
+  -v $(pwd)/examples:/home/jupyter/examples \
+  -v $(pwd)/data:/home/jupyter/data \
+  datascience-notebook
 
 # Run with custom port
-docker run -p 9999:8888 datascience-notebook
+docker run -p 9999:8888 \
+  -v $(pwd)/notebooks:/home/jupyter/notebooks \
+  -v $(pwd)/examples:/home/jupyter/examples \
+  datascience-notebook
 
 # Run with increased memory limit
-docker run -p 8888:8888 --memory=4g datascience-notebook
+docker run -p 8888:8888 --memory=4g \
+  -v $(pwd)/notebooks:/home/jupyter/notebooks \
+  -v $(pwd)/examples:/home/jupyter/examples \
+  datascience-notebook
 
 # Run with environment variables
-docker run -p 8888:8888 -e MY_VAR=value datascience-notebook
+docker run -p 8888:8888 -e MY_VAR=value \
+  -v $(pwd)/notebooks:/home/jupyter/notebooks \
+  datascience-notebook
 ```
 
-## Run an iPython shell
+### Run IPython Shell
+
 ```bash
+# Interactive IPython with volume mounts
+docker run --rm -it \
+  -v $(pwd)/notebooks:/home/jupyter/notebooks \
+  -v $(pwd)/data:/home/jupyter/data \
+  datascience-notebook uv run ipython
+
+# Quick IPython without mounts
 docker run --rm -it datascience-notebook uv run ipython
 ```
 
