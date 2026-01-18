@@ -177,15 +177,6 @@ uv run python examples/01_numpy_scipy_basics.py
 for f in examples/*.py; do uv run python "$f"; done
 ```
 
-## Verifying Installation
-
-The container includes a verification script to check all package imports:
-
-```bash
-# Inside the container
-uv run python scripts/verify_imports.py
-```
-
 ## Docker Commands Reference
 
 ### Build
@@ -201,6 +192,9 @@ docker build --no-cache -t datascience-notebook .
 ### Run
 
 ```bash
+# Test that all packages are installed correctly:
+docker run --rm datascience-notebook uv run python /home/jupyter/scripts/verify_imports.py
+
 # Basic run
 docker run -p 8888:8888 datascience-notebook
 
@@ -223,69 +217,20 @@ docker run -p 8888:8888 --memory=4g datascience-notebook
 docker run -p 8888:8888 -e MY_VAR=value datascience-notebook
 ```
 
-### Management
+## Run an iPython shell
+```bash
+docker run --rm -it datascience-notebook uv run ipython
+```
+
+## Security Note
+
+The default configuration has **no authentication** for convenience in local development. For production or shared environments, use a token:
 
 ```bash
-# Stop container
-docker stop jupyter
-
-# Start stopped container
-docker start jupyter
-
-# Remove container
-docker rm jupyter
-
-# View logs
-docker logs jupyter
-
-# Execute command in running container
-docker exec -it jupyter bash
-
-# Execute Python in container
-docker exec -it jupyter uv run python -c "import numpy; print(numpy.__version__)"
-```
-
-### Cleanup
-
-```bash
-# Remove image
-docker rmi datascience-notebook
-
-# Remove all stopped containers
-docker container prune
-
-# Remove unused images
-docker image prune
-```
-
-## Directory Structure
-
-```
-.
-├── Dockerfile              # Container definition
-├── pyproject.toml          # Project dependencies (uv)
-├── uv.lock                  # Lock file (generated)
-├── README.md               # This file
-├── INSTRUCTIONS.md         # Quick start guide
-├── notebooks/              # Your Jupyter notebooks (mounted)
-├── data/                   # Your datasets (mounted)
-├── examples/               # Example scripts
-│   ├── output/             # Generated visualizations
-│   ├── 01_numpy_scipy_basics.py
-│   ├── 02_pandas_data_analysis.py
-│   ├── 03_matplotlib_seaborn_viz.py
-│   ├── 04_plotly_interactive.py
-│   ├── 05_bokeh_holoviews.py
-│   ├── 06_geospatial.py
-│   ├── 07_timeseries_analysis.py
-│   ├── 08_data_io_serialization.py
-│   ├── 09_machine_learning.py
-│   ├── 10_deep_learning_pytorch.py
-│   ├── 11_deep_learning_tensorflow.py
-│   ├── 12_image_processing.py
-│   └── 13_object_detection_yolo.py
-└── scripts/
-    └── verify_imports.py   # Package verification script
+docker run -p 8888:8888 \
+  -e JUPYTER_TOKEN=your-secret-token \
+  datascience-notebook \
+  uv run jupyter lab --ip=0.0.0.0 --IdentityProvider.token='your-secret-token'
 ```
 
 ## Container Details
@@ -297,25 +242,6 @@ docker image prune
 - **Exposed Port**: `8888`
 - **Default Command**: `uv run jupyter lab --ip=0.0.0.0 --port=8888 --no-browser`
 
-## Customization
-
-### Adding More Packages
-
-To add additional packages, edit `pyproject.toml` and rebuild:
-
-```toml
-# Add to the dependencies list in pyproject.toml
-dependencies = [
-    # ... existing packages ...
-    "your-package-here",
-]
-```
-
-Then rebuild the image:
-
-```bash
-docker build -t datascience-notebook .
-```
 
 ### Using a Password
 
@@ -336,38 +262,3 @@ docker run --gpus all -p 8888:8888 datascience-notebook
 ```
 
 Note: Requires NVIDIA Container Toolkit and GPU-compatible packages to be added to Dockerfile.
-
-## Troubleshooting
-
-### Container Won't Start
-
-Check if port 8888 is already in use:
-```bash
-lsof -i :8888
-```
-
-### Import Errors
-
-Run the verification script to identify issues:
-```bash
-docker exec -it jupyter uv run python scripts/verify_imports.py
-```
-
-### Out of Memory
-
-Increase Docker memory limit in Docker Desktop settings or use `--memory` flag.
-
-## License
-
-This Dockerfile and example code are provided under the MIT License.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Submit a pull request
-
-## Support
-
-For issues and feature requests, please open an issue in the repository.
