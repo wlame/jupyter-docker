@@ -5,18 +5,69 @@ description = "Audio processing and analysis"
 requires-python = ">=3.13"
 
 dependencies = [
+    # ========================================
+    # BASE dependencies
+    # ========================================
+    # Interactive Python
+    "ipython==9.9.0",
+    "jupyter==1.1.1",
+    "jupyterlab==4.5.2",
+
+    # JSON libraries
+    "orjson==3.11.5",
+    "ujson==5.11.0",
+    "simplejson==3.20.2",
+
+    # XML/HTML processing
+    "lxml==6.0.2",
+    "xmltodict==1.0.2",
+    "beautifulsoup4==4.14.3",
+
+    # YAML
+    "pyyaml==6.0.3",
+
+    # HTTP clients
+    "requests==2.32.5",
+    "httpx==0.28.1",
+    "aiohttp==3.13.3",
+
+    # Data validation
+    "pydantic==2.12.5",
+
+    # Utilities
+    "tqdm==4.67.1",
+    "loguru==0.7.3",
+    "python-dotenv==1.2.1",
+    "joblib==1.5.3",
+    "toolz==1.1.0",
+    "more-itertools==10.8.0",
+
+    # Date/time
+    "python-dateutil==2.9.0.post0",
+    "pytz==2025.2",
+    "pendulum==3.1.0",
+
+    # ========================================
+    # AUDIO dependencies (needs numpy and torch)
+    # ========================================
+    # numpy 2.3.x required for numba compatibility (numba requires numpy<2.4)
+    "numpy==2.3.5",
+    "torch==2.9.1",
+
     # PyTorch audio
-    "torchaudio>=2.1.0",
+    "torchaudio==2.9.1",
 
     # Audio analysis
-    "librosa>=0.10.0",
+    "librosa==0.11.0",
+    # numba/llvmlite for Python 3.13 compatibility (librosa dependency)
+    "numba>=0.60.0",
 
     # Audio I/O
-    "soundfile>=0.12.0",
-    "pydub>=0.25.0",
+    "soundfile==0.13.1",
+    "pydub==0.25.1",
 
     # Audio features
-    "audioread>=3.0.0",
+    "audioread==3.1.0",
 ]
 
 [build-system]

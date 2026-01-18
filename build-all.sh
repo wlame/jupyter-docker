@@ -38,9 +38,50 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Track results
-declare -A BUILD_RESULTS
-declare -A TEST_RESULTS
+# Track results using parallel arrays (bash 3.x compatible)
+BUILD_RESULT_TARGETS=()
+BUILD_RESULT_VALUES=()
+TEST_RESULT_TARGETS=()
+TEST_RESULT_VALUES=()
+
+# Helper functions to simulate associative arrays
+set_build_result() {
+    local target=$1
+    local value=$2
+    BUILD_RESULT_TARGETS+=("$target")
+    BUILD_RESULT_VALUES+=("$value")
+}
+
+get_build_result() {
+    local target=$1
+    local i
+    for i in "${!BUILD_RESULT_TARGETS[@]}"; do
+        if [ "${BUILD_RESULT_TARGETS[$i]}" = "$target" ]; then
+            echo "${BUILD_RESULT_VALUES[$i]}"
+            return
+        fi
+    done
+    echo "skipped"
+}
+
+set_test_result() {
+    local target=$1
+    local value=$2
+    TEST_RESULT_TARGETS+=("$target")
+    TEST_RESULT_VALUES+=("$value")
+}
+
+get_test_result() {
+    local target=$1
+    local i
+    for i in "${!TEST_RESULT_TARGETS[@]}"; do
+        if [ "${TEST_RESULT_TARGETS[$i]}" = "$target" ]; then
+            echo "${TEST_RESULT_VALUES[$i]}"
+            return
+        fi
+    done
+    echo "skipped"
+}
 
 print_header() {
     echo ""
@@ -72,11 +113,11 @@ build_target() {
     echo ""
 
     if docker build --target "${target}" -t "${image_name}" -f "${DOCKERFILE}" .; then
-        BUILD_RESULTS[$target]="success"
+        set_build_result "$target" "success"
         print_success "Built ${image_name}"
         return 0
     else
-        BUILD_RESULTS[$target]="failed"
+        set_build_result "$target" "failed"
         print_error "Failed to build ${image_name}"
         return 1
     fi
@@ -92,27 +133,27 @@ test_target() {
     # Check if image exists
     if ! docker image inspect "${image_name}" &> /dev/null; then
         print_error "Image ${image_name} not found. Build it first."
-        TEST_RESULTS[$target]="not_found"
+        set_test_result "$target" "not_found"
         return 1
     fi
 
     # Determine which verification script to use
     local verify_script
-    if [ "${target}" = "full" ]; then
+    if [ "${target}" = "full" ] || [ "${target}" = "base" ]; then
         verify_script="/home/jupyter/scripts/verify_imports.py"
     else
         verify_script="/home/jupyter/scripts/verify_${target}.py"
     fi
 
-    echo "  Running: docker run --rm ${image_name} uv run python ${verify_script}"
+    echo "  Running: docker run --rm ${image_name} uv run --no-project python ${verify_script}"
     echo ""
 
-    if docker run --rm "${image_name}" uv run python "${verify_script}"; then
-        TEST_RESULTS[$target]="success"
+    if docker run --rm "${image_name}" uv run --no-project python "${verify_script}"; then
+        set_test_result "$target" "success"
         print_success "Tests passed for ${image_name}"
         return 0
     else
-        TEST_RESULTS[$target]="failed"
+        set_test_result "$target" "failed"
         print_error "Tests failed for ${image_name}"
         return 1
     fi
@@ -130,7 +171,8 @@ print_summary() {
     echo "Build Results:"
     echo "--------------"
     for target in "${TARGETS[@]}"; do
-        local result="${BUILD_RESULTS[$target]:-skipped}"
+        local result
+        result=$(get_build_result "$target")
         local image_name="${IMAGE_PREFIX}-${target}"
         local size=""
 
@@ -149,7 +191,8 @@ print_summary() {
         echo "Test Results:"
         echo "-------------"
         for target in "${TARGETS[@]}"; do
-            local result="${TEST_RESULTS[$target]:-skipped}"
+            local result
+            result=$(get_test_result "$target")
             if [ "$result" = "success" ]; then
                 print_success "${target}"
             elif [ "$result" = "failed" ]; then
@@ -169,8 +212,11 @@ print_summary() {
     local test_failures=0
 
     for target in "${TARGETS[@]}"; do
-        [ "${BUILD_RESULTS[$target]}" = "failed" ] && ((build_failures++))
-        [ "${TEST_RESULTS[$target]}" = "failed" ] && ((test_failures++))
+        local build_res test_res
+        build_res=$(get_build_result "$target")
+        test_res=$(get_test_result "$target")
+        [ "$build_res" = "failed" ] && build_failures=$((build_failures + 1))
+        [ "$test_res" = "failed" ] && test_failures=$((test_failures + 1))
     done
 
     if [ $build_failures -eq 0 ] && [ $test_failures -eq 0 ]; then
