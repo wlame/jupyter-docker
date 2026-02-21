@@ -1,0 +1,158 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel in-flight runs for the same ref when a new push arrives.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # ─── Tier 1 ──────────────────────────────────────────────────────────────────
+  base:
+    name: base
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: base
+
+  # ─── Tier 2 — parallel, all FROM base ────────────────────────────────────────
+  scientific:
+    name: scientific
+    needs: base
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: scientific
+          cache-from: type=gha,scope=base
+
+  visualization:
+    name: visualization
+    needs: base
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: visualization
+          cache-from: type=gha,scope=base
+
+  dataio:
+    name: dataio
+    needs: base
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: dataio
+          cache-from: type=gha,scope=base
+
+  vision:
+    name: vision
+    needs: base
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: vision
+          cache-from: type=gha,scope=base
+
+  audio:
+    name: audio
+    needs: base
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: audio
+          cache-from: type=gha,scope=base
+
+  nlp:
+    name: nlp
+    needs: base
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: nlp
+          cache-from: type=gha,scope=base
+
+  # ─── Tier 3 — parallel, FROM scientific ──────────────────────────────────────
+  ml:
+    name: ml
+    needs: scientific
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: ml
+          cache-from: |
+            type=gha,scope=base
+            type=gha,scope=scientific
+
+  geospatial:
+    name: geospatial
+    needs: scientific
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: geospatial
+          cache-from: |
+            type=gha,scope=base
+            type=gha,scope=scientific
+
+  timeseries:
+    name: timeseries
+    needs: scientific
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: timeseries
+          cache-from: |
+            type=gha,scope=base
+            type=gha,scope=scientific
+
+  # ─── Tier 4 — FROM ml, main branch only (PyTorch + TensorFlow, large image) ──
+  deeplearn:
+    name: deeplearn
+    needs: ml
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: deeplearn
+          cache-from: |
+            type=gha,scope=base
+            type=gha,scope=scientific
+            type=gha,scope=ml

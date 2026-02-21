@@ -1,0 +1,40 @@
+name: 'Build and Test Docker Target'
+description: 'Build a single Docker target with GHA layer-caching and run its test suite'
+
+inputs:
+  target:
+    description: 'Docker build target name (base, scientific, ml, …)'
+    required: true
+  cache-from:
+    description: >
+      Extra cache sources beyond this target's own scope.
+      One "type=gha,scope=<name>" entry per line.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build ${{ inputs.target }}
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        target: ${{ inputs.target }}
+        tags: ds-${{ inputs.target }}
+        load: true
+        cache-from: |
+          type=gha,scope=${{ inputs.target }}
+          ${{ inputs.cache-from }}
+        cache-to: type=gha,scope=${{ inputs.target }},mode=max
+
+    - name: Test ${{ inputs.target }}
+      shell: bash
+      run: ./build-all.sh --test-only ${{ inputs.target }}
+
+    - name: Remove local image
+      if: always()
+      shell: bash
+      run: docker rmi ds-${{ inputs.target }} 2>/dev/null || true
