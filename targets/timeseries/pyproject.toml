@@ -84,8 +84,13 @@ dependencies = [
 
     # Forecasting
     "prophet==1.2.1",
-]
 
+    # Plotting (used by timeseries example scripts)
+    "matplotlib==3.10.8",
+    # Testing
+    "pytest",
+    "pytest-timeout",
+]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

@@ -14,8 +14,6 @@ Sentence transformer models download automatically on first use (~80 MB).
 """
 
 import os
-import sys
-import subprocess
 
 import numpy as np
 import matplotlib
@@ -73,17 +71,7 @@ print("=" * 60)
 try:
     import spacy
 
-    # Download model if missing
-    try:
-        nlp = spacy.load('en_core_web_sm')
-    except OSError:
-        print("Downloading en_core_web_sm...")
-        subprocess.run(
-            [sys.executable, '-m', 'spacy', 'download', 'en_core_web_sm'],
-            check=True,
-            capture_output=True,
-        )
-        nlp = spacy.load('en_core_web_sm')
+    nlp = spacy.load('en_core_web_sm')
 
     print("\nNamed Entity Recognition:")
     all_entities = []

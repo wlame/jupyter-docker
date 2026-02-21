@@ -60,8 +60,10 @@ dependencies = [
 
     # Object detection
     "ultralytics==8.4.5",
+    # Testing
+    "pytest",
+    "pytest-timeout",
 ]
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

@@ -160,7 +160,7 @@ print("=" * 60)
 chirp_signal = signal.chirp(t, f0=50, f1=300, t1=T, method='linear')
 chirp_noisy = chirp_signal + rng.normal(scale=0.3, size=len(t))
 
-stft = fft.ShortTimeFFT(
+stft = signal.ShortTimeFFT(
     win=signal.windows.hann(256),
     hop=64,
     fs=fs,

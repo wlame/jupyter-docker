@@ -285,7 +285,11 @@ with tempfile.NamedTemporaryFile(suffix=".h5", delete=False) as f:
     hdf_pandas_path = f.name
 
 # Write DataFrame to HDF5
-df_large.to_hdf(hdf_pandas_path, key="data", mode="w", complevel=5)
+# Cast StringDtype columns to object — PyTables doesn't support pandas 3.x StringDtype
+df_hdf_write = df_large.copy()
+str_cols = df_hdf_write.select_dtypes('string').columns
+df_hdf_write[str_cols] = df_hdf_write[str_cols].astype(object)
+df_hdf_write.to_hdf(hdf_pandas_path, key="data", mode="w", complevel=5)
 print(f"\nWritten DataFrame to HDF5 (Pandas): {os.path.getsize(hdf_pandas_path) / 1024:.2f} KB")
 
 # Read back

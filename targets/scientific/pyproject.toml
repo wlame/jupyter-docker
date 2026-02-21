@@ -60,6 +60,13 @@ dependencies = [
 
     # Symbolic mathematics
     "sympy==1.14.0",
+
+    # Plotting (needed for example scripts that visualise scipy results)
+    "matplotlib==3.10.8",
+
+    # Testing
+    "pytest",
+    "pytest-timeout",
 ]
 
 [build-system]

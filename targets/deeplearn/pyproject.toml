@@ -71,12 +71,15 @@ dependencies = [
     # PyTorch ecosystem
     "torch==2.9.1",
     "torchvision==0.24.1",
+    "torchaudio==2.9.1",
 
     # TensorFlow ecosystem
     "tensorflow==2.20.0",
     "keras==3.13.1",
+    # Testing
+    "pytest",
+    "pytest-timeout",
 ]
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

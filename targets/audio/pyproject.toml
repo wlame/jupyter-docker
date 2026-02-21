@@ -68,8 +68,14 @@ dependencies = [
 
     # Audio features
     "audioread==3.1.0",
-]
 
+    # Plotting (used by audio example scripts)
+    "matplotlib==3.10.8",
+
+    # Testing
+    "pytest",
+    "pytest-timeout",
+]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

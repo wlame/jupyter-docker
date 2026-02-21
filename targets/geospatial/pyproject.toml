@@ -68,8 +68,10 @@ dependencies = [
 
     # HoloViews geographic
     "geoviews==1.15.1",
+    # Testing
+    "pytest",
+    "pytest-timeout",
 ]
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
