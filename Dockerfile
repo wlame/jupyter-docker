@@ -82,8 +82,9 @@ COPY --chown=jupyter:jupyter targets/base/verify_imports.py /home/jupyter/script
 
 RUN uv lock && uv sync --no-install-project
 
-# Copy examples and scripts
+# Copy examples, tests, and scripts
 COPY --chown=jupyter:jupyter examples/ /home/jupyter/examples/
+COPY --chown=jupyter:jupyter tests/ /home/jupyter/tests/
 
 # Configure Jupyter
 USER jupyter
@@ -422,8 +423,9 @@ COPY --chown=jupyter:jupyter targets/full/verify_imports.py /home/jupyter/script
 
 RUN uv lock && uv sync --no-install-project
 
-# Copy examples and scripts
+# Copy examples, tests, and scripts
 COPY --chown=jupyter:jupyter examples/ /home/jupyter/examples/
+COPY --chown=jupyter:jupyter tests/ /home/jupyter/tests/
 COPY --chown=jupyter:jupyter targets/ /home/jupyter/targets/
 
 # Copy all verification scripts

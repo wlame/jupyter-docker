@@ -137,7 +137,7 @@ test_target() {
         return 1
     fi
 
-    # Determine which verification script to use
+    # --- Step 1: import verification (fast smoke test) ---
     local verify_script
     if [ "${target}" = "full" ] || [ "${target}" = "base" ]; then
         verify_script="/home/jupyter/scripts/verify_imports.py"
@@ -145,16 +145,54 @@ test_target() {
         verify_script="/home/jupyter/scripts/verify_${target}.py"
     fi
 
+    echo "  [1/2] Import verification"
     echo "  Running: docker run --rm ${image_name} uv run --no-project python ${verify_script}"
     echo ""
 
-    if docker run --rm "${image_name}" uv run --no-project python "${verify_script}"; then
+    if ! docker run --rm "${image_name}" uv run --no-project python "${verify_script}"; then
+        set_test_result "$target" "failed"
+        print_error "Import verification failed for ${image_name}"
+        return 1
+    fi
+
+    # --- Step 2: example smoke tests (run actual example scripts) ---
+    # base has no example tests; skip pytest for it.
+    if [ "${target}" = "base" ]; then
+        set_test_result "$target" "success"
+        print_success "Tests passed for ${image_name} (no examples for base target)"
+        return 0
+    fi
+
+    # Build pytest -m expression: full runs all marks, others run their own mark.
+    local pytest_marks
+    if [ "${target}" = "full" ]; then
+        # Run every marked test (skip slow/network-dependent by default)
+        pytest_marks="scientific or visualization or dataio or ml or deeplearn or vision or audio or geospatial or timeseries or nlp"
+    else
+        pytest_marks="${target}"
+    fi
+
+    echo ""
+    echo "  [2/2] Example smoke tests"
+    echo "  Running: docker run --rm ${image_name} uv run --no-project python -m pytest /home/jupyter/tests/ -m \"${pytest_marks}\" -v --timeout=300"
+    echo ""
+
+    # Exit code 5 means "no tests collected" — treat as success (mark not yet populated).
+    local pytest_exit
+    docker run --rm "${image_name}" \
+        uv run --no-project python -m pytest /home/jupyter/tests/ \
+        -m "${pytest_marks}" \
+        -v \
+        --timeout=300
+    pytest_exit=$?
+
+    if [ "${pytest_exit}" -eq 0 ] || [ "${pytest_exit}" -eq 5 ]; then
         set_test_result "$target" "success"
         print_success "Tests passed for ${image_name}"
         return 0
     else
         set_test_result "$target" "failed"
-        print_error "Tests failed for ${image_name}"
+        print_error "Example tests failed for ${image_name} (exit code ${pytest_exit})"
         return 1
     fi
 }

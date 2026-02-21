@@ -157,3 +157,4 @@ config.local.*
 tmp/
 temp/
 .claude/
+.serena/

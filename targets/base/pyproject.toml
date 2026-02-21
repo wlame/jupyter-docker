@@ -43,6 +43,10 @@ dependencies = [
     "python-dateutil==2.9.0.post0",
     "pytz==2025.2",
     "pendulum==3.1.0",
+
+    # Testing (available in all targets for running example smoke tests)
+    "pytest",
+    "pytest-timeout",
 ]
 
 [build-system]
