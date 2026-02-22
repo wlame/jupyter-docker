@@ -1,5 +1,5 @@
 name: 'Build and Test Docker Target'
-description: 'Build a single Docker target with GHA layer-caching and run its test suite'
+description: 'Build a single Docker target with GHA layer-caching, run its test suite, and optionally push to ghcr.io'
 
 inputs:
   target:
@@ -9,6 +9,18 @@ inputs:
     description: >
       Extra cache sources beyond this target's own scope.
       One "type=gha,scope=<name>" entry per line.
+    required: false
+    default: ''
+  push:
+    description: 'Push the image to ghcr.io after tests pass (true/false)'
+    required: false
+    default: 'false'
+  image-name:
+    description: 'Full image name without tag (e.g. ghcr.io/owner/repo)'
+    required: false
+    default: ''
+  registry-token:
+    description: 'Token for ghcr.io authentication (usually secrets.GITHUB_TOKEN)'
     required: false
     default: ''
 
@@ -34,7 +46,24 @@ runs:
       shell: bash
       run: ./build-all.sh --test-only ${{ inputs.target }}
 
-    - name: Remove local image
+    - name: Login to ghcr.io
+      if: inputs.push == 'true'
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ inputs.registry-token }}
+
+    - name: Push ${{ inputs.target }} to ghcr.io
+      if: inputs.push == 'true'
+      shell: bash
+      run: |
+        docker tag "ds-${{ inputs.target }}" "${{ inputs.image-name }}:${{ inputs.target }}"
+        docker push "${{ inputs.image-name }}:${{ inputs.target }}"
+
+    - name: Remove local images
       if: always()
       shell: bash
-      run: docker rmi ds-${{ inputs.target }} 2>/dev/null || true
+      run: |
+        docker rmi "ds-${{ inputs.target }}" 2>/dev/null || true
+        docker rmi "${{ inputs.image-name }}:${{ inputs.target }}" 2>/dev/null || true

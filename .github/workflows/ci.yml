@@ -11,6 +11,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+
 jobs:
 
   # ─── Tier 1 ──────────────────────────────────────────────────────────────────
@@ -23,6 +30,9 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: base
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   # ─── Tier 2 — parallel, all FROM base ────────────────────────────────────────
   scientific:
@@ -36,6 +46,9 @@ jobs:
         with:
           target: scientific
           cache-from: type=gha,scope=base
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   visualization:
     name: visualization
@@ -48,6 +61,9 @@ jobs:
         with:
           target: visualization
           cache-from: type=gha,scope=base
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   dataio:
     name: dataio
@@ -60,6 +76,9 @@ jobs:
         with:
           target: dataio
           cache-from: type=gha,scope=base
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   vision:
     name: vision
@@ -72,6 +91,9 @@ jobs:
         with:
           target: vision
           cache-from: type=gha,scope=base
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   audio:
     name: audio
@@ -84,6 +106,9 @@ jobs:
         with:
           target: audio
           cache-from: type=gha,scope=base
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   nlp:
     name: nlp
@@ -96,6 +121,9 @@ jobs:
         with:
           target: nlp
           cache-from: type=gha,scope=base
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   # ─── Tier 3 — parallel, FROM scientific ──────────────────────────────────────
   ml:
@@ -111,6 +139,9 @@ jobs:
           cache-from: |
             type=gha,scope=base
             type=gha,scope=scientific
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   geospatial:
     name: geospatial
@@ -125,6 +156,9 @@ jobs:
           cache-from: |
             type=gha,scope=base
             type=gha,scope=scientific
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   timeseries:
     name: timeseries
@@ -139,6 +173,9 @@ jobs:
           cache-from: |
             type=gha,scope=base
             type=gha,scope=scientific
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   # ─── Tier 4 — FROM ml, main branch only (PyTorch + TensorFlow, large image) ──
   deeplearn:
@@ -156,3 +193,6 @@ jobs:
             type=gha,scope=base
             type=gha,scope=scientific
             type=gha,scope=ml
+          push: 'true'
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
