@@ -6,7 +6,20 @@ A modular, multi-target Docker environment for data science with Python 3.13. Bu
 
 ## Quick Start
 
-### Build a Specific Target
+### Use Prebuilt Images
+
+Prebuilt images are published to GitHub Container Registry on every push to `main`:
+
+```bash
+docker run -p 8888:8888 \
+  -v $(pwd)/notebooks:/home/jupyter/notebooks \
+  -v $(pwd)/data:/home/jupyter/data \
+  ghcr.io/wlame/jupyter-docker:scientific
+```
+
+See [Available Targets](#available-targets) for the full list. Replace `scientific` with any target name.
+
+### Build from Source
 
 ```bash
 # Build only what you need
