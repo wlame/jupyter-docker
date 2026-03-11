@@ -108,6 +108,22 @@ IMPORTS = {
         ("sentence_transformers", "sentence-transformers"),
         ("tokenizers", "tokenizers"),
     ],
+    "speech": [
+        ("whisper", "openai-whisper"),
+        ("faster_whisper", "faster-whisper"),
+        ("speech_recognition", "SpeechRecognition"),
+        ("TTS", "coqui-tts"),
+        ("gtts", "gTTS"),
+        ("pyannote.audio", "pyannote-audio"),
+        ("speechbrain", "speechbrain"),
+    ],
+    "face": [
+        ("deepface", "deepface"),
+        ("mtcnn", "mtcnn"),
+        ("face_alignment", "face-alignment"),
+        ("diffusers", "diffusers"),
+        ("dlib", "dlib"),
+    ],
 }
 
 

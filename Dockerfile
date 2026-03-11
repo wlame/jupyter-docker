@@ -14,6 +14,8 @@
 #   docker build --target geospatial -t ds-geospatial .
 #   docker build --target timeseries -t ds-timeseries .
 #   docker build --target nlp -t ds-nlp .
+#   docker build --target speech -t ds-speech .
+#   docker build --target face -t ds-face .
 #   docker build --target full -t ds-full .
 #
 # =============================================================================
@@ -337,6 +339,65 @@ USER jupyter
 
 
 # =============================================================================
+# SPEECH: Speech recognition and text-to-speech (inherits from base, needs torch)
+# =============================================================================
+FROM base AS speech
+
+USER root
+
+# Install speech dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gfortran \
+    libopenblas-dev \
+    liblapack-dev \
+    libsndfile1 \
+    ffmpeg \
+    espeak-ng \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Replace pyproject.toml with speech version (includes all base + speech deps)
+COPY --chown=jupyter:jupyter targets/speech/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/speech/verify_imports.py /home/jupyter/scripts/verify_speech.py
+
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+
+USER jupyter
+
+
+# =============================================================================
+# FACE: Face detection, recognition, and analysis (inherits from base, needs torch + tensorflow)
+# =============================================================================
+FROM base AS face
+
+USER root
+
+# Install face dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gfortran \
+    libopenblas-dev \
+    liblapack-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libgl1 \
+    libglib2.0-0 \
+    cmake \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Replace pyproject.toml with face version (includes all base + face deps)
+COPY --chown=jupyter:jupyter targets/face/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/face/verify_imports.py /home/jupyter/scripts/verify_face.py
+
+# Install with uv lock and sync
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+
+USER jupyter
+
+
+# =============================================================================
 # FULL: Complete data science environment (all libraries)
 # =============================================================================
 FROM ubuntu:24.04 AS full
@@ -390,9 +451,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     # XML
     libxml2-dev \
     libxslt1-dev \
-    # Audio
+    # Audio / Speech
     libsndfile1 \
     ffmpeg \
+    espeak-ng \
+    # Face (dlib compilation)
+    cmake \
     # Network utilities
     curl \
     wget \
@@ -440,6 +504,8 @@ COPY --chown=jupyter:jupyter targets/audio/verify_imports.py /home/jupyter/scrip
 COPY --chown=jupyter:jupyter targets/geospatial/verify_imports.py /home/jupyter/scripts/verify_geospatial.py
 COPY --chown=jupyter:jupyter targets/timeseries/verify_imports.py /home/jupyter/scripts/verify_timeseries.py
 COPY --chown=jupyter:jupyter targets/nlp/verify_imports.py /home/jupyter/scripts/verify_nlp.py
+COPY --chown=jupyter:jupyter targets/speech/verify_imports.py /home/jupyter/scripts/verify_speech.py
+COPY --chown=jupyter:jupyter targets/face/verify_imports.py /home/jupyter/scripts/verify_face.py
 
 # Configure Jupyter
 USER jupyter

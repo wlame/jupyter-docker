@@ -147,6 +147,30 @@ dependencies = [
     "transformers==4.57.6",
     "sentence-transformers==5.2.0",
     "tokenizers==0.22.2",
+
+    # ============================================
+    # SPEECH: Speech recognition and TTS
+    # ============================================
+    # Note: espeak-ng system package required for coqui-tts
+    "openai-whisper",
+    "faster-whisper",
+    "SpeechRecognition",
+    "coqui-tts",
+    "gTTS",
+    "piper-tts",
+    "pyannote-audio",
+    "speechbrain",
+
+    # ============================================
+    # FACE: Face detection, recognition, analysis
+    # ============================================
+    # Note: cmake system package required for dlib compilation
+    "deepface",
+    "mtcnn",
+    "retina-face",
+    "face-alignment",
+    "diffusers",
+    "dlib",
     # Testing
     "pytest",
     "pytest-timeout",

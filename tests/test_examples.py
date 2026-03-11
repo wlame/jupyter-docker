@@ -275,3 +275,41 @@ def test_example_14_nlp_text_analysis():
         ],
         timeout=300,
     )
+
+
+# =============================================================================
+# SPEECH target — whisper, gTTS, torchaudio, SpeechRecognition
+# =============================================================================
+
+@pytest.mark.speech
+@pytest.mark.slow
+def test_example_19_speech_processing():
+    """Whisper ASR, gTTS synthesis, torchaudio spectrogram, waveform visualization."""
+    run_example(
+        '19_speech_processing.py',
+        expected_outputs=[
+            'speech_synthetic_audio.wav',
+            'speech_gtts_output.mp3',
+            'speech_waveforms.png',
+        ],
+        timeout=300,
+    )
+
+
+# =============================================================================
+# FACE target — dlib, deepface, face-alignment, mtcnn
+# =============================================================================
+
+@pytest.mark.face
+@pytest.mark.slow
+def test_example_20_face_analysis():
+    """dlib HOG detection, DeepFace attributes, face-alignment landmarks."""
+    run_example(
+        '20_face_analysis.py',
+        expected_outputs=[
+            'face_synthetic_input.png',
+            'face_detection.png',
+            'face_landmarks.png',
+        ],
+        timeout=300,
+    )

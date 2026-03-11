@@ -55,7 +55,9 @@ Access Jupyter Lab at: **http://localhost:8888**
 | `geospatial` | ~2GB | Cartopy, GeoPandas, Folium | scientific |
 | `timeseries` | ~2GB | tsfresh, sktime, Prophet | scientific |
 | `nlp` | ~4GB | spaCy, Transformers, NLTK | base |
-| `full` | ~11GB | Everything combined | standalone |
+| `speech` | ~4GB | Whisper, gTTS, SpeechBrain | base |
+| `face` | ~7GB | DeepFace, dlib, face-alignment | base |
+| `full` | ~14GB | Everything combined | standalone |
 
 ### Target Inheritance Tree
 
@@ -70,7 +72,9 @@ base
 ├── dataio
 ├── vision
 ├── audio
-└── nlp
+├── nlp
+├── speech
+└── face
 
 full (standalone - includes all)
 ```
@@ -232,6 +236,34 @@ Text processing and language models.
 | sentence-transformers | Sentence embeddings |
 | tokenizers | Fast tokenization |
 
+### Speech (Speech Recognition & TTS)
+
+Speech-to-text and text-to-speech.
+
+| Library | Description |
+|---------|-------------|
+| openai-whisper | Best overall ASR |
+| faster-whisper | 4x faster ASR (CTranslate2) |
+| SpeechRecognition | Lightweight ASR API wrapper |
+| coqui-tts | Mature TTS engine |
+| gTTS | Google Text-to-Speech |
+| piper-tts | ONNX-based CPU-friendly TTS |
+| pyannote-audio | Speaker diarization |
+| speechbrain | All-in-one speech toolkit |
+
+### Face (Face Detection & Recognition)
+
+Face detection, recognition, analysis, and generation.
+
+| Library | Description |
+|---------|-------------|
+| DeepFace | Recognition + attribute analysis |
+| dlib | Face detection, 68-point landmarks |
+| MTCNN | TensorFlow face detection |
+| RetinaFace | Face detection with landmarks |
+| face-alignment | 2D/3D face landmarks (PyTorch) |
+| diffusers | Face generation (Stable Diffusion) |
+
 ### Full (Complete Environment)
 
 All libraries from all targets combined. Use when you need everything.
@@ -299,6 +331,13 @@ The `examples/` directory contains Python scripts and Jupyter notebooks:
 | `11_deep_learning_tensorflow` | TensorFlow and Keras |
 | `12_image_processing` | PIL, OpenCV, scikit-image |
 | `13_object_detection_yolo` | YOLOv8 object detection |
+| `14_nlp_text_analysis` | spaCy, NLTK, sentence-transformers |
+| `15_audio_analysis` | librosa, torchaudio features |
+| `16_altair_panel_viz` | Altair, hvPlot, Panel dashboards |
+| `17_scipy_signal_processing` | FFT, filters, spectrograms |
+| `18_sqlalchemy_database` | SQLAlchemy ORM, Parquet, HDF5 |
+| `19_speech_processing` | Whisper ASR, gTTS, torchaudio |
+| `20_face_analysis` | dlib, DeepFace, face-alignment |
 
 ## Choosing the Right Target
 
@@ -313,6 +352,8 @@ The `examples/` directory contains Python scripts and Jupyter notebooks:
 | Geographic data/maps | `geospatial` |
 | Time series forecasting | `timeseries` |
 | Text/NLP work | `nlp` |
+| Speech recognition/synthesis | `speech` |
+| Face detection/recognition | `face` |
 | Need everything | `full` |
 
 ## Container Details
@@ -366,6 +407,8 @@ Note: Requires NVIDIA Container Toolkit.
 │   ├── geospatial/
 │   ├── timeseries/
 │   ├── nlp/
+│   ├── speech/
+│   ├── face/
 │   └── full/
 ├── examples/
 │   ├── *.py                # Python scripts

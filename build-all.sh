@@ -28,6 +28,8 @@ ALL_TARGETS=(
     "geospatial"
     "timeseries"
     "nlp"
+    "speech"
+    "face"
     "full"
 )
 
@@ -167,7 +169,7 @@ test_target() {
     local pytest_marks
     if [ "${target}" = "full" ]; then
         # Run every marked test (skip slow/network-dependent by default)
-        pytest_marks="scientific or visualization or dataio or ml or deeplearn or vision or audio or geospatial or timeseries or nlp"
+        pytest_marks="scientific or visualization or dataio or ml or deeplearn or vision or audio or geospatial or timeseries or nlp or speech or face"
     else
         pytest_marks="${target}"
     fi
