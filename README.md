@@ -367,14 +367,23 @@ The `examples/` directory contains Python scripts and Jupyter notebooks:
 
 ## Security Note
 
-Default configuration has **no authentication** for local development. For production:
+Jupyter Lab requires **token authentication** by default. A random token is generated
+on every container start — find the login URL (with `?token=...`) in the logs:
+
+```bash
+docker logs jupyter
+```
+
+To set a fixed token instead, pass the `JUPYTER_TOKEN` environment variable:
 
 ```bash
 docker run -p 8888:8888 \
   -e JUPYTER_TOKEN=your-secret-token \
-  ds-scientific \
-  uv run jupyter lab --ip=0.0.0.0 --IdentityProvider.token='your-secret-token'
+  ds-scientific
 ```
+
+Do not expose the port beyond localhost without a token and TLS — put a reverse proxy
+in front for anything non-local.
 
 ## GPU Support
 

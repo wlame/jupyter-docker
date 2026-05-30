@@ -66,10 +66,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.13 1 \
     && update-alternatives --install /usr/bin/python python /usr/bin/python3.13 1
 
-# Install uv
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && mv /root/.local/bin/uv /usr/local/bin/uv \
-    && mv /root/.local/bin/uvx /usr/local/bin/uvx
+# Install uv (version-pinned copy from the official distroless image)
+COPY --from=ghcr.io/astral-sh/uv:0.11.28 /uv /uvx /usr/local/bin/
 
 # Create non-root user and directories
 RUN useradd -m -s /bin/bash jupyter \
@@ -82,6 +80,8 @@ WORKDIR /home/jupyter
 COPY --chown=jupyter:jupyter targets/base/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/base/verify_imports.py /home/jupyter/scripts/verify_imports.py
 
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+USER jupyter
 RUN uv lock && uv sync --no-install-project
 
 # Copy examples, tests, and scripts
@@ -90,13 +90,13 @@ COPY --chown=jupyter:jupyter tests/ /home/jupyter/tests/
 
 # Configure Jupyter
 USER jupyter
+# No token/password lines: jupyter-server generates a random token per start
+# (printed in the logs) and honors the JUPYTER_TOKEN env var for a fixed one.
 RUN uv run --no-project jupyter lab --generate-config \
     && echo "c.ServerApp.ip = '0.0.0.0'" >> /home/jupyter/.jupyter/jupyter_lab_config.py \
     && echo "c.ServerApp.port = 8888" >> /home/jupyter/.jupyter/jupyter_lab_config.py \
     && echo "c.ServerApp.open_browser = False" >> /home/jupyter/.jupyter/jupyter_lab_config.py \
-    && echo "c.ServerApp.allow_root = False" >> /home/jupyter/.jupyter/jupyter_lab_config.py \
-    && echo "c.ServerApp.token = ''" >> /home/jupyter/.jupyter/jupyter_lab_config.py \
-    && echo "c.ServerApp.password = ''" >> /home/jupyter/.jupyter/jupyter_lab_config.py
+    && echo "c.ServerApp.allow_root = False" >> /home/jupyter/.jupyter/jupyter_lab_config.py
 
 EXPOSE 8888
 CMD ["uv", "run", "--no-project", "jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
@@ -121,10 +121,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --chown=jupyter:jupyter targets/scientific/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/scientific/verify_imports.py /home/jupyter/scripts/verify_scientific.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -146,10 +145,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --chown=jupyter:jupyter targets/visualization/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/visualization/verify_imports.py /home/jupyter/scripts/verify_visualization.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -169,10 +167,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --chown=jupyter:jupyter targets/dataio/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/dataio/verify_imports.py /home/jupyter/scripts/verify_dataio.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -180,16 +177,13 @@ USER jupyter
 # =============================================================================
 FROM scientific AS ml
 
-USER root
-
 # Replace pyproject.toml with ml version (includes all base + scientific + ml deps)
 COPY --chown=jupyter:jupyter targets/ml/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/ml/verify_imports.py /home/jupyter/scripts/verify_ml.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -197,16 +191,13 @@ USER jupyter
 # =============================================================================
 FROM ml AS deeplearn
 
-USER root
-
 # Replace pyproject.toml with deeplearn version (includes all base + scientific + ml + deeplearn deps)
 COPY --chown=jupyter:jupyter targets/deeplearn/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/deeplearn/verify_imports.py /home/jupyter/scripts/verify_deeplearn.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -233,10 +224,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --chown=jupyter:jupyter targets/vision/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/vision/verify_imports.py /home/jupyter/scripts/verify_vision.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -260,10 +250,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --chown=jupyter:jupyter targets/audio/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/audio/verify_imports.py /home/jupyter/scripts/verify_audio.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -290,10 +279,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --chown=jupyter:jupyter targets/geospatial/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/geospatial/verify_imports.py /home/jupyter/scripts/verify_geospatial.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -301,16 +289,13 @@ USER jupyter
 # =============================================================================
 FROM scientific AS timeseries
 
-USER root
-
 # Replace pyproject.toml with timeseries version (includes all deps)
 COPY --chown=jupyter:jupyter targets/timeseries/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/timeseries/verify_imports.py /home/jupyter/scripts/verify_timeseries.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -332,10 +317,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --chown=jupyter:jupyter targets/nlp/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/nlp/verify_imports.py /home/jupyter/scripts/verify_nlp.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -360,10 +344,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --chown=jupyter:jupyter targets/speech/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/speech/verify_imports.py /home/jupyter/scripts/verify_speech.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -391,10 +374,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --chown=jupyter:jupyter targets/face/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/face/verify_imports.py /home/jupyter/scripts/verify_face.py
 
-# Install with uv lock and sync
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
-
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
 USER jupyter
+RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 
 
 # =============================================================================
@@ -469,10 +451,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.13 1 \
     && update-alternatives --install /usr/bin/python python /usr/bin/python3.13 1
 
-# Install uv
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && mv /root/.local/bin/uv /usr/local/bin/uv \
-    && mv /root/.local/bin/uvx /usr/local/bin/uvx
+# Install uv (version-pinned copy from the official distroless image)
+COPY --from=ghcr.io/astral-sh/uv:0.11.28 /uv /uvx /usr/local/bin/
 
 # Create non-root user and directories
 RUN useradd -m -s /bin/bash jupyter \
@@ -485,6 +465,8 @@ WORKDIR /home/jupyter
 COPY --chown=jupyter:jupyter targets/full/pyproject.toml /home/jupyter/
 COPY --chown=jupyter:jupyter targets/full/verify_imports.py /home/jupyter/scripts/verify_imports.py
 
+# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+USER jupyter
 RUN uv lock && uv sync --no-install-project
 
 # Copy examples, tests, and scripts
@@ -509,13 +491,13 @@ COPY --chown=jupyter:jupyter targets/face/verify_imports.py /home/jupyter/script
 
 # Configure Jupyter
 USER jupyter
+# No token/password lines: jupyter-server generates a random token per start
+# (printed in the logs) and honors the JUPYTER_TOKEN env var for a fixed one.
 RUN uv run --no-project jupyter lab --generate-config \
     && echo "c.ServerApp.ip = '0.0.0.0'" >> /home/jupyter/.jupyter/jupyter_lab_config.py \
     && echo "c.ServerApp.port = 8888" >> /home/jupyter/.jupyter/jupyter_lab_config.py \
     && echo "c.ServerApp.open_browser = False" >> /home/jupyter/.jupyter/jupyter_lab_config.py \
-    && echo "c.ServerApp.allow_root = False" >> /home/jupyter/.jupyter/jupyter_lab_config.py \
-    && echo "c.ServerApp.token = ''" >> /home/jupyter/.jupyter/jupyter_lab_config.py \
-    && echo "c.ServerApp.password = ''" >> /home/jupyter/.jupyter/jupyter_lab_config.py
+    && echo "c.ServerApp.allow_root = False" >> /home/jupyter/.jupyter/jupyter_lab_config.py
 
 EXPOSE 8888
 CMD ["uv", "run", "--no-project", "jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
