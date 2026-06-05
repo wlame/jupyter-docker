@@ -1,29 +1,55 @@
 #!/usr/bin/env python3
-"""Verify all speech target imports are working correctly."""
+"""Verify all speech target imports are working correctly.
+
+GENERATED FILE — do not edit by hand.
+Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py).
+"""
 
 import sys
 
 IMPORTS = [
-    # PyTorch audio
-    ("torchaudio", "torchaudio"),
-
-    # ASR
-    ("whisper", "openai-whisper"),
-    ("faster_whisper", "faster-whisper"),
-    ("speech_recognition", "SpeechRecognition"),
-
-    # TTS
+    # --- base ---
+    ("aiohttp", "aiohttp"),
+    ("bs4", "beautifulsoup4"),
+    ("httpx", "httpx"),
+    ("IPython", "ipython"),
+    ("joblib", "joblib"),
+    ("jupyter", "jupyter"),
+    ("jupyterlab", "jupyterlab"),
+    ("loguru", "loguru"),
+    ("lxml", "lxml"),
+    ("more_itertools", "more-itertools"),
+    ("orjson", "orjson"),
+    ("pendulum", "pendulum"),
+    ("pip", "pip"),
+    ("pydantic", "pydantic"),
+    ("pytest", "pytest"),
+    ("pytest_timeout", "pytest-timeout"),
+    ("dateutil", "python-dateutil"),
+    ("dotenv", "python-dotenv"),
+    ("pytz", "pytz"),
+    ("yaml", "pyyaml"),
+    ("requests", "requests"),
+    ("simplejson", "simplejson"),
+    ("toolz", "toolz"),
+    ("tqdm", "tqdm"),
+    ("ujson", "ujson"),
+    ("xmltodict", "xmltodict"),
+    # --- speech ---
     ("TTS", "coqui-tts"),
-    ("gtts", "gTTS"),
-
-    # Speaker diarization
+    ("faster_whisper", "faster-whisper"),
+    ("gtts", "gtts"),
+    ("matplotlib", "matplotlib"),
+    ("numba", "numba"),
+    ("numpy", "numpy"),
+    ("whisper", "openai-whisper"),
+    ("piper", "piper-tts"),
     ("pyannote.audio", "pyannote-audio"),
-
-    # Speech toolkit
-    ("speechbrain", "speechbrain"),
-
-    # Audio I/O
     ("soundfile", "soundfile"),
+    ("speechbrain", "speechbrain"),
+    ("speech_recognition", "speechrecognition"),
+    ("torch", "torch"),
+    ("torchaudio", "torchaudio"),
 ]
 
 
@@ -40,10 +66,10 @@ def verify_imports():
     for module_name, package_name in IMPORTS:
         try:
             __import__(module_name)
-            print(f"  ✓ {package_name}")
+            print(f"  \u2713 {package_name}")
             passed += 1
         except ImportError as e:
-            print(f"  ✗ {package_name}: {e}")
+            print(f"  \u2717 {package_name}: {e}")
             failed += 1
             errors.append((package_name, str(e)))
 

@@ -1,3 +1,9 @@
+# -----------------------------------------------------------------------------
+# GENERATED FILE — do not edit by hand.
+# Source of truth: targets/matrix.toml
+# Regenerate with:  python3 scripts/gen_targets.py
+# -----------------------------------------------------------------------------
+
 [project]
 name = "datascience-scientific"
 version = "1.0.0"
@@ -5,72 +11,45 @@ description = "Scientific computing with NumPy, SciPy, and Pandas"
 requires-python = ">=3.13"
 
 dependencies = [
-    # ========================================
-    # BASE dependencies
-    # ========================================
-    # Interactive Python
+    # --- base ---
+    "aiohttp==3.13.3",
+    "beautifulsoup4==4.14.3",
+    "httpx==0.28.1",
     "ipython==9.9.0",
+    "joblib==1.5.3",
     "jupyter==1.1.1",
     "jupyterlab==4.5.2",
-
-    # JSON libraries
-    "orjson==3.11.5",
-    "ujson==5.11.0",
-    "simplejson==3.20.2",
-
-    # XML/HTML processing
-    "lxml==6.0.2",
-    "xmltodict==1.0.2",
-    "beautifulsoup4==4.14.3",
-
-    # YAML
-    "pyyaml==6.0.3",
-
-    # HTTP clients
-    "requests==2.32.5",
-    "httpx==0.28.1",
-    "aiohttp==3.13.3",
-
-    # Data validation
-    "pydantic==2.12.5",
-
-    # Utilities
-    "tqdm==4.67.1",
     "loguru==0.7.3",
-    "python-dotenv==1.2.1",
-    "joblib==1.5.3",
-    "toolz==1.1.0",
+    "lxml==6.0.2",
     "more-itertools==10.8.0",
-
-    # Date/time
-    "python-dateutil==2.9.0.post0",
-    "pytz==2025.2",
+    "orjson==3.11.5",
     "pendulum==3.1.0",
-
-    # ========================================
-    # SCIENTIFIC dependencies
-    # ========================================
-    # Core scientific computing
-    "numpy==2.4.1",
-    "scipy==1.17.0",
-    "pandas==2.3.3",
-
-    # Statistical modeling
-    "statsmodels==0.14.6",
-
-    # Symbolic mathematics
-    "sympy==1.14.0",
-
-    # Plotting (needed for example scripts that visualise scipy results)
-    "matplotlib==3.10.8",
-
-    # Testing
+    "pip==26.1.2",
+    "pydantic==2.12.5",
     "pytest==9.1.1",
     "pytest-timeout==2.4.0",
-
-    # In-notebook installs (!pip install ...)
-    "pip==26.1.2",
+    "python-dateutil==2.9.0.post0",
+    "python-dotenv==1.2.1",
+    "pytz==2025.2",
+    "pyyaml==6.0.3",
+    "requests==2.32.5",
+    "simplejson==3.20.2",
+    "toolz==1.1.0",
+    "tqdm==4.67.1",
+    "ujson==5.11.0",
+    "xmltodict==1.0.2",
+    # --- scientific ---
+    "matplotlib==3.10.8",
+    "numpy==2.4.1",
+    "pandas==2.3.3",
+    "scipy==1.17.0",
+    "statsmodels==0.14.6",
+    "sympy==1.14.0",
 ]
+
+[tool.uv]
+# Supply-chain guard: never resolve packages published after this date
+exclude-newer = "2026-07-04"
 
 [build-system]
 requires = ["hatchling"]
@@ -78,7 +57,3 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = []
-
-[tool.uv]
-# Supply-chain guard: never resolve packages published after this date
-exclude-newer = "2026-07-04"

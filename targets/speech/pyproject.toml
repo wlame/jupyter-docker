@@ -1,3 +1,9 @@
+# -----------------------------------------------------------------------------
+# GENERATED FILE — do not edit by hand.
+# Source of truth: targets/matrix.toml
+# Regenerate with:  python3 scripts/gen_targets.py
+# -----------------------------------------------------------------------------
+
 [project]
 name = "datascience-speech"
 version = "1.0.0"
@@ -5,101 +11,57 @@ description = "Speech recognition and text-to-speech synthesis"
 requires-python = ">=3.13"
 
 dependencies = [
-    # ========================================
-    # BASE dependencies
-    # ========================================
-    # Interactive Python
+    # --- base ---
+    "aiohttp==3.13.3",
+    "beautifulsoup4==4.14.3",
+    "httpx==0.28.1",
     "ipython==9.9.0",
+    "joblib==1.5.3",
     "jupyter==1.1.1",
     "jupyterlab==4.5.2",
-
-    # JSON libraries
-    "orjson==3.11.5",
-    "ujson==5.11.0",
-    "simplejson==3.20.2",
-
-    # XML/HTML processing
-    "lxml==6.0.2",
-    "xmltodict==1.0.2",
-    "beautifulsoup4==4.14.3",
-
-    # YAML
-    "pyyaml==6.0.3",
-
-    # HTTP clients
-    "requests==2.32.5",
-    "httpx==0.28.1",
-    "aiohttp==3.13.3",
-
-    # Data validation
-    "pydantic==2.12.5",
-
-    # Utilities
-    "tqdm==4.67.1",
     "loguru==0.7.3",
-    "python-dotenv==1.2.1",
-    "joblib==1.5.3",
-    "toolz==1.1.0",
+    "lxml==6.0.2",
     "more-itertools==10.8.0",
-
-    # Date/time
-    "python-dateutil==2.9.0.post0",
-    "pytz==2025.2",
+    "orjson==3.11.5",
     "pendulum==3.1.0",
-
-    # ========================================
-    # SPEECH dependencies (needs numpy and torch)
-    # ========================================
-    # numpy 2.3.x required for numba compatibility (numba requires numpy<2.4)
-    "numpy==2.3.5",
-    "torch==2.9.1",
-
-    # PyTorch audio
-    "torchaudio==2.9.1",
-
-    # ASR — Whisper (OpenAI)
-    "openai-whisper",
-    # ASR — Faster Whisper (CTranslate2 backend, ~4x faster)
-    "faster-whisper",
-    # ASR — SpeechRecognition (lightweight API wrapper)
-    "SpeechRecognition",
-
-    # TTS — Coqui TTS (idiap fork, supports Python 3.13)
-    "coqui-tts",
-    # TTS — Google TTS (lightweight)
-    "gTTS",
-    # TTS — Piper (ONNX-based, CPU-friendly)
-    "piper-tts",
-
-    # Speaker diarization
-    "pyannote-audio",
-
-    # All-in-one speech toolkit
-    "speechbrain",
-
-    # Audio I/O (shared with audio target)
-    "soundfile==0.13.1",
-
-    # numba for Python 3.13 compatibility (whisper dep chain)
-    "numba>=0.60.0",
-
-    # Plotting (used by speech example scripts)
-    "matplotlib==3.10.8",
-
-    # Testing
+    "pip==26.1.2",
+    "pydantic==2.12.5",
     "pytest==9.1.1",
     "pytest-timeout==2.4.0",
-
-    # In-notebook installs (!pip install ...)
-    "pip==26.1.2",
+    "python-dateutil==2.9.0.post0",
+    "python-dotenv==1.2.1",
+    "pytz==2025.2",
+    "pyyaml==6.0.3",
+    "requests==2.32.5",
+    "simplejson==3.20.2",
+    "toolz==1.1.0",
+    "tqdm==4.67.1",
+    "ujson==5.11.0",
+    "xmltodict==1.0.2",
+    # --- speech ---
+    "coqui-tts==0.27.5",
+    "faster-whisper==1.2.1",
+    "gtts==2.5.4",
+    "matplotlib==3.10.8",
+    "numba==0.66.0",
+    "numpy==2.3.5",
+    "openai-whisper==20250625",
+    "piper-tts==1.4.2",
+    "pyannote-audio==4.0.7",
+    "soundfile==0.13.1",
+    "speechbrain==1.1.0",
+    "speechrecognition==3.17.0",
+    "torch==2.9.1",
+    "torchaudio==2.9.1",
 ]
+
+[tool.uv]
+# Supply-chain guard: never resolve packages published after this date
+exclude-newer = "2026-07-04"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = []
-
-[tool.uv]
-# Supply-chain guard: never resolve packages published after this date
-exclude-newer = "2026-07-04"

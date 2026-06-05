@@ -77,12 +77,12 @@ RUN useradd -m -s /bin/bash jupyter \
 WORKDIR /home/jupyter
 
 # Copy base pyproject.toml and install
-COPY --chown=jupyter:jupyter targets/base/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/base/pyproject.toml targets/base/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/base/verify_imports.py /home/jupyter/scripts/verify_imports.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 # Copy examples, tests, and scripts
 COPY --chown=jupyter:jupyter examples/ /home/jupyter/examples/
@@ -118,12 +118,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Replace pyproject.toml with scientific version (includes all base + scientific deps)
-COPY --chown=jupyter:jupyter targets/scientific/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/scientific/pyproject.toml targets/scientific/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/scientific/verify_imports.py /home/jupyter/scripts/verify_scientific.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -142,12 +142,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Replace pyproject.toml with visualization version (includes all base + visualization deps)
-COPY --chown=jupyter:jupyter targets/visualization/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/visualization/pyproject.toml targets/visualization/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/visualization/verify_imports.py /home/jupyter/scripts/verify_visualization.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -164,12 +164,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Replace pyproject.toml with dataio version (includes all base + dataio deps)
-COPY --chown=jupyter:jupyter targets/dataio/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/dataio/pyproject.toml targets/dataio/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/dataio/verify_imports.py /home/jupyter/scripts/verify_dataio.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -178,12 +178,12 @@ RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 FROM scientific AS ml
 
 # Replace pyproject.toml with ml version (includes all base + scientific + ml deps)
-COPY --chown=jupyter:jupyter targets/ml/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/ml/pyproject.toml targets/ml/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/ml/verify_imports.py /home/jupyter/scripts/verify_ml.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -192,12 +192,12 @@ RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 FROM ml AS deeplearn
 
 # Replace pyproject.toml with deeplearn version (includes all base + scientific + ml + deeplearn deps)
-COPY --chown=jupyter:jupyter targets/deeplearn/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/deeplearn/pyproject.toml targets/deeplearn/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/deeplearn/verify_imports.py /home/jupyter/scripts/verify_deeplearn.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -221,12 +221,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Replace pyproject.toml with vision version (includes all base + vision deps)
-COPY --chown=jupyter:jupyter targets/vision/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/vision/pyproject.toml targets/vision/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/vision/verify_imports.py /home/jupyter/scripts/verify_vision.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -247,12 +247,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Replace pyproject.toml with audio version (includes all base + audio deps)
-COPY --chown=jupyter:jupyter targets/audio/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/audio/pyproject.toml targets/audio/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/audio/verify_imports.py /home/jupyter/scripts/verify_audio.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -276,12 +276,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Replace pyproject.toml with geospatial version (includes all deps)
-COPY --chown=jupyter:jupyter targets/geospatial/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/geospatial/pyproject.toml targets/geospatial/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/geospatial/verify_imports.py /home/jupyter/scripts/verify_geospatial.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -290,12 +290,12 @@ RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
 FROM scientific AS timeseries
 
 # Replace pyproject.toml with timeseries version (includes all deps)
-COPY --chown=jupyter:jupyter targets/timeseries/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/timeseries/pyproject.toml targets/timeseries/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/timeseries/verify_imports.py /home/jupyter/scripts/verify_timeseries.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -314,12 +314,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Replace pyproject.toml with nlp version (includes all deps)
-COPY --chown=jupyter:jupyter targets/nlp/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/nlp/pyproject.toml targets/nlp/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/nlp/verify_imports.py /home/jupyter/scripts/verify_nlp.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -341,12 +341,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Replace pyproject.toml with speech version (includes all base + speech deps)
-COPY --chown=jupyter:jupyter targets/speech/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/speech/pyproject.toml targets/speech/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/speech/verify_imports.py /home/jupyter/scripts/verify_speech.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -371,12 +371,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Replace pyproject.toml with face version (includes all base + face deps)
-COPY --chown=jupyter:jupyter targets/face/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/face/pyproject.toml targets/face/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/face/verify_imports.py /home/jupyter/scripts/verify_face.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN rm -f /home/jupyter/uv.lock && uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 # =============================================================================
@@ -462,12 +462,12 @@ RUN useradd -m -s /bin/bash jupyter \
 WORKDIR /home/jupyter
 
 # Copy full pyproject.toml and install all packages
-COPY --chown=jupyter:jupyter targets/full/pyproject.toml /home/jupyter/
+COPY --chown=jupyter:jupyter targets/full/pyproject.toml targets/full/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/full/verify_imports.py /home/jupyter/scripts/verify_imports.py
 
-# Lock and sync as the jupyter user so .venv/uv.lock stay user-writable
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
 USER jupyter
-RUN uv lock && uv sync --no-install-project
+RUN uv sync --locked --no-install-project
 
 # Copy examples, tests, and scripts
 COPY --chown=jupyter:jupyter examples/ /home/jupyter/examples/

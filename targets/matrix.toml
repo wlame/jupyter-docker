@@ -1,0 +1,603 @@
+# =============================================================================
+# Dependency matrix — single source of truth for all Docker targets.
+#
+# Edit this file, then regenerate the per-target pyproject.toml and
+# verify_imports.py files with:
+#
+#     python3 scripts/gen_targets.py        # rewrite generated files
+#     python3 scripts/gen_targets.py --check # verify nothing drifted (CI)
+#
+# Semantics:
+#   * A package is installed in every target listed in introduced-by and in
+#     all descendants of those targets (see [targets.*] parent chains).
+#   * The "full" target always contains every package in this file.
+#   * overrides pin a different version for specific targets; remove an
+#     override once the constraint that forced it is gone.
+# =============================================================================
+
+[settings]
+requires-python = ">=3.13"
+# Supply-chain guard: never resolve packages published after this date.
+exclude-newer = "2026-07-04"
+
+# --- Target tree -------------------------------------------------------------
+
+[targets.base]
+parent = ""
+description = "Base Python environment with common utilities for data science"
+
+[targets.scientific]
+parent = "base"
+description = "Scientific computing with NumPy, SciPy, and Pandas"
+
+[targets.visualization]
+parent = "base"
+description = "Data visualization with Matplotlib, Seaborn, Plotly, and Bokeh"
+
+[targets.dataio]
+parent = "base"
+description = "Data I/O for Parquet, HDF5, Excel, and databases"
+
+[targets.ml]
+parent = "scientific"
+description = "Classical machine learning with scikit-learn, XGBoost, and LightGBM"
+
+[targets.deeplearn]
+parent = "ml"
+description = "Deep learning with PyTorch and TensorFlow"
+
+[targets.vision]
+parent = "base"
+description = "Computer vision and image processing"
+
+[targets.audio]
+parent = "base"
+description = "Audio processing and analysis"
+
+[targets.geospatial]
+parent = "scientific"
+description = "Geospatial analysis and mapping"
+
+[targets.timeseries]
+parent = "scientific"
+description = "Time series analysis and forecasting"
+
+[targets.nlp]
+parent = "base"
+description = "Natural language processing"
+
+[targets.speech]
+parent = "base"
+description = "Speech recognition and text-to-speech synthesis"
+
+[targets.face]
+parent = "base"
+description = "Face detection, recognition, analysis, and generation"
+
+[targets.full]
+parent = ""
+description = "Complete data science environment with all libraries"
+
+# --- Packages ----------------------------------------------------------------
+
+# ── introduced in: base ──────────────────────────────────────────────────────
+
+[packages."aiohttp"]
+version = "3.13.3"
+module = "aiohttp"
+introduced-by = ["base"]
+
+[packages."beautifulsoup4"]
+version = "4.14.3"
+module = "bs4"
+introduced-by = ["base"]
+
+[packages."httpx"]
+version = "0.28.1"
+module = "httpx"
+introduced-by = ["base"]
+
+[packages."ipython"]
+version = "9.9.0"
+module = "IPython"
+introduced-by = ["base"]
+
+[packages."joblib"]
+version = "1.5.3"
+module = "joblib"
+introduced-by = ["base"]
+
+[packages."jupyter"]
+version = "1.1.1"
+module = "jupyter"
+introduced-by = ["base"]
+
+[packages."jupyterlab"]
+version = "4.5.2"
+module = "jupyterlab"
+introduced-by = ["base"]
+
+[packages."loguru"]
+version = "0.7.3"
+module = "loguru"
+introduced-by = ["base"]
+
+[packages."lxml"]
+version = "6.0.2"
+module = "lxml"
+introduced-by = ["base"]
+
+[packages."more-itertools"]
+version = "10.8.0"
+module = "more_itertools"
+introduced-by = ["base"]
+
+[packages."orjson"]
+version = "3.11.5"
+module = "orjson"
+introduced-by = ["base"]
+
+[packages."pendulum"]
+version = "3.1.0"
+module = "pendulum"
+introduced-by = ["base"]
+
+[packages."pip"]
+version = "26.1.2"
+module = "pip"
+introduced-by = ["base"]
+
+[packages."pydantic"]
+version = "2.12.5"
+module = "pydantic"
+introduced-by = ["base"]
+
+[packages."pytest"]
+version = "9.1.1"
+module = "pytest"
+introduced-by = ["base"]
+
+[packages."pytest-timeout"]
+version = "2.4.0"
+module = "pytest_timeout"
+introduced-by = ["base"]
+
+[packages."python-dateutil"]
+version = "2.9.0.post0"
+module = "dateutil"
+introduced-by = ["base"]
+
+[packages."python-dotenv"]
+version = "1.2.1"
+module = "dotenv"
+introduced-by = ["base"]
+
+[packages."pytz"]
+version = "2025.2"
+module = "pytz"
+introduced-by = ["base"]
+
+[packages."pyyaml"]
+version = "6.0.3"
+module = "yaml"
+introduced-by = ["base"]
+
+[packages."requests"]
+version = "2.32.5"
+module = "requests"
+introduced-by = ["base"]
+
+[packages."simplejson"]
+version = "3.20.2"
+module = "simplejson"
+introduced-by = ["base"]
+
+[packages."toolz"]
+version = "1.1.0"
+module = "toolz"
+introduced-by = ["base"]
+
+[packages."tqdm"]
+version = "4.67.1"
+module = "tqdm"
+introduced-by = ["base"]
+
+[packages."ujson"]
+version = "5.11.0"
+module = "ujson"
+introduced-by = ["base"]
+
+[packages."xmltodict"]
+version = "1.0.2"
+module = "xmltodict"
+introduced-by = ["base"]
+
+# ── introduced in: scientific ────────────────────────────────────────────────
+
+[packages."matplotlib"]
+version = "3.10.8"
+module = "matplotlib"
+introduced-by = ["scientific", "visualization", "audio", "nlp", "speech", "face"]
+
+[packages."numpy"]
+version = "2.4.1"
+module = "numpy"
+introduced-by = ["scientific", "vision", "audio", "nlp", "speech", "face"]
+# numba (pulled in via tsfresh/librosa) does not support numpy 2.4 yet;
+# the targets below stay on the newest numba-compatible release.
+[packages."numpy".overrides]
+audio = "2.3.5"
+timeseries = "2.3.5"
+speech = "2.3.5"
+full = "2.3.5"
+
+[packages."pandas"]
+version = "2.3.3"
+module = "pandas"
+introduced-by = ["scientific"]
+
+[packages."scipy"]
+version = "1.17.0"
+module = "scipy"
+introduced-by = ["scientific"]
+
+[packages."statsmodels"]
+version = "0.14.6"
+module = "statsmodels"
+introduced-by = ["scientific"]
+
+[packages."sympy"]
+version = "1.14.0"
+module = "sympy"
+introduced-by = ["scientific"]
+
+# ── introduced in: visualization ─────────────────────────────────────────────
+
+[packages."altair"]
+version = "6.0.0"
+module = "altair"
+introduced-by = ["visualization"]
+
+[packages."bokeh"]
+version = "3.8.2"
+module = "bokeh"
+introduced-by = ["visualization"]
+
+[packages."holoviews"]
+version = "1.22.1"
+module = "holoviews"
+introduced-by = ["visualization"]
+
+[packages."hvplot"]
+version = "0.12.2"
+module = "hvplot"
+introduced-by = ["visualization"]
+
+[packages."panel"]
+version = "1.8.5"
+module = "panel"
+introduced-by = ["visualization"]
+
+[packages."plotly"]
+version = "6.5.2"
+module = "plotly"
+introduced-by = ["visualization"]
+
+[packages."seaborn"]
+version = "0.13.2"
+module = "seaborn"
+introduced-by = ["visualization"]
+
+# ── introduced in: dataio ────────────────────────────────────────────────────
+
+[packages."fastparquet"]
+version = "2025.12.0"
+module = "fastparquet"
+introduced-by = ["dataio"]
+
+[packages."h5py"]
+version = "3.15.1"
+module = "h5py"
+introduced-by = ["dataio"]
+
+[packages."openpyxl"]
+version = "3.1.5"
+module = "openpyxl"
+introduced-by = ["dataio"]
+
+[packages."pyarrow"]
+version = "23.0.0"
+module = "pyarrow"
+introduced-by = ["dataio"]
+
+[packages."sqlalchemy"]
+version = "2.0.45"
+module = "sqlalchemy"
+introduced-by = ["dataio"]
+
+[packages."tables"]
+version = "3.10.2"
+module = "tables"
+introduced-by = ["dataio"]
+
+[packages."xlrd"]
+version = "2.0.2"
+module = "xlrd"
+introduced-by = ["dataio"]
+
+# ── introduced in: ml ────────────────────────────────────────────────────────
+
+[packages."imbalanced-learn"]
+version = "0.14.1"
+module = "imblearn"
+introduced-by = ["ml", "timeseries"]
+
+[packages."lightgbm"]
+version = "4.6.0"
+module = "lightgbm"
+introduced-by = ["ml", "timeseries"]
+
+[packages."optuna"]
+version = "4.6.0"
+module = "optuna"
+introduced-by = ["ml", "timeseries"]
+
+[packages."scikit-learn"]
+version = "1.8.0"
+module = "sklearn"
+introduced-by = ["ml", "timeseries"]
+# sktime constrains scikit-learn below 1.8; affected targets hold 1.7.2.
+[packages."scikit-learn".overrides]
+timeseries = "1.7.2"
+full = "1.7.2"
+
+[packages."xgboost"]
+version = "3.1.3"
+module = "xgboost"
+introduced-by = ["ml", "timeseries"]
+
+# ── introduced in: deeplearn ─────────────────────────────────────────────────
+
+[packages."keras"]
+version = "3.13.1"
+module = "keras"
+introduced-by = ["deeplearn", "face"]
+
+[packages."tensorflow"]
+version = "2.20.0"
+module = "tensorflow"
+introduced-by = ["deeplearn", "face"]
+
+[packages."torch"]
+version = "2.9.1"
+module = "torch"
+introduced-by = ["deeplearn", "audio", "nlp", "speech", "face"]
+
+[packages."torchaudio"]
+version = "2.9.1"
+module = "torchaudio"
+introduced-by = ["deeplearn", "audio", "speech"]
+
+[packages."torchvision"]
+version = "0.24.1"
+module = "torchvision"
+introduced-by = ["deeplearn", "face"]
+
+# ── introduced in: vision ────────────────────────────────────────────────────
+
+[packages."imageio"]
+version = "2.37.2"
+module = "imageio"
+introduced-by = ["vision"]
+
+[packages."opencv-python-headless"]
+version = "4.13.0.90"
+module = "cv2"
+introduced-by = ["vision", "face"]
+
+[packages."pillow"]
+version = "12.1.0"
+module = "PIL"
+introduced-by = ["vision", "face"]
+
+[packages."scikit-image"]
+version = "0.26.0"
+module = "skimage"
+introduced-by = ["vision", "face"]
+
+[packages."ultralytics"]
+version = "8.4.5"
+module = "ultralytics"
+introduced-by = ["vision"]
+
+# ── introduced in: audio ─────────────────────────────────────────────────────
+
+[packages."audioread"]
+version = "3.1.0"
+module = "audioread"
+introduced-by = ["audio"]
+
+[packages."librosa"]
+version = "0.11.0"
+module = "librosa"
+introduced-by = ["audio"]
+
+[packages."numba"]
+version = "0.66.0"
+module = "numba"
+introduced-by = ["audio", "timeseries", "speech"]
+
+[packages."pydub"]
+version = "0.25.1"
+module = "pydub"
+introduced-by = ["audio"]
+
+[packages."soundfile"]
+version = "0.13.1"
+module = "soundfile"
+introduced-by = ["audio", "speech"]
+
+# ── introduced in: geospatial ────────────────────────────────────────────────
+
+[packages."cartopy"]
+version = "0.25.0"
+module = "cartopy"
+introduced-by = ["geospatial"]
+
+[packages."folium"]
+version = "0.20.0"
+module = "folium"
+introduced-by = ["geospatial"]
+
+[packages."geopandas"]
+version = "1.1.2"
+module = "geopandas"
+introduced-by = ["geospatial"]
+
+[packages."geoviews"]
+version = "1.15.1"
+module = "geoviews"
+introduced-by = ["geospatial"]
+
+[packages."pyproj"]
+version = "3.7.2"
+module = "pyproj"
+introduced-by = ["geospatial"]
+
+[packages."shapely"]
+version = "2.1.2"
+module = "shapely"
+introduced-by = ["geospatial"]
+
+# ── introduced in: timeseries ────────────────────────────────────────────────
+
+[packages."pmdarima"]
+version = "2.1.1"
+module = "pmdarima"
+introduced-by = ["timeseries"]
+
+[packages."prophet"]
+version = "1.2.1"
+module = "prophet"
+introduced-by = ["timeseries"]
+
+[packages."sktime"]
+version = "0.40.1"
+module = "sktime"
+introduced-by = ["timeseries"]
+
+[packages."tsfresh"]
+version = "0.21.1"
+module = "tsfresh"
+introduced-by = ["timeseries"]
+
+# ── introduced in: nlp ───────────────────────────────────────────────────────
+
+[packages."en-core-web-sm"]
+module = "en_core_web_sm"
+introduced-by = ["nlp"]
+source-url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl"
+
+[packages."nltk"]
+version = "3.9.2"
+module = "nltk"
+introduced-by = ["nlp"]
+
+[packages."sentence-transformers"]
+version = "5.2.0"
+module = "sentence_transformers"
+introduced-by = ["nlp"]
+
+[packages."spacy"]
+version = "3.8.11"
+module = "spacy"
+introduced-by = ["nlp"]
+
+[packages."tokenizers"]
+version = "0.22.2"
+module = "tokenizers"
+introduced-by = ["nlp"]
+
+[packages."transformers"]
+version = "4.57.6"
+module = "transformers"
+introduced-by = ["nlp"]
+
+# ── introduced in: speech ────────────────────────────────────────────────────
+
+[packages."coqui-tts"]
+version = "0.27.5"
+module = "TTS"
+introduced-by = ["speech"]
+
+[packages."faster-whisper"]
+version = "1.2.1"
+module = "faster_whisper"
+introduced-by = ["speech"]
+
+[packages."gtts"]
+version = "2.5.4"
+module = "gtts"
+introduced-by = ["speech"]
+
+[packages."openai-whisper"]
+version = "20250625"
+module = "whisper"
+introduced-by = ["speech"]
+
+[packages."piper-tts"]
+version = "1.4.2"
+module = "piper"
+introduced-by = ["speech"]
+
+[packages."pyannote-audio"]
+version = "4.0.7"
+module = "pyannote.audio"
+introduced-by = ["speech"]
+
+[packages."speechbrain"]
+version = "1.1.0"
+module = "speechbrain"
+introduced-by = ["speech"]
+
+[packages."speechrecognition"]
+version = "3.17.0"
+module = "speech_recognition"
+introduced-by = ["speech"]
+
+# ── introduced in: face ──────────────────────────────────────────────────────
+
+[packages."deepface"]
+version = "0.0.100"
+module = "deepface"
+introduced-by = ["face"]
+
+[packages."diffusers"]
+version = "0.39.0"
+module = "diffusers"
+introduced-by = ["face"]
+
+[packages."dlib"]
+version = "20.0.1"
+module = "dlib"
+introduced-by = ["face"]
+
+[packages."face-alignment"]
+version = "1.5.0"
+module = "face_alignment"
+introduced-by = ["face"]
+
+[packages."mtcnn"]
+version = "1.0.0"
+module = "mtcnn"
+introduced-by = ["face"]
+
+[packages."retina-face"]
+version = "0.0.18"
+module = "retinaface"
+introduced-by = ["face"]
+
+[packages."tf-keras"]
+version = "2.20.1"
+module = "tf_keras"
+introduced-by = ["face"]

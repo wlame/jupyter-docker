@@ -20,9 +20,29 @@ env:
 
 jobs:
 
+  # ─── Tier 0 — fast consistency gate (no Docker) ─────────────────────────────
+  consistency:
+    name: consistency
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify generated files match targets/matrix.toml
+        run: python3 scripts/gen_targets.py --check
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.28"
+      - name: Verify lockfiles are up to date
+        run: |
+          for d in targets/*/; do
+            echo "── ${d}"
+            (cd "${d}" && uv lock --check)
+          done
+
   # ─── Tier 1 ──────────────────────────────────────────────────────────────────
   base:
     name: base
+    needs: consistency
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

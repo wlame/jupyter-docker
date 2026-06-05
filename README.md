@@ -402,9 +402,13 @@ Note: Requires NVIDIA Container Toolkit.
 ├── Dockerfile              # Multi-stage Dockerfile
 ├── build-all.sh            # Build and test all targets
 ├── README.md
+├── scripts/
+│   └── gen_targets.py      # Regenerates per-target files from the matrix
 ├── targets/
+│   ├── matrix.toml         # SOURCE OF TRUTH: packages, versions, target tree
 │   ├── base/
-│   │   ├── pyproject.toml
+│   │   ├── pyproject.toml  # GENERATED — edit matrix.toml instead
+│   │   ├── uv.lock         # Committed lockfile (reproducible builds)
 │   │   └── verify_imports.py
 │   ├── scientific/
 │   ├── visualization/

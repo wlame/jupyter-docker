@@ -1,171 +1,157 @@
 #!/usr/bin/env python3
-"""Verify all imports for the FULL target (all libraries)."""
+"""Verify all full target imports are working correctly.
+
+GENERATED FILE — do not edit by hand.
+Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py).
+"""
 
 import sys
-import os
 
-# Suppress TensorFlow warnings during import verification
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-
-# All imports organized by target
-IMPORTS = {
-    "base": [
-        ("IPython", "ipython"),
-        ("jupyter", "jupyter"),
-        ("jupyterlab", "jupyterlab"),
-        ("orjson", "orjson"),
-        ("ujson", "ujson"),
-        ("simplejson", "simplejson"),
-        ("lxml", "lxml"),
-        ("xmltodict", "xmltodict"),
-        ("bs4", "beautifulsoup4"),
-        ("yaml", "pyyaml"),
-        ("requests", "requests"),
-        ("httpx", "httpx"),
-        ("aiohttp", "aiohttp"),
-        ("pydantic", "pydantic"),
-        ("tqdm", "tqdm"),
-        ("loguru", "loguru"),
-        ("dotenv", "python-dotenv"),
-        ("joblib", "joblib"),
-        ("toolz", "toolz"),
-        ("more_itertools", "more-itertools"),
-        ("dateutil", "python-dateutil"),
-        ("pytz", "pytz"),
-        ("pendulum", "pendulum"),
-    ],
-    "scientific": [
-        ("numpy", "numpy"),
-        ("scipy", "scipy"),
-        ("pandas", "pandas"),
-        ("statsmodels", "statsmodels"),
-        ("sympy", "sympy"),
-    ],
-    "visualization": [
-        ("matplotlib", "matplotlib"),
-        ("seaborn", "seaborn"),
-        ("plotly", "plotly"),
-        ("bokeh", "bokeh"),
-        ("holoviews", "holoviews"),
-        ("hvplot", "hvplot"),
-        ("panel", "panel"),
-        ("altair", "altair"),
-    ],
-    "dataio": [
-        ("pyarrow", "pyarrow"),
-        ("fastparquet", "fastparquet"),
-        ("h5py", "h5py"),
-        ("tables", "tables"),
-        ("openpyxl", "openpyxl"),
-        ("xlrd", "xlrd"),
-        ("sqlalchemy", "sqlalchemy"),
-    ],
-    "ml": [
-        ("sklearn", "scikit-learn"),
-        ("xgboost", "xgboost"),
-        ("lightgbm", "lightgbm"),
-        ("imblearn", "imbalanced-learn"),
-        ("optuna", "optuna"),
-    ],
-    "deeplearn": [
-        ("torch", "torch"),
-        ("torchvision", "torchvision"),
-        ("tensorflow", "tensorflow"),
-        ("keras", "keras"),
-    ],
-    "vision": [
-        ("PIL", "pillow"),
-        ("cv2", "opencv-python-headless"),
-        ("skimage", "scikit-image"),
-        ("imageio", "imageio"),
-        ("ultralytics", "ultralytics"),
-    ],
-    "audio": [
-        ("torchaudio", "torchaudio"),
-        ("librosa", "librosa"),
-        ("soundfile", "soundfile"),
-        ("pydub", "pydub"),
-        ("audioread", "audioread"),
-    ],
-    "geospatial": [
-        ("cartopy", "cartopy"),
-        ("geopandas", "geopandas"),
-        ("shapely", "shapely"),
-        ("pyproj", "pyproj"),
-        ("folium", "folium"),
-        ("geoviews", "geoviews"),
-    ],
-    "timeseries": [
-        ("tsfresh", "tsfresh"),
-        ("sktime", "sktime"),
-        ("pmdarima", "pmdarima"),
-        ("prophet", "prophet"),
-    ],
-    "nlp": [
-        ("spacy", "spacy"),
-        ("nltk", "nltk"),
-        ("transformers", "transformers"),
-        ("sentence_transformers", "sentence-transformers"),
-        ("tokenizers", "tokenizers"),
-    ],
-    "speech": [
-        ("whisper", "openai-whisper"),
-        ("faster_whisper", "faster-whisper"),
-        ("speech_recognition", "SpeechRecognition"),
-        ("TTS", "coqui-tts"),
-        ("gtts", "gTTS"),
-        ("pyannote.audio", "pyannote-audio"),
-        ("speechbrain", "speechbrain"),
-    ],
-    "face": [
-        ("deepface", "deepface"),
-        ("mtcnn", "mtcnn"),
-        ("face_alignment", "face-alignment"),
-        ("diffusers", "diffusers"),
-        ("dlib", "dlib"),
-    ],
-}
+IMPORTS = [
+    # --- base ---
+    ("aiohttp", "aiohttp"),
+    ("bs4", "beautifulsoup4"),
+    ("httpx", "httpx"),
+    ("IPython", "ipython"),
+    ("joblib", "joblib"),
+    ("jupyter", "jupyter"),
+    ("jupyterlab", "jupyterlab"),
+    ("loguru", "loguru"),
+    ("lxml", "lxml"),
+    ("more_itertools", "more-itertools"),
+    ("orjson", "orjson"),
+    ("pendulum", "pendulum"),
+    ("pip", "pip"),
+    ("pydantic", "pydantic"),
+    ("pytest", "pytest"),
+    ("pytest_timeout", "pytest-timeout"),
+    ("dateutil", "python-dateutil"),
+    ("dotenv", "python-dotenv"),
+    ("pytz", "pytz"),
+    ("yaml", "pyyaml"),
+    ("requests", "requests"),
+    ("simplejson", "simplejson"),
+    ("toolz", "toolz"),
+    ("tqdm", "tqdm"),
+    ("ujson", "ujson"),
+    ("xmltodict", "xmltodict"),
+    # --- scientific ---
+    ("matplotlib", "matplotlib"),
+    ("numpy", "numpy"),
+    ("pandas", "pandas"),
+    ("scipy", "scipy"),
+    ("statsmodels", "statsmodels"),
+    ("sympy", "sympy"),
+    # --- visualization ---
+    ("altair", "altair"),
+    ("bokeh", "bokeh"),
+    ("holoviews", "holoviews"),
+    ("hvplot", "hvplot"),
+    ("panel", "panel"),
+    ("plotly", "plotly"),
+    ("seaborn", "seaborn"),
+    # --- dataio ---
+    ("fastparquet", "fastparquet"),
+    ("h5py", "h5py"),
+    ("openpyxl", "openpyxl"),
+    ("pyarrow", "pyarrow"),
+    ("sqlalchemy", "sqlalchemy"),
+    ("tables", "tables"),
+    ("xlrd", "xlrd"),
+    # --- ml ---
+    ("imblearn", "imbalanced-learn"),
+    ("lightgbm", "lightgbm"),
+    ("optuna", "optuna"),
+    ("sklearn", "scikit-learn"),
+    ("xgboost", "xgboost"),
+    # --- deeplearn ---
+    ("keras", "keras"),
+    ("tensorflow", "tensorflow"),
+    ("torch", "torch"),
+    ("torchaudio", "torchaudio"),
+    ("torchvision", "torchvision"),
+    # --- vision ---
+    ("imageio", "imageio"),
+    ("cv2", "opencv-python-headless"),
+    ("PIL", "pillow"),
+    ("skimage", "scikit-image"),
+    ("ultralytics", "ultralytics"),
+    # --- audio ---
+    ("audioread", "audioread"),
+    ("librosa", "librosa"),
+    ("numba", "numba"),
+    ("pydub", "pydub"),
+    ("soundfile", "soundfile"),
+    # --- geospatial ---
+    ("cartopy", "cartopy"),
+    ("folium", "folium"),
+    ("geopandas", "geopandas"),
+    ("geoviews", "geoviews"),
+    ("pyproj", "pyproj"),
+    ("shapely", "shapely"),
+    # --- timeseries ---
+    ("pmdarima", "pmdarima"),
+    ("prophet", "prophet"),
+    ("sktime", "sktime"),
+    ("tsfresh", "tsfresh"),
+    # --- nlp ---
+    ("en_core_web_sm", "en-core-web-sm"),
+    ("nltk", "nltk"),
+    ("sentence_transformers", "sentence-transformers"),
+    ("spacy", "spacy"),
+    ("tokenizers", "tokenizers"),
+    ("transformers", "transformers"),
+    # --- speech ---
+    ("TTS", "coqui-tts"),
+    ("faster_whisper", "faster-whisper"),
+    ("gtts", "gtts"),
+    ("whisper", "openai-whisper"),
+    ("piper", "piper-tts"),
+    ("pyannote.audio", "pyannote-audio"),
+    ("speechbrain", "speechbrain"),
+    ("speech_recognition", "speechrecognition"),
+    # --- face ---
+    ("deepface", "deepface"),
+    ("diffusers", "diffusers"),
+    ("dlib", "dlib"),
+    ("face_alignment", "face-alignment"),
+    ("mtcnn", "mtcnn"),
+    ("retinaface", "retina-face"),
+    ("tf_keras", "tf-keras"),
+]
 
 
 def verify_imports():
     """Verify all imports and report results."""
     print("=" * 60)
-    print("Verifying FULL target imports (all libraries)")
+    print("Verifying FULL target imports")
     print("=" * 60)
 
-    total_passed = 0
-    total_failed = 0
-    all_errors = []
+    passed = 0
+    failed = 0
+    errors = []
 
-    for target_name, imports in IMPORTS.items():
-        print(f"\n[{target_name.upper()}]")
-        passed = 0
-        failed = 0
+    for module_name, package_name in IMPORTS:
+        try:
+            __import__(module_name)
+            print(f"  \u2713 {package_name}")
+            passed += 1
+        except ImportError as e:
+            print(f"  \u2717 {package_name}: {e}")
+            failed += 1
+            errors.append((package_name, str(e)))
 
-        for module_name, package_name in imports:
-            try:
-                __import__(module_name)
-                print(f"  ✓ {package_name}")
-                passed += 1
-            except ImportError as e:
-                print(f"  ✗ {package_name}: {e}")
-                failed += 1
-                all_errors.append((target_name, package_name, str(e)))
-
-        total_passed += passed
-        total_failed += failed
-
-    print("\n" + "=" * 60)
-    print(f"TOTAL: {total_passed} passed, {total_failed} failed")
+    print("=" * 60)
+    print(f"Results: {passed} passed, {failed} failed")
     print("=" * 60)
 
-    if total_failed > 0:
+    if failed > 0:
         print("\nFailed imports:")
-        for target, pkg, err in all_errors:
-            print(f"  [{target}] {pkg}: {err}")
+        for pkg, err in errors:
+            print(f"  - {pkg}: {err}")
         sys.exit(1)
     else:
-        print("\nAll imports successful!")
+        print("\nAll full imports successful!")
         sys.exit(0)
 
 
