@@ -24,6 +24,10 @@ from bokeh.palettes import Category10
 # HoloViews imports
 import holoviews as hv
 from holoviews import opts
+import os
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 hv.extension("bokeh")
 
@@ -46,7 +50,7 @@ sizes = np.abs(y) * 5 + 5
 source = ColumnDataSource(data=dict(x=x, y=y, colors=colors, sizes=sizes))
 
 # Scatter plot with hover
-output_file("/home/jupyter/examples/output/bokeh_scatter.html")
+output_file(os.path.join(OUTPUT_DIR, "bokeh_scatter.html"))
 p = figure(
     title="Interactive Scatter Plot",
     x_axis_label="X",
@@ -65,7 +69,7 @@ save(p)
 print("Saved: bokeh_scatter.html")
 
 # Multiple line plot
-output_file("/home/jupyter/examples/output/bokeh_lines.html")
+output_file(os.path.join(OUTPUT_DIR, "bokeh_lines.html"))
 x_line = np.linspace(0, 4 * np.pi, 100)
 p = figure(
     title="Multiple Time Series",
@@ -86,7 +90,7 @@ save(p)
 print("Saved: bokeh_lines.html")
 
 # Bar chart with interaction
-output_file("/home/jupyter/examples/output/bokeh_bar.html")
+output_file(os.path.join(OUTPUT_DIR, "bokeh_bar.html"))
 categories = ["Product A", "Product B", "Product C", "Product D", "Product E"]
 values = [28, 55, 43, 91, 67]
 colors = Category10[5]
@@ -114,7 +118,7 @@ print("\n" + "=" * 60)
 print("Bokeh Dashboard Layout")
 print("=" * 60)
 
-output_file("/home/jupyter/examples/output/bokeh_dashboard.html")
+output_file(os.path.join(OUTPUT_DIR, "bokeh_dashboard.html"))
 
 # Create multiple plots
 dates = pd.date_range("2024-01-01", periods=50, freq="D")
@@ -169,7 +173,7 @@ scatter = hv.Scatter(df, kdims=["x"], vdims=["y", "category", "value"])
 scatter = scatter.opts(
     opts.Scatter(color="category", cmap="Category10", size=8, tools=["hover"], width=600, height=400)
 )
-hv.save(scatter, "/home/jupyter/examples/output/holoviews_scatter.html")
+hv.save(scatter, os.path.join(OUTPUT_DIR, "holoviews_scatter.html"))
 print("Saved: holoviews_scatter.html")
 
 # HoloViews with multiple elements
@@ -178,7 +182,7 @@ curve = hv.Curve(curve_data, label="sin(x)")
 curve2 = hv.Curve([(x, np.cos(x)) for x in np.linspace(0, 2 * np.pi, 100)], label="cos(x)")
 
 overlay = (curve * curve2).opts(opts.Curve(width=600, height=400, tools=["hover"]))
-hv.save(overlay, "/home/jupyter/examples/output/holoviews_overlay.html")
+hv.save(overlay, os.path.join(OUTPUT_DIR, "holoviews_overlay.html"))
 print("Saved: holoviews_overlay.html")
 
 # HoloViews Heatmap
@@ -186,7 +190,7 @@ heatmap_data = [(i, j, np.sin(i) * np.cos(j)) for i in range(10) for j in range(
 heatmap = hv.HeatMap(heatmap_data).opts(
     opts.HeatMap(colorbar=True, width=500, height=400, cmap="viridis", tools=["hover"])
 )
-hv.save(heatmap, "/home/jupyter/examples/output/holoviews_heatmap.html")
+hv.save(heatmap, os.path.join(OUTPUT_DIR, "holoviews_heatmap.html"))
 print("Saved: holoviews_heatmap.html")
 
 # HoloViews Layout
@@ -195,7 +199,7 @@ hist = hv.Histogram(np.histogram(np.random.randn(1000), bins=30)).opts(
     opts.Histogram(width=300, height=300)
 )
 layout = (bars + hist).opts(shared_axes=False)
-hv.save(layout, "/home/jupyter/examples/output/holoviews_layout.html")
+hv.save(layout, os.path.join(OUTPUT_DIR, "holoviews_layout.html"))
 print("Saved: holoviews_layout.html")
 
 # =============================================================================
@@ -219,7 +223,7 @@ ts_df = pd.DataFrame(
 ts_df = ts_df.set_index("date")
 
 plot = ts_df.hvplot.line(title="Time Series with hvPlot", width=700, height=400)
-hv.save(plot, "/home/jupyter/examples/output/hvplot_timeseries.html")
+hv.save(plot, os.path.join(OUTPUT_DIR, "hvplot_timeseries.html"))
 print("Saved: hvplot_timeseries.html")
 
 # Scatter with hvplot
@@ -232,7 +236,7 @@ scatter_plot = df.hvplot.scatter(
     width=700,
     height=400,
 )
-hv.save(scatter_plot, "/home/jupyter/examples/output/hvplot_scatter.html")
+hv.save(scatter_plot, os.path.join(OUTPUT_DIR, "hvplot_scatter.html"))
 print("Saved: hvplot_scatter.html")
 
 print("\n" + "=" * 60)

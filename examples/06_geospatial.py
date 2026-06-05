@@ -23,6 +23,10 @@ import geopandas as gpd
 from shapely.geometry import Point, Polygon, LineString
 import folium
 from folium.plugins import HeatMap, MarkerCluster
+import os
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # =============================================================================
 # Cartopy - Map Projections and Features
@@ -72,7 +76,7 @@ ax4.gridlines(linewidth=0.5, alpha=0.5)
 ax4.set_title("Robinson Projection")
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/cartopy_projections.png", dpi=150, bbox_inches="tight")
+plt.savefig(os.path.join(OUTPUT_DIR, "cartopy_projections.png"), dpi=150, bbox_inches="tight")
 print("Saved: cartopy_projections.png")
 plt.close()
 
@@ -141,7 +145,7 @@ for idx, row in cities.iterrows():
 
 plt.colorbar(scatter, label="Population (millions)", shrink=0.5)
 ax.set_title("Major World Cities by Population", fontsize=14)
-plt.savefig("/home/jupyter/examples/output/cartopy_cities.png", dpi=150, bbox_inches="tight")
+plt.savefig(os.path.join(OUTPUT_DIR, "cartopy_cities.png"), dpi=150, bbox_inches="tight")
 print("Saved: cartopy_cities.png")
 plt.close()
 
@@ -207,7 +211,7 @@ gdf_cities.plot(
 ax.set_title("Cities GeoDataFrame Visualization")
 ax.set_xlabel("Longitude")
 ax.set_ylabel("Latitude")
-plt.savefig("/home/jupyter/examples/output/geopandas_cities.png", dpi=150, bbox_inches="tight")
+plt.savefig(os.path.join(OUTPUT_DIR, "geopandas_cities.png"), dpi=150, bbox_inches="tight")
 print("Saved: geopandas_cities.png")
 plt.close()
 
@@ -250,7 +254,7 @@ folium.Polygon(
     popup="Continental US (approximate)",
 ).add_to(m)
 
-m.save("/home/jupyter/examples/output/folium_basic.html")
+m.save(os.path.join(OUTPUT_DIR, "folium_basic.html"))
 print("Saved: folium_basic.html")
 
 # Folium with marker clusters
@@ -268,7 +272,7 @@ for point in random_points:
         marker_cluster
     )
 
-m_cluster.save("/home/jupyter/examples/output/folium_cluster.html")
+m_cluster.save(os.path.join(OUTPUT_DIR, "folium_cluster.html"))
 print("Saved: folium_cluster.html")
 
 # Folium heatmap
@@ -280,7 +284,7 @@ heat_data = [
 ]
 
 HeatMap(heat_data, radius=50).add_to(m_heat)
-m_heat.save("/home/jupyter/examples/output/folium_heatmap.html")
+m_heat.save(os.path.join(OUTPUT_DIR, "folium_heatmap.html"))
 print("Saved: folium_heatmap.html")
 
 # Folium with different tile layers
@@ -301,7 +305,7 @@ folium.Marker(
     icon=folium.Icon(color="red", icon="info-sign"),
 ).add_to(m_tiles)
 
-m_tiles.save("/home/jupyter/examples/output/folium_layers.html")
+m_tiles.save(os.path.join(OUTPUT_DIR, "folium_layers.html"))
 print("Saved: folium_layers.html")
 
 print("\n" + "=" * 60)

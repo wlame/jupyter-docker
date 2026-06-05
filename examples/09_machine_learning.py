@@ -36,6 +36,10 @@ from sklearn.cluster import KMeans
 # Gradient boosting libraries
 import xgboost as xgb
 import lightgbm as lgb
+import os
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # =============================================================================
 # Classification Example
@@ -144,7 +148,7 @@ axes[1].set_title("Top 10 Feature Importances")
 axes[1].set_xlabel("Importance")
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/ml_classification.png", dpi=150)
+plt.savefig(os.path.join(OUTPUT_DIR, "ml_classification.png"), dpi=150)
 print("\nSaved: ml_classification.png")
 plt.close()
 
@@ -251,7 +255,7 @@ axes[1].set_xlabel("PC1")
 axes[1].set_ylabel("PC2")
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/ml_clustering.png", dpi=150)
+plt.savefig(os.path.join(OUTPUT_DIR, "ml_clustering.png"), dpi=150)
 print("Saved: ml_clustering.png")
 plt.close()
 
@@ -286,7 +290,7 @@ axes[1].set_title("Cumulative Variance Explained")
 axes[1].legend()
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/ml_pca.png", dpi=150)
+plt.savefig(os.path.join(OUTPUT_DIR, "ml_pca.png"), dpi=150)
 print("Saved: ml_pca.png")
 plt.close()
 

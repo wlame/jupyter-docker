@@ -14,6 +14,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Set style
 plt.style.use("seaborn-v0_8-whitegrid")
@@ -78,7 +82,7 @@ axes[1, 1].set_title("Histogram with Mean Line")
 axes[1, 1].legend()
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/matplotlib_basics.png", dpi=150, bbox_inches="tight")
+plt.savefig(os.path.join(OUTPUT_DIR, "matplotlib_basics.png"), dpi=150, bbox_inches="tight")
 print("Saved: matplotlib_basics.png")
 plt.close()
 
@@ -130,7 +134,7 @@ sns.countplot(data=df, x="group", hue="category", ax=axes[1, 2])
 axes[1, 2].set_title("Count Plot")
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/seaborn_stats.png", dpi=150, bbox_inches="tight")
+plt.savefig(os.path.join(OUTPUT_DIR, "seaborn_stats.png"), dpi=150, bbox_inches="tight")
 print("Saved: seaborn_stats.png")
 plt.close()
 
@@ -168,7 +172,7 @@ sns.heatmap(cluster_data, cmap="YlGnBu", ax=axes[1], cbar_kws={"label": "Value"}
 axes[1].set_title("General Heatmap")
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/heatmaps.png", dpi=150, bbox_inches="tight")
+plt.savefig(os.path.join(OUTPUT_DIR, "heatmaps.png"), dpi=150, bbox_inches="tight")
 print("Saved: heatmaps.png")
 plt.close()
 
@@ -218,7 +222,7 @@ axes[1].set_ylabel("Average Value")
 axes[1].set_title("Monthly Aggregation with Error Bars")
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/timeseries_viz.png", dpi=150, bbox_inches="tight")
+plt.savefig(os.path.join(OUTPUT_DIR, "timeseries_viz.png"), dpi=150, bbox_inches="tight")
 print("Saved: timeseries_viz.png")
 plt.close()
 

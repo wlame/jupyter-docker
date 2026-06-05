@@ -26,6 +26,10 @@ from tsfresh.feature_extraction import MinimalFCParameters
 from sktime.forecasting.naive import NaiveForecaster
 from sktime.forecasting.model_selection import temporal_train_test_split
 from sktime.performance_metrics.forecasting import mean_absolute_percentage_error
+import os
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # =============================================================================
 # Generate Sample Time Series Data
@@ -72,7 +76,7 @@ decomposition.seasonal.plot(ax=axes[2], title="Seasonal")
 decomposition.resid.plot(ax=axes[3], title="Residual")
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/ts_decomposition.png", dpi=150)
+plt.savefig(os.path.join(OUTPUT_DIR, "ts_decomposition.png"), dpi=150)
 print("Saved: ts_decomposition.png")
 plt.close()
 
@@ -121,7 +125,7 @@ axes[1].set_title("Partial Autocorrelation Function (PACF)")
 axes[1].set_xlabel("Lag")
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/ts_acf_pacf.png", dpi=150)
+plt.savefig(os.path.join(OUTPUT_DIR, "ts_acf_pacf.png"), dpi=150)
 print("Saved: ts_acf_pacf.png")
 plt.close()
 
@@ -159,7 +163,7 @@ forecast.plot(ax=ax, label="Forecast", linestyle="--")
 ax.set_title("ARIMA Forecast")
 ax.legend()
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/ts_arima.png", dpi=150)
+plt.savefig(os.path.join(OUTPUT_DIR, "ts_arima.png"), dpi=150)
 print("Saved: ts_arima.png")
 plt.close()
 
@@ -256,7 +260,7 @@ y_pred.plot(ax=ax, label="Naive Forecast", linestyle="--")
 ax.set_title("sktime Naive Forecaster")
 ax.legend()
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/ts_sktime.png", dpi=150)
+plt.savefig(os.path.join(OUTPUT_DIR, "ts_sktime.png"), dpi=150)
 print("Saved: ts_sktime.png")
 plt.close()
 
@@ -303,7 +307,7 @@ axes[1].set_title("Z-Scores")
 axes[1].legend()
 
 plt.tight_layout()
-plt.savefig("/home/jupyter/examples/output/ts_anomalies.png", dpi=150)
+plt.savefig(os.path.join(OUTPUT_DIR, "ts_anomalies.png"), dpi=150)
 print("Saved: ts_anomalies.png")
 plt.close()
 

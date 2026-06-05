@@ -15,6 +15,10 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import os
+
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # =============================================================================
 # Plotly Express Quick Plots
@@ -45,7 +49,7 @@ fig = px.line(
     title="Daily Sales by Region",
     labels={"sales": "Sales ($)", "date": "Date"},
 )
-fig.write_html("/home/jupyter/examples/output/plotly_line.html")
+fig.write_html(os.path.join(OUTPUT_DIR, "plotly_line.html"))
 print("Saved: plotly_line.html")
 
 # Scatter plot with multiple dimensions
@@ -59,7 +63,7 @@ fig = px.scatter(
     title="Sales vs Profit by Region",
     labels={"sales": "Sales ($)", "profit": "Profit ($)"},
 )
-fig.write_html("/home/jupyter/examples/output/plotly_scatter.html")
+fig.write_html(os.path.join(OUTPUT_DIR, "plotly_scatter.html"))
 print("Saved: plotly_scatter.html")
 
 # Bar chart
@@ -72,7 +76,7 @@ fig = px.bar(
     barmode="group",
     title="Total Sales by Region and Category",
 )
-fig.write_html("/home/jupyter/examples/output/plotly_bar.html")
+fig.write_html(os.path.join(OUTPUT_DIR, "plotly_bar.html"))
 print("Saved: plotly_bar.html")
 
 # =============================================================================
@@ -115,7 +119,7 @@ fig.add_trace(
 )
 
 fig.update_layout(height=800, title_text="Dashboard with Multiple Chart Types")
-fig.write_html("/home/jupyter/examples/output/plotly_subplots.html")
+fig.write_html(os.path.join(OUTPUT_DIR, "plotly_subplots.html"))
 print("Saved: plotly_subplots.html")
 
 # =============================================================================
@@ -135,7 +139,7 @@ fig = px.scatter_3d(
     size="sales",
     title="3D Sales Analysis",
 )
-fig.write_html("/home/jupyter/examples/output/plotly_3d_scatter.html")
+fig.write_html(os.path.join(OUTPUT_DIR, "plotly_3d_scatter.html"))
 print("Saved: plotly_3d_scatter.html")
 
 # 3D Surface
@@ -149,7 +153,7 @@ fig.update_layout(
     title="3D Surface Plot",
     scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"),
 )
-fig.write_html("/home/jupyter/examples/output/plotly_3d_surface.html")
+fig.write_html(os.path.join(OUTPUT_DIR, "plotly_3d_surface.html"))
 print("Saved: plotly_3d_surface.html")
 
 # =============================================================================
@@ -185,7 +189,7 @@ fig = px.scatter(
     range_y=[50, 700],
     title="Sales Evolution Over Months (Animated)",
 )
-fig.write_html("/home/jupyter/examples/output/plotly_animated.html")
+fig.write_html(os.path.join(OUTPUT_DIR, "plotly_animated.html"))
 print("Saved: plotly_animated.html")
 
 # =============================================================================
@@ -230,7 +234,7 @@ fig = go.Figure(
     ]
 )
 fig.update_layout(title="Stock Price Candlestick Chart", xaxis_rangeslider_visible=False)
-fig.write_html("/home/jupyter/examples/output/plotly_candlestick.html")
+fig.write_html(os.path.join(OUTPUT_DIR, "plotly_candlestick.html"))
 print("Saved: plotly_candlestick.html")
 
 print("\n" + "=" * 60)
