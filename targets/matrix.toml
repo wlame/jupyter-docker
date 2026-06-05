@@ -83,12 +83,12 @@ description = "Complete data science environment with all libraries"
 # ── introduced in: base ──────────────────────────────────────────────────────
 
 [packages."aiohttp"]
-version = "3.13.3"
+version = "3.14.1"
 module = "aiohttp"
 introduced-by = ["base"]
 
 [packages."beautifulsoup4"]
-version = "4.14.3"
+version = "4.15.0"
 module = "bs4"
 introduced-by = ["base"]
 
@@ -98,7 +98,7 @@ module = "httpx"
 introduced-by = ["base"]
 
 [packages."ipython"]
-version = "9.9.0"
+version = "9.15.0"
 module = "IPython"
 introduced-by = ["base"]
 
@@ -113,7 +113,7 @@ module = "jupyter"
 introduced-by = ["base"]
 
 [packages."jupyterlab"]
-version = "4.5.2"
+version = "4.6.1"
 module = "jupyterlab"
 introduced-by = ["base"]
 
@@ -123,7 +123,7 @@ module = "loguru"
 introduced-by = ["base"]
 
 [packages."lxml"]
-version = "6.0.2"
+version = "6.1.1"
 module = "lxml"
 introduced-by = ["base"]
 
@@ -133,12 +133,12 @@ module = "more_itertools"
 introduced-by = ["base"]
 
 [packages."orjson"]
-version = "3.11.5"
+version = "3.11.9"
 module = "orjson"
 introduced-by = ["base"]
 
 [packages."pendulum"]
-version = "3.1.0"
+version = "3.2.0"
 module = "pendulum"
 introduced-by = ["base"]
 
@@ -148,7 +148,7 @@ module = "pip"
 introduced-by = ["base"]
 
 [packages."pydantic"]
-version = "2.12.5"
+version = "2.13.4"
 module = "pydantic"
 introduced-by = ["base"]
 
@@ -168,12 +168,12 @@ module = "dateutil"
 introduced-by = ["base"]
 
 [packages."python-dotenv"]
-version = "1.2.1"
+version = "1.2.2"
 module = "dotenv"
 introduced-by = ["base"]
 
 [packages."pytz"]
-version = "2025.2"
+version = "2026.2"
 module = "pytz"
 introduced-by = ["base"]
 
@@ -183,7 +183,7 @@ module = "yaml"
 introduced-by = ["base"]
 
 [packages."requests"]
-version = "2.32.5"
+version = "2.34.2"
 module = "requests"
 introduced-by = ["base"]
 
@@ -198,38 +198,32 @@ module = "toolz"
 introduced-by = ["base"]
 
 [packages."tqdm"]
-version = "4.67.1"
+version = "4.68.3"
 module = "tqdm"
 introduced-by = ["base"]
 
 [packages."ujson"]
-version = "5.11.0"
+version = "5.13.0"
 module = "ujson"
 introduced-by = ["base"]
 
 [packages."xmltodict"]
-version = "1.0.2"
+version = "1.0.4"
 module = "xmltodict"
 introduced-by = ["base"]
 
 # ── introduced in: scientific ────────────────────────────────────────────────
 
 [packages."matplotlib"]
-version = "3.10.8"
+version = "3.11.0"
 module = "matplotlib"
 introduced-by = ["scientific", "visualization", "audio", "nlp", "speech", "face"]
 
 [packages."numpy"]
-version = "2.4.1"
+# Ceiling: numba 0.66 and sktime 1.0 both require numpy < 2.5.
+version = "2.4.6"
 module = "numpy"
 introduced-by = ["scientific", "vision", "audio", "nlp", "speech", "face"]
-# numba (pulled in via tsfresh/librosa) does not support numpy 2.4 yet;
-# the targets below stay on the newest numba-compatible release.
-[packages."numpy".overrides]
-audio = "2.3.5"
-timeseries = "2.3.5"
-speech = "2.3.5"
-full = "2.3.5"
 
 [packages."pandas"]
 version = "2.3.3"
@@ -237,7 +231,7 @@ module = "pandas"
 introduced-by = ["scientific"]
 
 [packages."scipy"]
-version = "1.17.0"
+version = "1.18.0"
 module = "scipy"
 introduced-by = ["scientific"]
 
@@ -254,17 +248,17 @@ introduced-by = ["scientific"]
 # ── introduced in: visualization ─────────────────────────────────────────────
 
 [packages."altair"]
-version = "6.0.0"
+version = "6.2.2"
 module = "altair"
 introduced-by = ["visualization"]
 
 [packages."bokeh"]
-version = "3.8.2"
+version = "3.9.1"
 module = "bokeh"
 introduced-by = ["visualization"]
 
 [packages."holoviews"]
-version = "1.22.1"
+version = "1.23.1"
 module = "holoviews"
 introduced-by = ["visualization"]
 
@@ -274,12 +268,12 @@ module = "hvplot"
 introduced-by = ["visualization"]
 
 [packages."panel"]
-version = "1.8.5"
+version = "1.9.3"
 module = "panel"
 introduced-by = ["visualization"]
 
 [packages."plotly"]
-version = "6.5.2"
+version = "6.8.0"
 module = "plotly"
 introduced-by = ["visualization"]
 
@@ -291,14 +285,17 @@ introduced-by = ["visualization"]
 # ── introduced in: dataio ────────────────────────────────────────────────────
 
 [packages."fastparquet"]
-version = "2025.12.0"
+version = "2026.5.0"
 module = "fastparquet"
 introduced-by = ["dataio"]
 
 [packages."h5py"]
-version = "3.15.1"
+version = "3.16.0"
 module = "h5py"
 introduced-by = ["dataio"]
+# tensorflow 2.21 requires h5py < 3.15; only full merges both stacks.
+[packages."h5py".overrides]
+full = "3.14.0"
 
 [packages."openpyxl"]
 version = "3.1.5"
@@ -306,17 +303,17 @@ module = "openpyxl"
 introduced-by = ["dataio"]
 
 [packages."pyarrow"]
-version = "23.0.0"
+version = "24.0.0"
 module = "pyarrow"
 introduced-by = ["dataio"]
 
 [packages."sqlalchemy"]
-version = "2.0.45"
+version = "2.0.51"
 module = "sqlalchemy"
 introduced-by = ["dataio"]
 
 [packages."tables"]
-version = "3.10.2"
+version = "3.11.1"
 module = "tables"
 introduced-by = ["dataio"]
 
@@ -328,7 +325,7 @@ introduced-by = ["dataio"]
 # ── introduced in: ml ────────────────────────────────────────────────────────
 
 [packages."imbalanced-learn"]
-version = "0.14.1"
+version = "0.14.2"
 module = "imblearn"
 introduced-by = ["ml", "timeseries"]
 
@@ -338,12 +335,12 @@ module = "lightgbm"
 introduced-by = ["ml", "timeseries"]
 
 [packages."optuna"]
-version = "4.6.0"
+version = "4.9.0"
 module = "optuna"
 introduced-by = ["ml", "timeseries"]
 
 [packages."scikit-learn"]
-version = "1.8.0"
+version = "1.9.0"
 module = "sklearn"
 introduced-by = ["ml", "timeseries"]
 # sktime constrains scikit-learn below 1.8; affected targets hold 1.7.2.
@@ -352,41 +349,48 @@ timeseries = "1.7.2"
 full = "1.7.2"
 
 [packages."xgboost"]
-version = "3.1.3"
+version = "3.3.0"
 module = "xgboost"
 introduced-by = ["ml", "timeseries"]
 
 # ── introduced in: deeplearn ─────────────────────────────────────────────────
 
 [packages."keras"]
-version = "3.13.1"
+version = "3.15.0"
 module = "keras"
 introduced-by = ["deeplearn", "face"]
 
 [packages."tensorflow"]
-version = "2.20.0"
+version = "2.21.0"
 module = "tensorflow"
 introduced-by = ["deeplearn", "face"]
 
 [packages."torch"]
-version = "2.9.1"
+version = "2.12.1"
 module = "torch"
 introduced-by = ["deeplearn", "audio", "nlp", "speech", "face"]
 
 [packages."torchaudio"]
-version = "2.9.1"
+version = "2.11.0"
 module = "torchaudio"
 introduced-by = ["deeplearn", "audio", "speech"]
 
+# torchaudio >= 2.10 delegates load/save to torchcodec (needs FFmpeg shared
+# libraries at runtime — present in the audio/speech/full stages only).
+[packages."torchcodec"]
+version = "0.14.0"
+module = "torchcodec"
+introduced-by = ["audio", "speech"]
+
 [packages."torchvision"]
-version = "0.24.1"
+version = "0.27.1"
 module = "torchvision"
 introduced-by = ["deeplearn", "face"]
 
 # ── introduced in: vision ────────────────────────────────────────────────────
 
 [packages."imageio"]
-version = "2.37.2"
+version = "2.37.3"
 module = "imageio"
 introduced-by = ["vision"]
 
@@ -396,7 +400,7 @@ module = "cv2"
 introduced-by = ["vision", "face"]
 
 [packages."pillow"]
-version = "12.1.0"
+version = "12.3.0"
 module = "PIL"
 introduced-by = ["vision", "face"]
 
@@ -406,7 +410,7 @@ module = "skimage"
 introduced-by = ["vision", "face"]
 
 [packages."ultralytics"]
-version = "8.4.5"
+version = "8.4.87"
 module = "ultralytics"
 introduced-by = ["vision"]
 
@@ -433,7 +437,7 @@ module = "pydub"
 introduced-by = ["audio"]
 
 [packages."soundfile"]
-version = "0.13.1"
+version = "0.14.0"
 module = "soundfile"
 introduced-by = ["audio", "speech"]
 
@@ -450,7 +454,7 @@ module = "folium"
 introduced-by = ["geospatial"]
 
 [packages."geopandas"]
-version = "1.1.2"
+version = "1.1.4"
 module = "geopandas"
 introduced-by = ["geospatial"]
 
@@ -477,17 +481,17 @@ module = "pmdarima"
 introduced-by = ["timeseries"]
 
 [packages."prophet"]
-version = "1.2.1"
+version = "1.3.0"
 module = "prophet"
 introduced-by = ["timeseries"]
 
 [packages."sktime"]
-version = "0.40.1"
+version = "1.0.1"
 module = "sktime"
 introduced-by = ["timeseries"]
 
 [packages."tsfresh"]
-version = "0.21.1"
+version = "0.21.2"
 module = "tsfresh"
 introduced-by = ["timeseries"]
 
@@ -499,7 +503,7 @@ introduced-by = ["nlp"]
 source-url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl"
 
 [packages."nltk"]
-version = "3.9.2"
+version = "3.9.4"
 module = "nltk"
 introduced-by = ["nlp"]
 
@@ -509,7 +513,7 @@ module = "sentence_transformers"
 introduced-by = ["nlp"]
 
 [packages."spacy"]
-version = "3.8.11"
+version = "3.8.14"
 module = "spacy"
 introduced-by = ["nlp"]
 
@@ -598,6 +602,6 @@ module = "retinaface"
 introduced-by = ["face"]
 
 [packages."tf-keras"]
-version = "2.20.1"
+version = "2.21.0"
 module = "tf_keras"
 introduced-by = ["face"]

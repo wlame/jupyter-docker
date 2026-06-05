@@ -45,6 +45,7 @@ IMPORTS = [
     ("soundfile", "soundfile"),
     ("torch", "torch"),
     ("torchaudio", "torchaudio"),
+    ("torchcodec", "torchcodec"),
 ]
 
 

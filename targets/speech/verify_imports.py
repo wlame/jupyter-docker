@@ -50,6 +50,7 @@ IMPORTS = [
     ("speech_recognition", "speechrecognition"),
     ("torch", "torch"),
     ("torchaudio", "torchaudio"),
+    ("torchcodec", "torchcodec"),
 ]
 
 

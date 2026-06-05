@@ -90,7 +90,11 @@ def test_every_package_version_is_exact_or_url_sourced(target):
 @pytest.fixture
 def repo_copy(tmp_path: Path) -> Path:
     """Minimal copy of the repo that gen_targets.py can operate on."""
-    shutil.copytree(REPO_ROOT / 'targets', tmp_path / 'targets')
+    shutil.copytree(
+        REPO_ROOT / 'targets',
+        tmp_path / 'targets',
+        ignore=shutil.ignore_patterns('.venv', '__pycache__'),
+    )
     return tmp_path
 
 

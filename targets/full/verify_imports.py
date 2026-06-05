@@ -82,6 +82,7 @@ IMPORTS = [
     ("numba", "numba"),
     ("pydub", "pydub"),
     ("soundfile", "soundfile"),
+    ("torchcodec", "torchcodec"),
     # --- geospatial ---
     ("cartopy", "cartopy"),
     ("folium", "folium"),
