@@ -41,6 +41,8 @@ IMPORTS = [
     ("holoviews", "holoviews"),
     ("hvplot", "hvplot"),
     ("matplotlib", "matplotlib"),
+    ("numpy", "numpy"),
+    ("pandas", "pandas"),
     ("panel", "panel"),
     ("plotly", "plotly"),
     ("seaborn", "seaborn"),

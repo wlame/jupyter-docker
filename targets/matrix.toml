@@ -223,12 +223,17 @@ introduced-by = ["scientific", "visualization", "audio", "nlp", "speech", "face"
 # Ceiling: numba 0.66 and sktime 1.0 both require numpy < 2.5.
 version = "2.4.6"
 module = "numpy"
-introduced-by = ["scientific", "vision", "audio", "nlp", "speech", "face"]
+introduced-by = ["scientific", "visualization", "dataio", "vision", "audio", "nlp", "speech", "face"]
 
 [packages."pandas"]
-version = "2.3.3"
+version = "3.0.3"
 module = "pandas"
-introduced-by = ["scientific"]
+# Declared (not just transitive) in visualization/dataio: their examples import it.
+introduced-by = ["scientific", "visualization", "dataio"]
+# sktime 1.0 requires pandas < 3.
+[packages."pandas".overrides]
+timeseries = "2.3.3"
+full = "2.3.3"
 
 [packages."scipy"]
 version = "1.18.0"

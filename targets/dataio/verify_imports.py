@@ -38,7 +38,9 @@ IMPORTS = [
     # --- dataio ---
     ("fastparquet", "fastparquet"),
     ("h5py", "h5py"),
+    ("numpy", "numpy"),
     ("openpyxl", "openpyxl"),
+    ("pandas", "pandas"),
     ("pyarrow", "pyarrow"),
     ("sqlalchemy", "sqlalchemy"),
     ("tables", "tables"),
