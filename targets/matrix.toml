@@ -513,7 +513,7 @@ module = "nltk"
 introduced-by = ["nlp"]
 
 [packages."sentence-transformers"]
-version = "5.2.0"
+version = "5.6.0"
 module = "sentence_transformers"
 introduced-by = ["nlp"]
 
@@ -523,12 +523,13 @@ module = "spacy"
 introduced-by = ["nlp"]
 
 [packages."tokenizers"]
+# transformers 5.13 requires tokenizers <= 0.23.0 (0.23.1+ too new; 0.23.0 unreleased).
 version = "0.22.2"
 module = "tokenizers"
 introduced-by = ["nlp"]
 
 [packages."transformers"]
-version = "4.57.6"
+version = "5.13.0"
 module = "transformers"
 introduced-by = ["nlp"]
 
