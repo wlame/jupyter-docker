@@ -128,7 +128,7 @@ module = "lxml"
 introduced-by = ["base"]
 
 [packages."more-itertools"]
-version = "10.8.0"
+version = "11.1.0"
 module = "more_itertools"
 introduced-by = ["base"]
 
@@ -188,7 +188,7 @@ module = "requests"
 introduced-by = ["base"]
 
 [packages."simplejson"]
-version = "3.20.2"
+version = "4.1.1"
 module = "simplejson"
 introduced-by = ["base"]
 
@@ -400,7 +400,7 @@ module = "imageio"
 introduced-by = ["vision"]
 
 [packages."opencv-python-headless"]
-version = "4.13.0.90"
+version = "5.0.0.93"
 module = "cv2"
 introduced-by = ["vision", "face"]
 
