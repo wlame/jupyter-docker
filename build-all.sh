@@ -11,6 +11,9 @@
 
 set -e
 
+# The Dockerfile uses BuildKit cache mounts.
+export DOCKER_BUILDKIT=1
+
 # Configuration
 IMAGE_PREFIX="ds"
 DOCKERFILE="Dockerfile"
@@ -111,7 +114,7 @@ build_target() {
     echo ""
     echo -e "${YELLOW}Building target: ${target}${NC}"
     echo "  Image: ${image_name}"
-    echo "  Command: docker build --target ${target} -t ${image_name} ."
+    echo "  Command: docker build --target ${target} -t ${image_name} -f ${DOCKERFILE} ."
     echo ""
 
     if docker build --target "${target}" -t "${image_name}" -f "${DOCKERFILE}" .; then
@@ -166,9 +169,10 @@ test_target() {
     fi
 
     # Build pytest -m expression: full runs all marks, others run their own mark.
+    # Note: slow/network-dependent tests are INCLUDED; a target's mark selects
+    # them too. Use pytest -m "<target> and not slow" manually to skip them.
     local pytest_marks
     if [ "${target}" = "full" ]; then
-        # Run every marked test (skip slow/network-dependent by default)
         pytest_marks="scientific or visualization or dataio or ml or deeplearn or vision or audio or geospatial or timeseries or nlp or speech or face"
     else
         pytest_marks="${target}"
@@ -180,13 +184,14 @@ test_target() {
     echo ""
 
     # Exit code 5 means "no tests collected" — treat as success (mark not yet populated).
-    local pytest_exit
+    # The `|| pytest_exit=$?` form keeps the capture correct even under `set -e`
+    # when this function is called without a `|| true` guard.
+    local pytest_exit=0
     docker run --rm "${image_name}" \
         uv run --no-project python -m pytest /home/jupyter/tests/ \
         -m "${pytest_marks}" \
         -v \
-        --timeout=300
-    pytest_exit=$?
+        --timeout=300 || pytest_exit=$?
 
     if [ "${pytest_exit}" -eq 0 ] || [ "${pytest_exit}" -eq 5 ]; then
         set_test_result "$target" "success"
@@ -329,6 +334,13 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# Contradictory flags: nothing would run, so fail loudly instead of "success".
+if [ "$RUN_BUILD" = false ] && [ "$RUN_TESTS" = false ]; then
+    echo "Error: --build-only and --test-only are mutually exclusive."
+    show_usage
+    exit 1
+fi
+
 # If no targets specified, use all
 if [ ${#TARGETS[@]} -eq 0 ]; then
     TARGETS=("${ALL_TARGETS[@]}")
@@ -352,6 +364,12 @@ fi
 if [ "$RUN_TESTS" = true ]; then
     print_header "TESTING IMAGES"
     for target in "${TARGETS[@]}"; do
+        # Never test a stale image left over from before a failed rebuild.
+        if [ "$RUN_BUILD" = true ] && [ "$(get_build_result "$target")" = "failed" ]; then
+            print_warning "Skipping tests for ${target}: its build failed in this run"
+            set_test_result "$target" "not_found"
+            continue
+        fi
         test_target "${target}" || true
     done
 fi

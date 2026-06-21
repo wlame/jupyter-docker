@@ -51,9 +51,11 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual environments
+# Virtual environments (**/ so nested ones like targets/*/.venv are excluded too)
 .env
 .venv
+**/.venv
+**/__pycache__
 env/
 venv/
 ENV/
