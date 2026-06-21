@@ -287,9 +287,10 @@ def test_example_19_speech_processing():
     """Whisper ASR, gTTS synthesis, torchaudio spectrogram, waveform visualization."""
     run_example(
         '19_speech_processing.py',
+        # speech_gtts_output.mp3 is intentionally NOT asserted: it depends on
+        # an external Google service and the example skips it without network.
         expected_outputs=[
             'speech_synthetic_audio.wav',
-            'speech_gtts_output.mp3',
             'speech_waveforms.png',
         ],
         timeout=300,

@@ -5,31 +5,54 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Weekly rebuild so published images pick up OS security patches.
+  schedule:
+    - cron: '30 5 * * 1'
+  workflow_dispatch:
 
-# Cancel in-flight runs for the same ref when a new push arrives.
+# Cancel in-flight PR runs on new pushes; never cancel a main publish mid-flight.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
-  packages: write
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}
 
 jobs:
 
-  # ─── Tier 0 — fast consistency gate (no Docker) ─────────────────────────────
+  # ─── Tier 0 — fast gates (no Docker builds) ─────────────────────────────────
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: shellcheck build-all.sh
+        run: shellcheck build-all.sh
+      - name: hadolint Dockerfile
+        uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5 # v3.3.0
+        with:
+          dockerfile: Dockerfile
+          ignore: DL3008
+          failure-threshold: warning
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          version: "0.11.28"
+      - name: ruff
+        run: uvx ruff check scripts/ tests/
+
   consistency:
     name: consistency
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Verify generated files match targets/matrix.toml
         run: python3 scripts/gen_targets.py --check
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           version: "0.11.28"
       - name: Verify lockfiles are up to date
@@ -38,19 +61,24 @@ jobs:
             echo "── ${d}"
             (cd "${d}" && uv lock --check)
           done
+      - name: Run generator tests
+        run: uv run --no-project --python 3.13 --with pytest==9.1.1 python -m pytest tests/test_gen_targets.py -q
 
   # ─── Tier 1 ──────────────────────────────────────────────────────────────────
   base:
     name: base
-    needs: consistency
+    needs: [lint, consistency]
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: base
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -60,13 +88,16 @@ jobs:
     needs: base
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: scientific
-          cache-from: type=gha,scope=base
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -75,13 +106,16 @@ jobs:
     needs: base
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: visualization
-          cache-from: type=gha,scope=base
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -90,13 +124,16 @@ jobs:
     needs: base
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: dataio
-          cache-from: type=gha,scope=base
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -105,13 +142,16 @@ jobs:
     needs: base
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: vision
-          cache-from: type=gha,scope=base
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -120,13 +160,17 @@ jobs:
     needs: base
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: audio
-          cache-from: type=gha,scope=base
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base
+          free-disk-space: 'true'
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -135,13 +179,17 @@ jobs:
     needs: base
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: nlp
-          cache-from: type=gha,scope=base
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base
+          free-disk-space: 'true'
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -150,13 +198,17 @@ jobs:
     needs: base
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: speech
-          cache-from: type=gha,scope=base
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base
+          free-disk-space: 'true'
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -165,13 +217,17 @@ jobs:
     needs: base
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: face
-          cache-from: type=gha,scope=base
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base
+          free-disk-space: 'true'
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -181,15 +237,16 @@ jobs:
     needs: scientific
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: ml
-          cache-from: |
-            type=gha,scope=base
-            type=gha,scope=scientific
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base scientific
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -198,15 +255,16 @@ jobs:
     needs: scientific
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: geospatial
-          cache-from: |
-            type=gha,scope=base
-            type=gha,scope=scientific
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base scientific
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -215,34 +273,54 @@ jobs:
     needs: scientific
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: timeseries
-          cache-from: |
-            type=gha,scope=base
-            type=gha,scope=scientific
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cache-scopes: base scientific
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
-  # ─── Tier 4 — FROM ml, main branch only (PyTorch + TensorFlow, large image) ──
+  # ─── Tier 4 — heavyweight images ─────────────────────────────────────────────
   deeplearn:
     name: deeplearn
     needs: ml
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/build-and-test
         with:
           target: deeplearn
-          cache-from: |
-            type=gha,scope=base
-            type=gha,scope=scientific
-            type=gha,scope=ml
-          push: 'true'
+          cache-scopes: base scientific ml
+          free-disk-space: 'true'
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
+
+  full:
+    name: full
+    needs: base
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: full
+          cache-scopes: base
+          free-disk-space: 'true'
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}

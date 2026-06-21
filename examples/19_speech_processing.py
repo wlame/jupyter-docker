@@ -100,9 +100,14 @@ print("\n" + "=" * 60)
 print("gTTS — Google Text-to-Speech")
 print("=" * 60)
 
-try:
-    from gtts import gTTS
+# gTTS calls Google's TTS endpoint, so it only works with network access.
+# Network problems are reported and skipped; any other error is a real bug
+# and propagates.
+from gtts import gTTS
+from gtts.tts import gTTSError
+import requests
 
+try:
     text = "Hello, this is a test of the speech synthesis system."
     tts = gTTS(text=text, lang='en', slow=False)
 
@@ -114,15 +119,8 @@ try:
     print(f"Saved        : {gtts_path}")
     print(f"File size    : {os.path.getsize(gtts_path)} bytes")
 
-except Exception as e:
-    print(f"gTTS synthesis skipped: {e}")
-    # Create a fallback WAV file so tests pass
-    gtts_path = os.path.join(OUTPUT_DIR, 'speech_gtts_output.mp3')
-    if not os.path.exists(gtts_path):
-        # Write a minimal valid file as placeholder
-        with open(gtts_path, 'wb') as f:
-            f.write(b'\x00' * 100)
-        print(f"Created placeholder: {gtts_path}")
+except (gTTSError, requests.RequestException) as e:
+    print(f"gTTS synthesis skipped (network/service unavailable): {e}")
 
 # =============================================================================
 # torchaudio — Waveform Analysis and Transforms

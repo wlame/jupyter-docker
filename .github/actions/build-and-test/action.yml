@@ -1,14 +1,14 @@
 name: 'Build and Test Docker Target'
-description: 'Build a single Docker target with GHA layer-caching, run its test suite, and optionally push to ghcr.io'
+description: >
+  Build a single Docker target with registry layer-caching, run its test suite,
+  scan it with Trivy, and optionally push it (plus a :target-<sha> tag) to ghcr.io.
 
 inputs:
   target:
     description: 'Docker build target name (base, scientific, ml, …)'
     required: true
-  cache-from:
-    description: >
-      Extra cache sources beyond this target's own scope.
-      One "type=gha,scope=<name>" entry per line.
+  cache-scopes:
+    description: 'Extra cache scope names beyond this target, space-separated (e.g. "base scientific")'
     required: false
     default: ''
   push:
@@ -17,53 +17,95 @@ inputs:
     default: 'false'
   image-name:
     description: 'Full image name without tag (e.g. ghcr.io/owner/repo)'
-    required: false
-    default: ''
+    required: true
   registry-token:
     description: 'Token for ghcr.io authentication (usually secrets.GITHUB_TOKEN)'
+    required: true
+  free-disk-space:
+    description: 'Remove unused preinstalled toolchains first (for multi-GB targets)'
     required: false
-    default: ''
+    default: 'false'
 
 runs:
   using: composite
   steps:
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Build ${{ inputs.target }}
-      uses: docker/build-push-action@v6
-      with:
-        context: .
-        target: ${{ inputs.target }}
-        tags: ds-${{ inputs.target }}
-        load: true
-        cache-from: |
-          type=gha,scope=${{ inputs.target }}
-          ${{ inputs.cache-from }}
-        cache-to: type=gha,scope=${{ inputs.target }},mode=max
-
-    - name: Test ${{ inputs.target }}
+    - name: Free disk space
+      if: inputs.free-disk-space == 'true'
       shell: bash
-      run: ./build-all.sh --test-only ${{ inputs.target }}
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+          /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+        df -h /
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+    # Login before the build: pulls the registry build cache, and lets
+    # cache-to write it back on main. PR tokens are read-only, which is enough
+    # for cache-from.
     - name: Login to ghcr.io
-      if: inputs.push == 'true'
-      uses: docker/login-action@v3
+      uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
       with:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ inputs.registry-token }}
 
+    - name: Compose cache references
+      id: cache
+      shell: bash
+      env:
+        IMAGE: ${{ inputs.image-name }}
+        TARGET: ${{ inputs.target }}
+        EXTRA_SCOPES: ${{ inputs.cache-scopes }}
+        PUSH: ${{ inputs.push }}
+      run: |
+        {
+          echo 'cache_from<<EOF'
+          echo "type=registry,ref=${IMAGE}/buildcache:${TARGET}"
+          for scope in ${EXTRA_SCOPES}; do
+            echo "type=registry,ref=${IMAGE}/buildcache:${scope}"
+          done
+          echo 'EOF'
+        } >> "$GITHUB_OUTPUT"
+        if [ "${PUSH}" = "true" ]; then
+          echo "cache_to=type=registry,ref=${IMAGE}/buildcache:${TARGET},mode=max" >> "$GITHUB_OUTPUT"
+        else
+          echo "cache_to=" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Build ${{ inputs.target }}
+      uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+      with:
+        context: .
+        target: ${{ inputs.target }}
+        tags: ds-${{ inputs.target }}
+        load: true
+        cache-from: ${{ steps.cache.outputs.cache_from }}
+        cache-to: ${{ steps.cache.outputs.cache_to }}
+
+    - name: Test ${{ inputs.target }}
+      shell: bash
+      run: ./build-all.sh --test-only ${{ inputs.target }}
+
+    # Report-only for now: surfaces HIGH/CRITICAL CVEs in the job log without
+    # blocking the pipeline. Tighten to exit-code 1 once a baseline is triaged.
+    - name: Scan ${{ inputs.target }} with Trivy
+      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+      with:
+        image-ref: ds-${{ inputs.target }}
+        severity: CRITICAL,HIGH
+        ignore-unfixed: true
+        exit-code: '0'
+
     - name: Push ${{ inputs.target }} to ghcr.io
       if: inputs.push == 'true'
       shell: bash
+      env:
+        IMAGE: ${{ inputs.image-name }}
+        TARGET: ${{ inputs.target }}
       run: |
-        docker tag "ds-${{ inputs.target }}" "${{ inputs.image-name }}:${{ inputs.target }}"
-        docker push "${{ inputs.image-name }}:${{ inputs.target }}"
-
-    - name: Remove local images
-      if: always()
-      shell: bash
-      run: |
-        docker rmi "ds-${{ inputs.target }}" 2>/dev/null || true
-        docker rmi "${{ inputs.image-name }}:${{ inputs.target }}" 2>/dev/null || true
+        SHORT_SHA="${GITHUB_SHA::7}"
+        docker tag "ds-${TARGET}" "${IMAGE}:${TARGET}"
+        docker tag "ds-${TARGET}" "${IMAGE}:${TARGET}-${SHORT_SHA}"
+        docker push "${IMAGE}:${TARGET}"
+        docker push "${IMAGE}:${TARGET}-${SHORT_SHA}"
