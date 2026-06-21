@@ -30,19 +30,18 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - name: shellcheck build-all.sh
-        run: shellcheck build-all.sh
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          version: "0.11.28"
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - name: Lint shell and Python
+        run: just lint
       - name: hadolint Dockerfile
         uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5 # v3.3.0
         with:
           dockerfile: Dockerfile
           ignore: DL3008
           failure-threshold: warning
-      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
-        with:
-          version: "0.11.28"
-      - name: ruff
-        run: uvx ruff check scripts/ tests/
 
   consistency:
     name: consistency
@@ -50,19 +49,18 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - name: Verify generated files match targets/matrix.toml
-        run: python3 scripts/gen_targets.py --check
       - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           version: "0.11.28"
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - name: Verify generated files match the matrix
+        run: just gen-check
       - name: Verify lockfiles are up to date
-        run: |
-          for d in targets/*/; do
-            echo "── ${d}"
-            (cd "${d}" && uv lock --check)
-          done
+        run: just lock-check
+      - name: Verify notebooks are in sync with .py sources
+        run: just nb-check
       - name: Run generator tests
-        run: uv run --no-project --python 3.13 --with pytest==9.1.1 python -m pytest tests/test_gen_targets.py -q
+        run: just test-gen
 
   # ─── Tier 1 ──────────────────────────────────────────────────────────────────
   base:

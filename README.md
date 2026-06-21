@@ -8,7 +8,9 @@ A modular, multi-target Docker environment for data science with Python 3.13. Bu
 
 ### Use Prebuilt Images
 
-Prebuilt images are published to GitHub Container Registry on every push to `main`:
+Prebuilt images are published to GitHub Container Registry on every push to `main`
+and rebuilt weekly to pick up OS security patches. Every push also publishes an
+immutable `<target>-<short-sha>` tag for pinning and rollback:
 
 ```bash
 docker run -p 8888:8888 \
@@ -112,6 +114,7 @@ Essential utilities included in all specialized targets.
 | requests, httpx, aiohttp | HTTP clients |
 | Pydantic | Data validation |
 | tqdm, loguru | Progress bars, logging |
+| python-dotenv | .env file loading |
 | python-dateutil, pytz, pendulum | Date/time utilities |
 | joblib, toolz, more-itertools | Utilities |
 
@@ -173,6 +176,7 @@ Deep learning frameworks.
 |---------|-------------|
 | PyTorch | Dynamic neural networks |
 | TorchVision | Computer vision for PyTorch |
+| TorchAudio | Audio for PyTorch |
 | TensorFlow | ML platform |
 | Keras | High-level neural network API |
 
@@ -195,6 +199,7 @@ Audio analysis and manipulation.
 | Library | Description |
 |---------|-------------|
 | TorchAudio | Audio for PyTorch |
+| torchcodec | Audio/video decoding for torchaudio I/O |
 | librosa | Music/audio analysis |
 | soundfile | Audio file I/O |
 | pydub | Audio manipulation |
@@ -250,6 +255,7 @@ Speech-to-text and text-to-speech.
 | piper-tts | ONNX-based CPU-friendly TTS |
 | pyannote-audio | Speaker diarization |
 | speechbrain | All-in-one speech toolkit |
+| torchcodec | Audio decoding for torchaudio I/O |
 
 ### Face (Face Detection & Recognition)
 
@@ -267,6 +273,25 @@ Face detection, recognition, analysis, and generation.
 ### Full (Complete Environment)
 
 All libraries from all targets combined. Use when you need everything.
+
+## Updating Dependencies
+
+All package versions live in one file: `targets/matrix.toml`. The per-target
+`pyproject.toml` and `verify_imports.py` files are generated from it, and each
+target has a committed `uv.lock` for reproducible image builds.
+
+```bash
+# 1. Edit targets/matrix.toml (versions, target membership, overrides)
+# 2. Regenerate the per-target files
+just gen
+# 3. Re-resolve the lockfiles
+just lock
+# 4. Run every fast gate CI enforces
+just ci
+```
+
+Version `overrides` in the matrix document real constraints (e.g. sktime capping
+scikit-learn); remove an override once the upstream constraint is gone.
 
 ## Docker Commands Reference
 
@@ -298,10 +323,10 @@ docker run -d -p 8888:8888 --name jupyter \
   ds-ml
 
 # Verify imports
-docker run --rm ds-scientific uv run python /home/jupyter/scripts/verify_scientific.py
+docker run --rm ds-scientific uv run --no-project python /home/jupyter/scripts/verify_scientific.py
 
 # Run IPython
-docker run --rm -it ds-scientific uv run ipython
+docker run --rm -it ds-scientific uv run --no-project ipython
 ```
 
 ### Volume Mounts
@@ -314,7 +339,9 @@ docker run --rm -it ds-scientific uv run ipython
 
 ## Example Files
 
-The `examples/` directory contains Python scripts and Jupyter notebooks:
+The `examples/` directory contains Python scripts and Jupyter notebooks. The
+`.py` files are the source of truth; notebooks are generated from them with
+jupytext (`just nb`) and CI verifies they stay in sync:
 
 | Example | Description |
 |---------|-------------|
@@ -361,7 +388,7 @@ The `examples/` directory contains Python scripts and Jupyter notebooks:
 - **Base Image**: Ubuntu 24.04
 - **Python**: 3.13 (via deadsnakes PPA)
 - **Package Manager**: uv
-- **User**: `jupyter` (non-root)
+- **User**: `jupyter` (non-root, UID 1000 — bind mounts keep host ownership)
 - **Working Directory**: `/home/jupyter`
 - **Exposed Port**: 8888
 
@@ -400,6 +427,7 @@ Note: Requires NVIDIA Container Toolkit.
 ```
 .
 ├── Dockerfile              # Multi-stage Dockerfile
+├── justfile                # Dev entrypoint (just --list)
 ├── build-all.sh            # Build and test all targets
 ├── README.md
 ├── scripts/
