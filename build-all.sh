@@ -222,7 +222,7 @@ print_summary() {
         local size=""
 
         if [ "$result" = "success" ]; then
-            size=" ($(get_image_size ${image_name}))"
+            size=" ($(get_image_size "${image_name}"))"
             print_success "${target}${size}"
         elif [ "$result" = "failed" ]; then
             print_error "${target}"
