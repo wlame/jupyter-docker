@@ -17,10 +17,20 @@ import pytest
 
 REPO_ROOT = Path(__file__).parent.parent
 GEN = REPO_ROOT / 'scripts' / 'gen_targets.py'
+MATRIX_PATH = REPO_ROOT / 'targets' / 'matrix.toml'
+
+# Inside the Docker images only tests/ and examples/ are shipped — the matrix
+# and generator stay in the repo. Skip at module level so in-container pytest
+# collection (which imports this file even for deselected tests) succeeds.
+if not MATRIX_PATH.exists() or not GEN.exists():
+    pytest.skip(
+        "generator sources not present (running inside a target image)",
+        allow_module_level=True,
+    )
 
 
 def load_matrix() -> dict:
-    with open(REPO_ROOT / 'targets' / 'matrix.toml', 'rb') as f:
+    with open(MATRIX_PATH, 'rb') as f:
         return tomllib.load(f)
 
 
