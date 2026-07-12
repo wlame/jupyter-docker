@@ -516,6 +516,10 @@ introduced-by = ["nlp"]
 version = "5.6.0"
 module = "sentence_transformers"
 introduced-by = ["nlp"]
+# sentence-transformers >= 5.3 requires transformers 5; full holds transformers 4
+# for coqui-tts, so it keeps the last transformers-4-compatible release.
+[packages."sentence-transformers".overrides]
+full = "5.2.0"
 
 [packages."spacy"]
 version = "3.8.14"
@@ -531,7 +535,13 @@ introduced-by = ["nlp"]
 [packages."transformers"]
 version = "5.13.0"
 module = "transformers"
-introduced-by = ["nlp"]
+# Declared in speech too: coqui-tts imports it and would otherwise float to 5.x.
+introduced-by = ["nlp", "speech"]
+# coqui-tts (latest 0.27.5) needs transformers < 5 (isin_mps_friendly removed
+# in 5.0); speech and full ship coqui-tts, nlp stays on 5.x.
+[packages."transformers".overrides]
+speech = "4.57.6"
+full = "4.57.6"
 
 # ── introduced in: speech ────────────────────────────────────────────────────
 

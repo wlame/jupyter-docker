@@ -51,6 +51,7 @@ IMPORTS = [
     ("torch", "torch"),
     ("torchaudio", "torchaudio"),
     ("torchcodec", "torchcodec"),
+    ("transformers", "transformers"),
 ]
 
 
