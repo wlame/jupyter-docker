@@ -142,6 +142,7 @@ def materialize(target: str, matrix: dict) -> dict[str, dict]:
             'module': spec['module'],
             'group': group or introducers[0],
             'source-url': spec.get('source-url'),
+            'verify-first': spec.get('verify-first', False),
         }
     return result
 
@@ -163,9 +164,16 @@ def excluded_dependencies(target: str, matrix: dict) -> list[str]:
 
 
 def grouped(mat: dict[str, dict], chain: list[str]) -> list[tuple[str, list[str]]]:
-    """Package names grouped by introducing target, in lineage order."""
+    """Package names grouped by introducing target, in lineage order.
+
+    Within a group, verify-first packages sort ahead of the rest: torch native
+    modules must be imported before TensorFlow in the same process.
+    """
+    def order(pkg: str) -> tuple[int, str]:
+        return (0 if mat[pkg].get('verify-first') else 1, pkg)
+
     return [
-        (t, sorted(p for p, spec in mat.items() if spec['group'] == t))
+        (t, sorted((p for p, spec in mat.items() if spec['group'] == t), key=order))
         for t in chain
         if any(spec['group'] == t for spec in mat.values())
     ]

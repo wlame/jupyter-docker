@@ -49,11 +49,11 @@ IMPORTS = [
     ("sklearn", "scikit-learn"),
     ("xgboost", "xgboost"),
     # --- deeplearn ---
-    ("keras", "keras"),
-    ("tensorflow", "tensorflow"),
     ("torch", "torch"),
     ("torchaudio", "torchaudio"),
     ("torchvision", "torchvision"),
+    ("keras", "keras"),
+    ("tensorflow", "tensorflow"),
 ]
 
 

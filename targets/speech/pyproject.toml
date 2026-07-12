@@ -39,6 +39,9 @@ dependencies = [
     "ujson==5.13.0",
     "xmltodict==1.0.4",
     # --- speech ---
+    "torch==2.12.1",
+    "torchaudio==2.11.0",
+    "torchcodec==0.14.0",
     "coqui-tts==0.27.5",
     "faster-whisper==1.2.1",
     "gtts==2.5.4",
@@ -51,9 +54,6 @@ dependencies = [
     "soundfile==0.14.0",
     "speechbrain==1.1.0",
     "speechrecognition==3.17.0",
-    "torch==2.12.1",
-    "torchaudio==2.11.0",
-    "torchcodec==0.14.0",
     "transformers==4.57.6",
 ]
 

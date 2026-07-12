@@ -86,6 +86,12 @@ Trivy scan (report-only), and pushes on main (`:target` + immutable
 
 ## Gotchas
 
+- **Import torch before TensorFlow in the same process** — the reverse order
+  segfaults (C++ symbol clash between their bundled runtimes). The matrix marks
+  torch-family packages `verify-first = true` so generated verify scripts order
+  them correctly, and example 20 runs face-alignment (torch) before DeepFace
+  (TensorFlow). Keep that ordering in any new example mixing both stacks.
+
 - The container user is `jupyter`, UID 1000; `uv sync` runs as that user so the
   venv stays writable (`pip install` works in notebooks). Keep it that way.
 - Jupyter auth: a random token is generated per start (`JUPYTER_TOKEN` overrides).

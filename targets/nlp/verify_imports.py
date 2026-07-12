@@ -36,6 +36,7 @@ IMPORTS = [
     ("ujson", "ujson"),
     ("xmltodict", "xmltodict"),
     # --- nlp ---
+    ("torch", "torch"),
     ("en_core_web_sm", "en-core-web-sm"),
     ("matplotlib", "matplotlib"),
     ("nltk", "nltk"),
@@ -43,7 +44,6 @@ IMPORTS = [
     ("sentence_transformers", "sentence-transformers"),
     ("spacy", "spacy"),
     ("tokenizers", "tokenizers"),
-    ("torch", "torch"),
     ("transformers", "transformers"),
 ]
 

@@ -381,13 +381,17 @@ version = "2.21.0"
 module = "tensorflow"
 introduced-by = ["deeplearn", "face"]
 
+# Torch native modules must import before TensorFlow in one process
+# (C++ symbol clash segfaults); verify-first orders them ahead in verify scripts.
 [packages."torch"]
 version = "2.12.1"
+verify-first = true
 module = "torch"
 introduced-by = ["deeplearn", "audio", "nlp", "speech", "face"]
 
 [packages."torchaudio"]
 version = "2.11.0"
+verify-first = true
 module = "torchaudio"
 introduced-by = ["deeplearn", "audio", "speech"]
 
@@ -395,11 +399,13 @@ introduced-by = ["deeplearn", "audio", "speech"]
 # libraries at runtime — present in the audio/speech/full stages only).
 [packages."torchcodec"]
 version = "0.14.0"
+verify-first = true
 module = "torchcodec"
 introduced-by = ["audio", "speech"]
 
 [packages."torchvision"]
 version = "0.27.1"
+verify-first = true
 module = "torchvision"
 introduced-by = ["deeplearn", "face"]
 

@@ -36,6 +36,9 @@ IMPORTS = [
     ("ujson", "ujson"),
     ("xmltodict", "xmltodict"),
     # --- speech ---
+    ("torch", "torch"),
+    ("torchaudio", "torchaudio"),
+    ("torchcodec", "torchcodec"),
     ("TTS", "coqui-tts"),
     ("faster_whisper", "faster-whisper"),
     ("gtts", "gtts"),
@@ -48,9 +51,6 @@ IMPORTS = [
     ("soundfile", "soundfile"),
     ("speechbrain", "speechbrain"),
     ("speech_recognition", "speechrecognition"),
-    ("torch", "torch"),
-    ("torchaudio", "torchaudio"),
-    ("torchcodec", "torchcodec"),
     ("transformers", "transformers"),
 ]
 

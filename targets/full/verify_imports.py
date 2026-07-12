@@ -65,11 +65,11 @@ IMPORTS = [
     ("sklearn", "scikit-learn"),
     ("xgboost", "xgboost"),
     # --- deeplearn ---
-    ("keras", "keras"),
-    ("tensorflow", "tensorflow"),
     ("torch", "torch"),
     ("torchaudio", "torchaudio"),
     ("torchvision", "torchvision"),
+    ("keras", "keras"),
+    ("tensorflow", "tensorflow"),
     # --- vision ---
     ("imageio", "imageio"),
     ("cv2", "opencv-python-headless"),
@@ -77,12 +77,12 @@ IMPORTS = [
     ("skimage", "scikit-image"),
     ("ultralytics", "ultralytics"),
     # --- audio ---
+    ("torchcodec", "torchcodec"),
     ("audioread", "audioread"),
     ("librosa", "librosa"),
     ("numba", "numba"),
     ("pydub", "pydub"),
     ("soundfile", "soundfile"),
-    ("torchcodec", "torchcodec"),
     # --- geospatial ---
     ("cartopy", "cartopy"),
     ("folium", "folium"),

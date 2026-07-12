@@ -36,6 +36,9 @@ IMPORTS = [
     ("ujson", "ujson"),
     ("xmltodict", "xmltodict"),
     # --- audio ---
+    ("torch", "torch"),
+    ("torchaudio", "torchaudio"),
+    ("torchcodec", "torchcodec"),
     ("audioread", "audioread"),
     ("librosa", "librosa"),
     ("matplotlib", "matplotlib"),
@@ -43,9 +46,6 @@ IMPORTS = [
     ("numpy", "numpy"),
     ("pydub", "pydub"),
     ("soundfile", "soundfile"),
-    ("torch", "torch"),
-    ("torchaudio", "torchaudio"),
-    ("torchcodec", "torchcodec"),
 ]
 
 

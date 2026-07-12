@@ -125,6 +125,72 @@ except Exception as e:
     plt.close()
 
 # =============================================================================
+# face-alignment — Landmark Extraction
+# =============================================================================
+print("\n" + "=" * 60)
+print("face-alignment — Landmark Extraction")
+print("=" * 60)
+
+# torch-based; must run BEFORE DeepFace loads TensorFlow — importing torch
+# native code after TensorFlow in one process segfaults (C++ symbol clash).
+import face_alignment
+
+fa = face_alignment.FaceAlignment(
+    face_alignment.LandmarksType.TWO_D,
+    device='cpu',
+    flip_input=False,
+)
+
+landmarks = fa.get_landmarks(img_array)
+
+fig, ax = plt.subplots(figsize=(6, 6))
+ax.imshow(img_array)
+
+if landmarks is not None and len(landmarks) > 0:
+    print(f"Faces with landmarks: {len(landmarks)}")
+    for face_idx, face_landmarks in enumerate(landmarks):
+        print(f"  Face {face_idx + 1}: {face_landmarks.shape[0]} landmarks")
+        ax.scatter(
+            face_landmarks[:, 0], face_landmarks[:, 1],
+            c='lime', s=8, zorder=5, edgecolors='black', linewidths=0.5,
+        )
+        # Connect landmark groups for visualization
+        # Jaw: 0-16, Eyebrow L: 17-21, Eyebrow R: 22-26
+        # Nose: 27-35, Eye L: 36-41, Eye R: 42-47, Mouth: 48-67
+        groups = [
+            (range(0, 17), 'cyan'),     # Jaw
+            (range(17, 22), 'yellow'),   # Left eyebrow
+            (range(22, 27), 'yellow'),   # Right eyebrow
+            (range(27, 36), 'orange'),   # Nose
+            (range(36, 42), 'lime'),     # Left eye
+            (range(42, 48), 'lime'),     # Right eye
+            (range(48, 60), 'red'),      # Outer mouth
+            (range(60, 68), 'pink'),     # Inner mouth
+        ]
+        for indices, color in groups:
+            idx_list = list(indices)
+            if max(idx_list) < len(face_landmarks):
+                pts = face_landmarks[idx_list]
+                ax.plot(pts[:, 0], pts[:, 1], color=color, linewidth=1, alpha=0.7)
+else:
+    print("  No landmarks detected (synthetic image)")
+    ax.text(
+        img_size // 2, img_size // 2,
+        "No landmarks detected\n(synthetic image)",
+        ha='center', va='center', fontsize=12, color='yellow',
+        bbox={'boxstyle': 'round', 'facecolor': 'black', 'alpha': 0.7},
+    )
+
+ax.set_title("Face Landmarks (face-alignment)")
+ax.axis('off')
+plt.tight_layout()
+
+landmarks_path = os.path.join(OUTPUT_DIR, 'face_landmarks.png')
+plt.savefig(landmarks_path, dpi=150)
+print(f"Saved: {landmarks_path}")
+plt.close()
+
+# =============================================================================
 # DeepFace — Attribute Analysis
 # =============================================================================
 print("\n" + "=" * 60)
@@ -161,82 +227,6 @@ try:
 
 except Exception as e:
     print(f"DeepFace analysis skipped: {e}")
-
-# =============================================================================
-# face-alignment — Landmark Extraction
-# =============================================================================
-print("\n" + "=" * 60)
-print("face-alignment — Landmark Extraction")
-print("=" * 60)
-
-try:
-    import face_alignment
-
-    fa = face_alignment.FaceAlignment(
-        face_alignment.LandmarksType.TWO_D,
-        device='cpu',
-        flip_input=False,
-    )
-
-    landmarks = fa.get_landmarks(img_array)
-
-    fig, ax = plt.subplots(figsize=(6, 6))
-    ax.imshow(img_array)
-
-    if landmarks is not None and len(landmarks) > 0:
-        print(f"Faces with landmarks: {len(landmarks)}")
-        for face_idx, face_landmarks in enumerate(landmarks):
-            print(f"  Face {face_idx + 1}: {face_landmarks.shape[0]} landmarks")
-            ax.scatter(
-                face_landmarks[:, 0], face_landmarks[:, 1],
-                c='lime', s=8, zorder=5, edgecolors='black', linewidths=0.5,
-            )
-            # Connect landmark groups for visualization
-            # Jaw: 0-16, Eyebrow L: 17-21, Eyebrow R: 22-26
-            # Nose: 27-35, Eye L: 36-41, Eye R: 42-47, Mouth: 48-67
-            groups = [
-                (range(0, 17), 'cyan'),     # Jaw
-                (range(17, 22), 'yellow'),   # Left eyebrow
-                (range(22, 27), 'yellow'),   # Right eyebrow
-                (range(27, 36), 'orange'),   # Nose
-                (range(36, 42), 'lime'),     # Left eye
-                (range(42, 48), 'lime'),     # Right eye
-                (range(48, 60), 'red'),      # Outer mouth
-                (range(60, 68), 'pink'),     # Inner mouth
-            ]
-            for indices, color in groups:
-                idx_list = list(indices)
-                if max(idx_list) < len(face_landmarks):
-                    pts = face_landmarks[idx_list]
-                    ax.plot(pts[:, 0], pts[:, 1], color=color, linewidth=1, alpha=0.7)
-    else:
-        print("  No landmarks detected (synthetic image)")
-        ax.text(
-            img_size // 2, img_size // 2,
-            "No landmarks detected\n(synthetic image)",
-            ha='center', va='center', fontsize=12, color='yellow',
-            bbox={'boxstyle': 'round', 'facecolor': 'black', 'alpha': 0.7},
-        )
-
-    ax.set_title("Face Landmarks (face-alignment)")
-    ax.axis('off')
-    plt.tight_layout()
-
-    landmarks_path = os.path.join(OUTPUT_DIR, 'face_landmarks.png')
-    plt.savefig(landmarks_path, dpi=150)
-    print(f"Saved: {landmarks_path}")
-    plt.close()
-
-except Exception as e:
-    print(f"face-alignment skipped: {e}")
-    # Create placeholder
-    fig, ax = plt.subplots(figsize=(6, 6))
-    ax.imshow(img_array)
-    ax.set_title("Face Landmarks (face-alignment unavailable)")
-    ax.axis('off')
-    landmarks_path = os.path.join(OUTPUT_DIR, 'face_landmarks.png')
-    plt.savefig(landmarks_path, dpi=150)
-    plt.close()
 
 # =============================================================================
 # Library Version Summary

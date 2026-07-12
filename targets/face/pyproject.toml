@@ -39,6 +39,8 @@ dependencies = [
     "ujson==5.13.0",
     "xmltodict==1.0.4",
     # --- face ---
+    "torch==2.12.1",
+    "torchvision==0.27.1",
     "deepface==0.0.100",
     "diffusers==0.39.0",
     "dlib==20.0.1",
@@ -53,8 +55,6 @@ dependencies = [
     "scikit-image==0.26.0",
     "tensorflow==2.21.0",
     "tf-keras==2.21.0",
-    "torch==2.12.1",
-    "torchvision==0.27.1",
 ]
 
 [tool.uv]

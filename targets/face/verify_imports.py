@@ -36,6 +36,8 @@ IMPORTS = [
     ("ujson", "ujson"),
     ("xmltodict", "xmltodict"),
     # --- face ---
+    ("torch", "torch"),
+    ("torchvision", "torchvision"),
     ("deepface", "deepface"),
     ("diffusers", "diffusers"),
     ("dlib", "dlib"),
@@ -50,8 +52,6 @@ IMPORTS = [
     ("skimage", "scikit-image"),
     ("tensorflow", "tensorflow"),
     ("tf_keras", "tf-keras"),
-    ("torch", "torch"),
-    ("torchvision", "torchvision"),
 ]
 
 
