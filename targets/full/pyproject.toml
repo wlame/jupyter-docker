@@ -75,7 +75,7 @@ dependencies = [
     "torchvision==0.27.1",
     # --- vision ---
     "imageio==2.37.3",
-    "opencv-python-headless==5.0.0.93",
+    "opencv-python-headless==4.13.0.90",
     "pillow==12.3.0",
     "scikit-image==0.26.0",
     "ultralytics==8.4.87",
@@ -127,6 +127,12 @@ dependencies = [
 [tool.uv]
 # Supply-chain guard: never resolve packages published after this date
 exclude-newer = "2026-07-04"
+# Transitive dependencies excluded via a never-true marker
+# (see exclude-dependencies comments in targets/matrix.toml)
+override-dependencies = [
+    "nvidia-nccl-cu12 ; sys_platform == 'never'",
+    "opencv-python ; sys_platform == 'never'",
+]
 
 [tool.uv.sources]
 en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }

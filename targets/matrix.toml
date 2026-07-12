@@ -41,6 +41,9 @@ description = "Data I/O for Parquet, HDF5, Excel, and databases"
 [targets.ml]
 parent = "scientific"
 description = "Classical machine learning with scikit-learn, XGBoost, and LightGBM"
+# xgboost 3.3 pulls nvidia-nccl-cu12 (distributed-GPU only); it collides with
+# torch's nvidia-nccl-cu13 wheels in deeplearn and is dead weight on CPU images.
+exclude-dependencies = ["nvidia-nccl-cu12"]
 
 [targets.deeplearn]
 parent = "ml"
@@ -49,6 +52,9 @@ description = "Deep learning with PyTorch and TensorFlow"
 [targets.vision]
 parent = "base"
 description = "Computer vision and image processing"
+# ultralytics requires GUI opencv-python, which double-installs cv2 over our
+# pinned opencv-python-headless (same paths, corrupted mix).
+exclude-dependencies = ["opencv-python"]
 
 [targets.audio]
 parent = "base"
@@ -61,6 +67,8 @@ description = "Geospatial analysis and mapping"
 [targets.timeseries]
 parent = "scientific"
 description = "Time series analysis and forecasting"
+# Same xgboost nccl exclusion as the ml target.
+exclude-dependencies = ["nvidia-nccl-cu12"]
 
 [targets.nlp]
 parent = "base"
@@ -73,6 +81,9 @@ description = "Speech recognition and text-to-speech synthesis"
 [targets.face]
 parent = "base"
 description = "Face detection, recognition, analysis, and generation"
+# deepface/retina-face/face-alignment require GUI opencv-python — same cv2
+# double-install problem as vision.
+exclude-dependencies = ["opencv-python"]
 
 [targets.full]
 parent = ""
@@ -403,6 +414,11 @@ introduced-by = ["vision"]
 version = "5.0.0.93"
 module = "cv2"
 introduced-by = ["vision", "face"]
+# OpenCV 5 removed the bundled haarcascade files that deepface requires;
+# targets shipping deepface stay on the last 4.x release.
+[packages."opencv-python-headless".overrides]
+face = "4.13.0.90"
+full = "4.13.0.90"
 
 [packages."pillow"]
 version = "12.3.0"

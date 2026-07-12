@@ -56,6 +56,11 @@ dependencies = [
 [tool.uv]
 # Supply-chain guard: never resolve packages published after this date
 exclude-newer = "2026-07-04"
+# Transitive dependencies excluded via a never-true marker
+# (see exclude-dependencies comments in targets/matrix.toml)
+override-dependencies = [
+    "nvidia-nccl-cu12 ; sys_platform == 'never'",
+]
 
 [build-system]
 requires = ["hatchling"]

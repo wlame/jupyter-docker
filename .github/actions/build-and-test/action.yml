@@ -107,5 +107,14 @@ runs:
         SHORT_SHA="${GITHUB_SHA::7}"
         docker tag "ds-${TARGET}" "${IMAGE}:${TARGET}"
         docker tag "ds-${TARGET}" "${IMAGE}:${TARGET}-${SHORT_SHA}"
-        docker push "${IMAGE}:${TARGET}"
-        docker push "${IMAGE}:${TARGET}-${SHORT_SHA}"
+        # ghcr occasionally races on blobs shared between parallel jobs
+        # ("unknown blob"); a short retry rides it out.
+        for attempt in 1 2 3; do
+          if docker push "${IMAGE}:${TARGET}" && docker push "${IMAGE}:${TARGET}-${SHORT_SHA}"; then
+            exit 0
+          fi
+          echo "push attempt ${attempt} failed; retrying in $((attempt * 20))s"
+          sleep $((attempt * 20))
+        done
+        echo "all push attempts failed"
+        exit 1

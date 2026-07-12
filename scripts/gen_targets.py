@@ -146,6 +146,22 @@ def materialize(target: str, matrix: dict) -> dict[str, dict]:
     return result
 
 
+def excluded_dependencies(target: str, matrix: dict) -> list[str]:
+    """Transitive packages force-excluded for a target (union along the lineage).
+
+    The 'full' target unions every target's exclusions, mirroring how it unions
+    every target's packages.
+    """
+    targets = matrix['targets']
+    chain = target_order(targets) if target == 'full' else lineage(target, targets)
+    names: list[str] = []
+    for t in chain + ([target] if target == 'full' else []):
+        for pkg in targets[t].get('exclude-dependencies', []):
+            if pkg not in names:
+                names.append(pkg)
+    return names
+
+
 def grouped(mat: dict[str, dict], chain: list[str]) -> list[tuple[str, list[str]]]:
     """Package names grouped by introducing target, in lineage order."""
     return [
@@ -184,8 +200,17 @@ def render_pyproject(target: str, matrix: dict) -> str:
         '[tool.uv]',
         '# Supply-chain guard: never resolve packages published after this date',
         f'exclude-newer = "{settings["exclude-newer"]}"',
-        '',
     ]
+    excluded = excluded_dependencies(target, matrix)
+    if excluded:
+        lines += [
+            '# Transitive dependencies excluded via a never-true marker',
+            '# (see exclude-dependencies comments in targets/matrix.toml)',
+            'override-dependencies = [',
+        ]
+        lines += [f'    "{pkg} ; sys_platform == \'never\'",' for pkg in excluded]
+        lines.append(']')
+    lines.append('')
     sourced = {p: s['source-url'] for p, s in mat.items() if s['source-url']}
     if sourced:
         lines.append('[tool.uv.sources]')
