@@ -96,6 +96,8 @@ runs:
         severity: CRITICAL,HIGH
         ignore-unfixed: true
         exit-code: '0'
+        # Multi-GB ML images (deeplearn, face, full) exceed Trivy's 5m default.
+        timeout: 30m
 
     - name: Push ${{ inputs.target }} to ghcr.io
       if: inputs.push == 'true'
