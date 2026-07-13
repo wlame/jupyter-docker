@@ -421,39 +421,3 @@ docker run --gpus all -p 8888:8888 ds-deeplearn
 ```
 
 Note: Requires NVIDIA Container Toolkit.
-
-## Project Structure
-
-```
-.
-├── Dockerfile              # Multi-stage Dockerfile
-├── justfile                # Dev entrypoint (just --list)
-├── build-all.sh            # Build and test all targets
-├── README.md
-├── scripts/
-│   └── gen_targets.py      # Regenerates per-target files from the matrix
-├── targets/
-│   ├── matrix.toml         # SOURCE OF TRUTH: packages, versions, target tree
-│   ├── base/
-│   │   ├── pyproject.toml  # GENERATED — edit matrix.toml instead
-│   │   ├── uv.lock         # Committed lockfile (reproducible builds)
-│   │   └── verify_imports.py
-│   ├── scientific/
-│   ├── visualization/
-│   ├── dataio/
-│   ├── ml/
-│   ├── deeplearn/
-│   ├── vision/
-│   ├── audio/
-│   ├── geospatial/
-│   ├── timeseries/
-│   ├── nlp/
-│   ├── speech/
-│   ├── face/
-│   └── full/
-├── examples/
-│   ├── *.py                # Python scripts
-│   └── *.ipynb             # Jupyter notebooks
-├── notebooks/              # Your notebooks (mounted)
-└── data/                   # Your data (mounted)
-```
