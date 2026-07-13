@@ -21,9 +21,32 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import nltk
 
-# Download NLTK data (silent if already present)
-for resource in ('punkt', 'punkt_tab', 'stopwords', 'vader_lexicon', 'wordnet', 'averaged_perceptron_tagger', 'averaged_perceptron_tagger_eng'):
-    nltk.download(resource, quiet=True)
+# Ensure NLTK data is available. Pre-baked in the nlp/full images (so this is a
+# no-op offline); downloaded on demand elsewhere. Only fetch what is missing, so
+# a fully offline run with baked data produces no network errors.
+_NLTK_RESOURCES = (
+    ('punkt', 'tokenizers/punkt'),
+    ('punkt_tab', 'tokenizers/punkt_tab'),
+    ('stopwords', 'corpora/stopwords'),
+    ('vader_lexicon', 'sentiment/vader_lexicon'),
+    ('wordnet', 'corpora/wordnet'),
+    ('averaged_perceptron_tagger', 'taggers/averaged_perceptron_tagger'),
+    ('averaged_perceptron_tagger_eng', 'taggers/averaged_perceptron_tagger_eng'),
+)
+def _nltk_present(lookup):
+    # Data may live unpacked (a dir) or as a .zip; accept either form.
+    for candidate in (lookup, lookup + '.zip'):
+        try:
+            nltk.data.find(candidate)
+            return True
+        except LookupError:
+            continue
+    return False
+
+
+for _resource, _lookup in _NLTK_RESOURCES:
+    if not _nltk_present(_lookup):
+        nltk.download(_resource, quiet=True)
 
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords, wordnet

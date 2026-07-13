@@ -180,14 +180,17 @@ test_target() {
 
     echo ""
     echo "  [2/2] Example smoke tests"
-    echo "  Running: docker run --rm ${image_name} uv run --no-project python -m pytest /home/jupyter/tests/ -m \"${pytest_marks}\" -v --timeout=300"
+    echo "  Running: docker run --rm -e HF_HUB_OFFLINE=1 ${image_name} uv run --no-project python -m pytest /home/jupyter/tests/ -m \"${pytest_marks}\" -v --timeout=300"
     echo ""
 
     # Exit code 5 means "no tests collected" — treat as success (mark not yet populated).
     # The `|| pytest_exit=$?` form keeps the capture correct even under `set -e`
     # when this function is called without a `|| true` guard.
+    # HF_HUB_OFFLINE forces the pre-baked HuggingFace cache (sentence-transformers)
+    # to be used without any network call, so a Hub outage can't flake the tests.
+    # It is set only for this test run, not baked into the image.
     local pytest_exit=0
-    docker run --rm "${image_name}" \
+    docker run --rm -e HF_HUB_OFFLINE=1 "${image_name}" \
         uv run --no-project python -m pytest /home/jupyter/tests/ \
         -m "${pytest_marks}" \
         -v \

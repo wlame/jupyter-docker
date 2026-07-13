@@ -70,6 +70,25 @@ base → per-target builds with registry layer-cache (`ghcr.io/.../buildcache:<s
 Trivy scan (report-only), and pushes on main (`:target` + immutable
 `:target-<sha>`), plus a weekly scheduled rebuild.
 
+## Model weights (offline tests)
+
+Examples that need model weights get them **pre-baked at build time** so the
+tests run without network. `scripts/bake_models.sh <target>` runs in the
+vision/nlp/speech/face/full stages after `uv sync`, fetching each model into its
+library's **default cache** under `/home/jupyter` (as the jupyter user), so no
+runtime env var is needed to find them:
+
+- vision → `yolov8n.pt` (curl + sha256, the one checksum-pinned file)
+- nlp → NLTK corpora (`~/nltk_data`) + sentence-transformers MiniLM (`~/.cache/huggingface`)
+- speech → Whisper `tiny` (`~/.cache/whisper`)
+- face → face-alignment s3fd + 2DFAN (`~/.cache/torch/hub`)
+
+Not baked: DeepFace's ~1.5 GB attribute models (reliably hosted, and example 20
+already skips them offline). The pytest run sets `HF_HUB_OFFLINE=1` (in
+build-all.sh, not the image) so a Hub outage can't flake the MiniLM load. When
+adding an example that downloads a model, add it to `bake_models.sh` and keep the
+download call as a fallback for when the example runs outside the image.
+
 ## Examples and tests
 
 - `examples/NN_*.py` are the source of truth; the paired `.ipynb` files are

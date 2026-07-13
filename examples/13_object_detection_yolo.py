@@ -96,9 +96,12 @@ print("\n" + "=" * 60)
 print("Loading YOLO Model")
 print("=" * 60)
 
-# Load pretrained YOLOv8 nano model (smallest, fastest)
+# Load pretrained YOLOv8 nano model (smallest, fastest). Prefer a pre-baked
+# copy (present in the vision/full images) so this runs offline; otherwise
+# ultralytics downloads it on first use.
 print("Loading YOLOv8n model (this may download the model on first run)...")
-model = YOLO("yolov8n.pt")
+_baked_yolo = os.path.expanduser("~/.cache/ultralytics/yolov8n.pt")
+model = YOLO(_baked_yolo if os.path.exists(_baked_yolo) else "yolov8n.pt")
 
 print(f"Model loaded successfully!")
 print(f"Model type: {type(model).__name__}")

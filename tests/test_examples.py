@@ -189,9 +189,8 @@ def test_example_12_image_processing():
 
 
 @pytest.mark.vision
-@pytest.mark.slow
 def test_example_13_object_detection_yolo():
-    """YOLO object detection (downloads model on first run, ~6 MB)."""
+    """YOLO object detection (weights pre-baked into the image; runs offline)."""
     run_example(
         '13_object_detection_yolo.py',
         expected_outputs=[
@@ -264,9 +263,11 @@ def test_example_07_timeseries_analysis():
 # =============================================================================
 
 @pytest.mark.nlp
-@pytest.mark.slow
 def test_example_14_nlp_text_analysis():
-    """NER, dependency parsing, VADER sentiment, WordNet, semantic search."""
+    """NER, dependency parsing, VADER sentiment, WordNet, semantic search.
+
+    NLTK data and the sentence-transformers model are pre-baked; runs offline.
+    """
     run_example(
         '14_nlp_text_analysis.py',
         expected_outputs=[
@@ -282,9 +283,11 @@ def test_example_14_nlp_text_analysis():
 # =============================================================================
 
 @pytest.mark.speech
-@pytest.mark.slow
 def test_example_19_speech_processing():
-    """Whisper ASR, gTTS synthesis, torchaudio spectrogram, waveform visualization."""
+    """Whisper ASR, gTTS synthesis, torchaudio spectrogram, waveform visualization.
+
+    The Whisper model is pre-baked; gTTS (external service) skips without network.
+    """
     run_example(
         '19_speech_processing.py',
         # speech_gtts_output.mp3 is intentionally NOT asserted: it depends on
@@ -304,7 +307,12 @@ def test_example_19_speech_processing():
 @pytest.mark.face
 @pytest.mark.slow
 def test_example_20_face_analysis():
-    """dlib HOG detection, DeepFace attributes, face-alignment landmarks."""
+    """dlib HOG detection, DeepFace attributes, face-alignment landmarks.
+
+    face-alignment weights are pre-baked; the asserted outputs run offline.
+    Still marked slow because the DeepFace attribute models (~1.5 GB) download
+    on first use and its section is skipped without network.
+    """
     run_example(
         '20_face_analysis.py',
         expected_outputs=[

@@ -87,9 +87,10 @@ USER jupyter
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Copy examples, tests, and scripts
+# Copy examples, tests, and the model-baking script (used by specialized stages)
 COPY --chown=jupyter:jupyter examples/ /home/jupyter/examples/
 COPY --chown=jupyter:jupyter tests/ /home/jupyter/tests/
+COPY --chown=jupyter:jupyter scripts/bake_models.sh /home/jupyter/scripts/bake_models.sh
 
 # Configure Jupyter.
 # No token/password lines: jupyter-server generates a random token per start
@@ -228,6 +229,9 @@ USER jupyter
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
+# Pre-bake model weights so example tests run offline (see scripts/bake_models.sh)
+RUN bash /home/jupyter/scripts/bake_models.sh vision
+
 
 # =============================================================================
 # AUDIO: Audio processing (inherits from base, needs torch)
@@ -318,6 +322,9 @@ USER jupyter
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
+# Pre-bake model weights so example tests run offline (see scripts/bake_models.sh)
+RUN bash /home/jupyter/scripts/bake_models.sh nlp
+
 
 # =============================================================================
 # SPEECH: Speech recognition and text-to-speech (inherits from base, needs torch)
@@ -343,6 +350,9 @@ COPY --chown=jupyter:jupyter targets/speech/verify_imports.py /home/jupyter/scri
 USER jupyter
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
+
+# Pre-bake model weights so example tests run offline (see scripts/bake_models.sh)
+RUN bash /home/jupyter/scripts/bake_models.sh speech
 
 
 # =============================================================================
@@ -372,6 +382,11 @@ COPY --chown=jupyter:jupyter targets/face/verify_imports.py /home/jupyter/script
 USER jupyter
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
+
+# Pre-bake face-alignment weights so example tests run offline. DeepFace's
+# attribute models are intentionally NOT baked (~1.5 GB, reliably hosted, and
+# the example already skips them offline). See scripts/bake_models.sh.
+RUN bash /home/jupyter/scripts/bake_models.sh face
 
 
 # =============================================================================
@@ -427,3 +442,6 @@ RUN for dir in /home/jupyter/targets/*/; do \
 USER jupyter
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
+
+# Pre-bake every target's model weights so example tests run offline
+RUN bash /home/jupyter/scripts/bake_models.sh full
