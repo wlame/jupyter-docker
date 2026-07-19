@@ -87,6 +87,30 @@ runs:
       shell: bash
       run: ./build-all.sh --test-only ${{ inputs.target }}
 
+    # Track image size so toolchain/dependency changes surface as size regressions.
+    # Reports the uncompressed size (what `docker images` shows) and the gzip size
+    # (≈ the ghcr pull size). Non-fatal: sizing must never fail a build.
+    - name: Report ${{ inputs.target }} image size
+      shell: bash
+      continue-on-error: true
+      env:
+        TARGET: ${{ inputs.target }}
+      run: |
+        img="ds-${TARGET}"
+        uncompressed=$(docker image inspect "$img" --format '{{.Size}}')
+        compressed=$(docker save "$img" | gzip -1 | wc -c)
+        u_mb=$(( uncompressed / 1024 / 1024 ))
+        c_mb=$(( compressed / 1024 / 1024 ))
+        echo "size ${img}: uncompressed=${u_mb}MB compressed(gzip)=${c_mb}MB"
+        {
+          echo "### Image size — ${TARGET}"
+          echo ""
+          echo "| metric | MB |"
+          echo "| --- | --- |"
+          echo "| uncompressed | ${u_mb} |"
+          echo "| compressed (gzip -1) | ${c_mb} |"
+        } >> "$GITHUB_STEP_SUMMARY"
+
     # Report-only for now: surfaces HIGH/CRITICAL CVEs in the job log without
     # blocking the pipeline. Tighten to exit-code 1 once a baseline is triaged.
     - name: Scan ${{ inputs.target }} with Trivy
