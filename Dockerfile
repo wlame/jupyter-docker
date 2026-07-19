@@ -48,6 +48,10 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     python3.13 \
     python3.13-venv \
+    # OpenMP runtime (libgomp.so.1): scikit-learn, xgboost, lightgbm and
+    # torchcodec's shared libraries dlopen it. The gcc toolchain used to pull it
+    # in transitively; keep it explicitly now that the compilers are gone.
+    libgomp1 \
     # Network utilities
     curl \
     wget \
