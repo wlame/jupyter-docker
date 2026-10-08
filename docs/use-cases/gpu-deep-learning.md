@@ -12,18 +12,19 @@ tags:
 You're training neural networks and want the container to use your machine's
 NVIDIA GPU instead of the CPU. The `deeplearn` target carries PyTorch,
 TorchVision, TorchAudio, TensorFlow, and Keras; `full` carries the same stack
-alongside everything else. Either can hand work to a GPU once Docker is wired to
-the NVIDIA runtime.
+alongside everything else. PyTorch in either image can hand work to a GPU once
+Docker is wired to the NVIDIA runtime; TensorFlow runs on the CPU (see
+[TensorFlow runs on the CPU](#tensorflow-runs-on-the-cpu)).
 
 ## Prerequisites
 
-- An NVIDIA GPU with a working host driver.
+- An NVIDIA GPU with a host driver from the **R580 branch or newer**. The PyPI
+  torch wheels bundle the CUDA 13.0 runtime libraries (the `nvidia-*` packages in
+  the lockfile), and CUDA 13.x applications run on drivers 580 and later. Neither
+  the host nor the image needs a CUDA toolkit install.
 - The **NVIDIA Container Toolkit** installed and configured on the host — this is
   what lets `docker run --gpus` expose the GPU to the container.
 - Docker installed and running.
-
-<!-- TODO: confirm minimum CUDA toolkit / NVIDIA driver versions the bundled
-     torch 2.12 and tensorflow 2.21 wheels require -->
 
 ## Complete example
 
@@ -116,14 +117,19 @@ docker run --rm --gpus all -p 8888:8888 \
   ds-deeplearn
 ```
 
-### Check TensorFlow sees the GPU
+### TensorFlow runs on the CPU
+
+TensorFlow is installed from PyPI without its `and-cuda` extra, and the image ships
+no CUDA 12 libraries for it, so TensorFlow ignores the GPU even with `--gpus all`:
 
 ```python
 import torch  # import torch first — see the warning above
 import tensorflow as tf
 
-print(tf.config.list_physical_devices("GPU"))
+print(tf.config.list_physical_devices("GPU"))  # [] in these images
 ```
+
+Use PyTorch for GPU training in these images.
 
 ## Related pages
 
