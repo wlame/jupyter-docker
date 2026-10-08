@@ -149,7 +149,7 @@ flowchart TD
 
 `full` follows the identical pattern with `full-builder`, and additionally installs
 the union of every specialized target's runtime libraries (geospatial, HDF5,
-audio, speech, and vision).
+audio, speech, vision, and PortAudio for face's MediaPipe).
 
 ## One image per Python version
 

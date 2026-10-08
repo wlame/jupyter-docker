@@ -86,9 +86,9 @@ description = "Face detection, recognition, analysis, and generation"
 # tensorflow 2.21 ships no cp314 wheels; widen once tensorflow 2.22 and
 # tf-keras 2.22 are released.
 python = ["3.13"]
-# deepface/retina-face/face-alignment require GUI opencv-python — same cv2
-# double-install problem as vision.
-exclude-dependencies = ["opencv-python"]
+# deepface/retina-face/face-alignment/insightface require GUI opencv-python and
+# mediapipe requires opencv-contrib-python — same cv2 double-install problem as vision.
+exclude-dependencies = ["opencv-python", "opencv-contrib-python"]
 
 [targets.full]
 parent = ""
@@ -230,6 +230,36 @@ version = "1.0.4"
 module = "xmltodict"
 introduced-by = ["base"]
 
+[packages."jupyter-resource-usage"]
+version = "1.3.0"
+module = "jupyter_resource_usage"
+introduced-by = ["base"]
+
+[packages."jupyterlab-git"]
+version = "0.54.1"
+module = "jupyterlab_git"
+introduced-by = ["base"]
+
+[packages."jupyterlab-lsp"]
+version = "5.3.0"
+module = "jupyterlab_lsp"
+introduced-by = ["base"]
+
+[packages."jupytext"]
+version = "1.19.5"
+module = "jupytext"
+introduced-by = ["base"]
+
+[packages."nbdime"]
+version = "4.0.4"
+module = "nbdime"
+introduced-by = ["base"]
+
+[packages."python-lsp-server"]
+version = "1.15.0"
+module = "pylsp"
+introduced-by = ["base"]
+
 # ── introduced in: scientific ────────────────────────────────────────────────
 
 [packages."matplotlib"]
@@ -247,6 +277,11 @@ version = "3.0.6"
 module = "pandas"
 # Declared (not just transitive) in visualization/dataio: their examples import it.
 introduced-by = ["scientific", "visualization", "dataio"]
+# statsforecast, mlforecast, and skforecast (timeseries) require pandas < 3;
+# full ships them too. Lift this hold once they support pandas 3.
+[packages."pandas".overrides]
+timeseries = "2.3.3"
+full = "2.3.3"
 
 [packages."scipy"]
 version = "1.18.1"
@@ -261,6 +296,36 @@ introduced-by = ["scientific"]
 [packages."sympy"]
 version = "1.14.0"
 module = "sympy"
+introduced-by = ["scientific"]
+
+[packages."bottleneck"]
+version = "1.6.0"
+module = "bottleneck"
+introduced-by = ["scientific"]
+
+[packages."duckdb"]
+version = "1.5.6"
+module = "duckdb"
+introduced-by = ["scientific", "dataio"]
+
+[packages."numexpr"]
+version = "2.14.2"
+module = "numexpr"
+introduced-by = ["scientific"]
+
+[packages."pint"]
+version = "0.26.1"
+module = "pint"
+introduced-by = ["scientific"]
+
+[packages."polars"]
+version = "1.44.2"
+module = "polars"
+introduced-by = ["scientific", "dataio"]
+
+[packages."xarray"]
+version = "2026.9.0"
+module = "xarray"
 introduced-by = ["scientific"]
 
 # ── introduced in: visualization ─────────────────────────────────────────────
@@ -301,6 +366,36 @@ version = "0.13.2"
 module = "seaborn"
 introduced-by = ["visualization"]
 
+[packages."datashader"]
+version = "0.19.1"
+module = "datashader"
+introduced-by = ["visualization"]
+
+[packages."great-tables"]
+version = "1.0.0"
+module = "great_tables"
+introduced-by = ["visualization"]
+
+[packages."ipympl"]
+version = "0.10.0"
+module = "ipympl"
+introduced-by = ["visualization"]
+
+[packages."jupyter-bokeh"]
+version = "4.1.0"
+module = "jupyter_bokeh"
+introduced-by = ["visualization"]
+
+[packages."plotnine"]
+version = "0.15.8"
+module = "plotnine"
+introduced-by = ["visualization"]
+
+[packages."vl-convert-python"]
+version = "1.9.0.post1"
+module = "vl_convert"
+introduced-by = ["visualization"]
+
 # ── introduced in: dataio ────────────────────────────────────────────────────
 
 [packages."fastparquet"]
@@ -324,7 +419,7 @@ introduced-by = ["dataio"]
 [packages."pyarrow"]
 version = "25.0.1"
 module = "pyarrow"
-introduced-by = ["dataio"]
+introduced-by = ["scientific", "dataio"]
 
 [packages."sqlalchemy"]
 version = "2.1.1"
@@ -339,6 +434,80 @@ introduced-by = ["dataio"]
 [packages."xlrd"]
 version = "2.0.2"
 module = "xlrd"
+introduced-by = ["dataio"]
+
+[packages."adlfs"]
+version = "2026.8.0"
+module = "adlfs"
+introduced-by = ["dataio"]
+
+[packages."connectorx"]
+version = "0.4.6"
+module = "connectorx"
+introduced-by = ["dataio"]
+
+[packages."deltalake"]
+version = "1.6.6"
+module = "deltalake"
+introduced-by = ["dataio"]
+
+[packages."gcsfs"]
+version = "2026.8.1"
+module = "gcsfs"
+introduced-by = ["dataio"]
+# datasets 5.0.1 (nlp) caps fsspec <= 2026.6.0; full ships both stacks, so it
+# holds the cloud filesystems released against that fsspec.
+[packages."gcsfs".overrides]
+full = "2026.7.0"
+
+[packages."netcdf4"]
+version = "1.7.4"
+module = "netCDF4"
+introduced-by = ["dataio"]
+
+[packages."psycopg"]
+version = "3.3.6"
+module = "psycopg"
+introduced-by = ["dataio"]
+
+[packages."psycopg-binary"]
+# The C implementation psycopg uses when present; no libpq install needed.
+version = "3.3.6"
+module = "psycopg_binary"
+introduced-by = ["dataio"]
+
+[packages."pymysql"]
+version = "1.2.3"
+module = "pymysql"
+introduced-by = ["dataio"]
+
+[packages."pyreadstat"]
+version = "1.3.6"
+module = "pyreadstat"
+introduced-by = ["dataio"]
+
+[packages."python-calamine"]
+version = "0.8.2"
+module = "python_calamine"
+introduced-by = ["dataio"]
+
+[packages."s3fs"]
+version = "2026.9.0"
+module = "s3fs"
+introduced-by = ["dataio"]
+# datasets 5.0.1 (nlp) caps fsspec <= 2026.6.0; full ships both stacks, so it
+# holds the cloud filesystems released against that fsspec.
+[packages."s3fs".overrides]
+full = "2026.6.0"
+
+[packages."xlsxwriter"]
+version = "3.2.9"
+module = "xlsxwriter"
+introduced-by = ["dataio"]
+
+[packages."zarr"]
+version = "3.4.0"
+module = "zarr"
 introduced-by = ["dataio"]
 
 # ── introduced in: ml ────────────────────────────────────────────────────────
@@ -370,6 +539,36 @@ introduced-by = ["ml", "timeseries"]
 # xgboost >= 3.4 depends on nvidia-nccl-cu13 (~200 MB, distributed GPU only), the
 # same NCCL torch uses. It cannot be excluded on ml: deeplearn and full inherit
 # ml's exclusions and torch needs the library, so the CPU images carry it.
+
+[packages."catboost"]
+version = "1.2.10"
+module = "catboost"
+introduced-by = ["ml"]
+
+[packages."mapie"]
+version = "1.5.0"
+module = "mapie"
+introduced-by = ["ml"]
+
+[packages."shap"]
+version = "0.52.0"
+module = "shap"
+introduced-by = ["ml"]
+
+[packages."skops"]
+version = "0.16.0"
+module = "skops"
+introduced-by = ["ml"]
+
+[packages."skrub"]
+version = "0.10.1"
+module = "skrub"
+introduced-by = ["ml"]
+
+[packages."umap-learn"]
+version = "0.5.12"
+module = "umap"
+introduced-by = ["ml"]
 
 # ── introduced in: deeplearn ─────────────────────────────────────────────────
 
@@ -411,6 +610,41 @@ verify-first = true
 module = "torchvision"
 introduced-by = ["deeplearn", "face"]
 
+[packages."accelerate"]
+version = "1.15.0"
+module = "accelerate"
+introduced-by = ["deeplearn", "nlp"]
+
+[packages."einops"]
+version = "0.8.2"
+module = "einops"
+introduced-by = ["deeplearn"]
+
+[packages."lightning"]
+version = "2.6.6"
+module = "lightning"
+introduced-by = ["deeplearn"]
+
+[packages."onnx"]
+version = "1.23.1"
+module = "onnx"
+introduced-by = ["deeplearn"]
+
+[packages."onnxruntime"]
+version = "1.30.0"
+module = "onnxruntime"
+introduced-by = ["deeplearn", "vision", "face"]
+
+[packages."tensorboard"]
+version = "2.21.0"
+module = "tensorboard"
+introduced-by = ["deeplearn"]
+
+[packages."torchmetrics"]
+version = "1.9.0"
+module = "torchmetrics"
+introduced-by = ["deeplearn"]
+
 # ── introduced in: vision ────────────────────────────────────────────────────
 
 [packages."imageio"]
@@ -443,6 +677,26 @@ version = "8.4.170"
 module = "ultralytics"
 introduced-by = ["vision"]
 
+[packages."kornia"]
+version = "0.8.3"
+module = "kornia"
+introduced-by = ["vision"]
+
+[packages."open-clip-torch"]
+version = "3.3.0"
+module = "open_clip"
+introduced-by = ["vision"]
+
+[packages."supervision"]
+version = "0.30.6"
+module = "supervision"
+introduced-by = ["vision"]
+
+[packages."timm"]
+version = "1.0.30"
+module = "timm"
+introduced-by = ["vision"]
+
 # ── introduced in: audio ─────────────────────────────────────────────────────
 
 [packages."audioread"]
@@ -469,6 +723,26 @@ introduced-by = ["audio"]
 version = "0.14.0"
 module = "soundfile"
 introduced-by = ["audio", "speech"]
+
+[packages."noisereduce"]
+version = "3.0.3"
+module = "noisereduce"
+introduced-by = ["audio"]
+
+[packages."pedalboard"]
+version = "0.9.25"
+module = "pedalboard"
+introduced-by = ["audio"]
+
+[packages."praat-parselmouth"]
+version = "0.4.7"
+module = "parselmouth"
+introduced-by = ["audio", "speech"]
+
+[packages."pyloudnorm"]
+version = "0.2.0"
+module = "pyloudnorm"
+introduced-by = ["audio"]
 
 # ── introduced in: geospatial ────────────────────────────────────────────────
 
@@ -502,6 +776,46 @@ version = "2.1.2"
 module = "shapely"
 introduced-by = ["geospatial"]
 
+[packages."contextily"]
+version = "1.7.1"
+module = "contextily"
+introduced-by = ["geospatial"]
+
+[packages."geodatasets"]
+version = "2026.5.1"
+module = "geodatasets"
+introduced-by = ["geospatial"]
+
+[packages."h3"]
+version = "4.5.0"
+module = "h3"
+introduced-by = ["geospatial"]
+
+[packages."lonboard"]
+version = "0.16.0"
+module = "lonboard"
+introduced-by = ["geospatial"]
+
+[packages."mapclassify"]
+version = "2.11.0"
+module = "mapclassify"
+introduced-by = ["geospatial"]
+
+[packages."osmnx"]
+version = "2.1.1"
+module = "osmnx"
+introduced-by = ["geospatial"]
+
+[packages."rasterio"]
+version = "1.5.2"
+module = "rasterio"
+introduced-by = ["geospatial"]
+
+[packages."rioxarray"]
+version = "0.23.0"
+module = "rioxarray"
+introduced-by = ["geospatial"]
+
 # ── introduced in: timeseries ────────────────────────────────────────────────
 
 [packages."pmdarima"]
@@ -522,6 +836,31 @@ introduced-by = ["timeseries"]
 [packages."tsfresh"]
 version = "0.21.2"
 module = "tsfresh"
+introduced-by = ["timeseries"]
+
+[packages."arch"]
+version = "8.0.0"
+module = "arch"
+introduced-by = ["timeseries"]
+
+[packages."mlforecast"]
+version = "1.1.0"
+module = "mlforecast"
+introduced-by = ["timeseries"]
+
+[packages."skforecast"]
+version = "0.25.0"
+module = "skforecast"
+introduced-by = ["timeseries"]
+
+[packages."statsforecast"]
+version = "2.1.1"
+module = "statsforecast"
+introduced-by = ["timeseries"]
+
+[packages."tslearn"]
+version = "0.9.0"
+module = "tslearn"
 introduced-by = ["timeseries"]
 
 # ── introduced in: nlp ───────────────────────────────────────────────────────
@@ -573,6 +912,46 @@ introduced-by = ["nlp", "speech"]
 speech = "4.57.6"
 full = "4.57.6"
 
+[packages."bertopic"]
+version = "0.17.4"
+module = "bertopic"
+introduced-by = ["nlp"]
+
+[packages."datasets"]
+version = "5.0.1"
+module = "datasets"
+introduced-by = ["nlp"]
+
+[packages."evaluate"]
+version = "0.4.6"
+module = "evaluate"
+introduced-by = ["nlp"]
+
+[packages."keybert"]
+version = "0.9.0"
+module = "keybert"
+introduced-by = ["nlp"]
+
+[packages."lingua-language-detector"]
+version = "2.2.0"
+module = "lingua"
+introduced-by = ["nlp"]
+
+[packages."peft"]
+version = "0.21.1"
+module = "peft"
+introduced-by = ["nlp"]
+
+[packages."rapidfuzz"]
+version = "3.14.6"
+module = "rapidfuzz"
+introduced-by = ["nlp"]
+
+[packages."tiktoken"]
+version = "0.14.0"
+module = "tiktoken"
+introduced-by = ["nlp"]
+
 # ── introduced in: speech ────────────────────────────────────────────────────
 
 [packages."coqui-tts"]
@@ -615,6 +994,16 @@ version = "3.17.0"
 module = "speech_recognition"
 introduced-by = ["speech"]
 
+[packages."jiwer"]
+version = "4.0.0"
+module = "jiwer"
+introduced-by = ["speech"]
+
+[packages."silero-vad"]
+version = "6.2.3"
+module = "silero_vad"
+introduced-by = ["speech"]
+
 # ── introduced in: face ──────────────────────────────────────────────────────
 
 [packages."deepface"]
@@ -654,4 +1043,14 @@ introduced-by = ["face"]
 [packages."tf-keras"]
 version = "2.21.0"
 module = "tf_keras"
+introduced-by = ["face"]
+
+[packages."insightface"]
+version = "2.0"
+module = "insightface"
+introduced-by = ["face"]
+
+[packages."mediapipe"]
+version = "1.0.1"
+module = "mediapipe"
 introduced-by = ["face"]

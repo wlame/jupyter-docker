@@ -30,8 +30,18 @@ To review what changed, browse the commit history on GitHub:
   `:<target>-py3.13`, or pin an immutable `-<short-sha>` tag from before the change.
 - Every target is published per supported Python as `:<target>-py<X.Y>` (plus
   `-<short-sha>`). See [Deployment & publishing](operations/deployment.md).
-- All dependencies were refreshed to the 2026-10-01 cutoff; scikit-learn and pandas
-  are no longer held back in `timeseries` and `full`.
+- All dependencies were refreshed to the 2026-10-01 cutoff; scikit-learn is no longer
+  held back in `timeseries` and `full`.
+- About 75 libraries were added across the targets (JupyterLab Git/LSP/Jupytext
+  extensions in every image; polars, DuckDB, xarray; plotnine, datashader; Delta Lake,
+  zarr, cloud filesystems; CatBoost, SHAP, MAPIE, UMAP; Lightning, ONNX; timm,
+  kornia; pedalboard; rasterio, H3, OSMnx; statsforecast, skforecast; datasets,
+  PEFT, KeyBERT; jiwer, silero-vad; InsightFace, MediaPipe), with examples 21–31. See
+  [Image targets](reference/targets.md). The new forecasting libraries require
+  pandas < 3, so `timeseries` and `full` run pandas 2.3.3.
+- Left out on purpose: audiomentations (caps librosa < 0.12, below the shipped 1.0),
+  webrtcvad (no Python 3.14 wheel before the cutoff), and jupyterlab-execute-time
+  (its Python module cannot be imported).
 
 ## Related pages
 

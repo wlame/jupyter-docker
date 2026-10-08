@@ -18,7 +18,7 @@ import pytest
 from conftest import run_example
 
 # =============================================================================
-# SCIENTIFIC target — numpy, scipy, pandas
+# SCIENTIFIC target — numpy, scipy, pandas, polars, duckdb, xarray
 # =============================================================================
 
 @pytest.mark.scientific
@@ -49,8 +49,20 @@ def test_example_17_scipy_signal_processing():
     )
 
 
+@pytest.mark.scientific
+def test_example_21_polars_duckdb_xarray():
+    """polars, DuckDB, Arrow, xarray, pint, numexpr, bottleneck."""
+    run_example(
+        '21_polars_duckdb_xarray.py',
+        expected_outputs=[
+            'xarray_zonal_mean.png',
+            'duckdb_sales.parquet',
+        ],
+    )
+
+
 # =============================================================================
-# VISUALIZATION target — matplotlib, seaborn, plotly, bokeh, altair, panel
+# VISUALIZATION target — matplotlib, seaborn, plotly, bokeh, altair, panel, plotnine, datashader
 # =============================================================================
 
 @pytest.mark.visualization
@@ -112,8 +124,22 @@ def test_example_16_altair_panel_viz():
     )
 
 
+@pytest.mark.visualization
+def test_example_22_plotnine_tables_datashader():
+    """plotnine, great-tables, datashader, vl-convert."""
+    run_example(
+        '22_plotnine_tables_datashader.py',
+        expected_outputs=[
+            'plotnine_efficiency.png',
+            'great_tables_summary.html',
+            'datashader_points.png',
+            'altair_vlconvert.png',
+        ],
+    )
+
+
 # =============================================================================
-# DATAIO target — pyarrow, parquet, HDF5, SQLAlchemy
+# DATAIO target — pyarrow, parquet, HDF5, SQLAlchemy, Delta Lake, zarr, netCDF
 # =============================================================================
 
 @pytest.mark.dataio
@@ -134,8 +160,22 @@ def test_example_18_sqlalchemy_database():
     )
 
 
+@pytest.mark.dataio
+def test_example_23_modern_data_formats():
+    """Delta Lake, Excel via calamine, SPSS, zarr, netCDF, connectorx."""
+    run_example(
+        '23_modern_data_formats.py',
+        expected_outputs=[
+            'survey_report.xlsx',
+            'survey.sav',
+            'temperature.nc',
+            'survey.sqlite',
+        ],
+    )
+
+
 # =============================================================================
-# ML target — scikit-learn, XGBoost, LightGBM
+# ML target — scikit-learn, XGBoost, LightGBM, CatBoost, SHAP, MAPIE, UMAP
 # =============================================================================
 
 @pytest.mark.ml
@@ -151,8 +191,22 @@ def test_example_09_machine_learning():
     )
 
 
+@pytest.mark.ml
+def test_example_24_ml_explain_and_uncertainty():
+    """CatBoost, SHAP, MAPIE, UMAP, skrub, skops."""
+    run_example(
+        '24_ml_explain_and_uncertainty.py',
+        expected_outputs=[
+            'shap_beeswarm.png',
+            'umap_digits.png',
+            'ridge.skops',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
-# DEEPLEARN target — PyTorch, TensorFlow/Keras
+# DEEPLEARN target — PyTorch, TensorFlow/Keras, Lightning, ONNX
 # =============================================================================
 
 @pytest.mark.deeplearn
@@ -169,8 +223,21 @@ def test_example_11_deep_learning_tensorflow():
     run_example('11_deep_learning_tensorflow.py', timeout=300)
 
 
+@pytest.mark.deeplearn
+def test_example_25_lightning_onnx():
+    """Lightning, torchmetrics, Accelerate, einops, ONNX + onnxruntime."""
+    run_example(
+        '25_lightning_onnx.py',
+        expected_outputs=[
+            'lightning_training.png',
+            'tiny_mlp.onnx',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
-# VISION target — PIL, OpenCV, scikit-image
+# VISION target — PIL, OpenCV, scikit-image, timm, kornia, supervision
 # =============================================================================
 
 @pytest.mark.vision
@@ -200,8 +267,20 @@ def test_example_13_object_detection_yolo():
     )
 
 
+@pytest.mark.vision
+def test_example_26_vision_backbones_kornia():
+    """timm, kornia, supervision, OpenCLIP (architectures only)."""
+    run_example(
+        '26_vision_backbones_kornia.py',
+        expected_outputs=[
+            'kornia_ops.png',
+            'supervision_annotated.png',
+        ],
+    )
+
+
 # =============================================================================
-# AUDIO target — librosa, torchaudio, soundfile
+# AUDIO target — librosa, torchaudio, soundfile, pedalboard, parselmouth
 # =============================================================================
 
 @pytest.mark.audio
@@ -221,8 +300,20 @@ def test_example_15_audio_analysis():
     )
 
 
+@pytest.mark.audio
+def test_example_27_audio_effects_loudness():
+    """pedalboard effects and augmentation, pyloudnorm, noisereduce, parselmouth."""
+    run_example(
+        '27_audio_effects_loudness.py',
+        expected_outputs=[
+            'pedalboard_fx.wav',
+            'audio_effects.png',
+        ],
+    )
+
+
 # =============================================================================
-# GEOSPATIAL target — cartopy, geopandas, folium
+# GEOSPATIAL target — cartopy, geopandas, folium, rasterio, H3, OSMnx
 # =============================================================================
 
 @pytest.mark.geospatial
@@ -239,8 +330,21 @@ def test_example_06_geospatial():
     )
 
 
+@pytest.mark.geospatial
+def test_example_28_geospatial_raster_h3():
+    """rasterio, rioxarray, H3, mapclassify, OSMnx, lonboard."""
+    run_example(
+        '28_geospatial_raster_h3.py',
+        expected_outputs=[
+            'elevation.tif',
+            'raster_reprojected.png',
+            'h3_choropleth.png',
+        ],
+    )
+
+
 # =============================================================================
-# TIMESERIES target — tsfresh, sktime, statsmodels, pmdarima, prophet
+# TIMESERIES target — tsfresh, sktime, statsmodels, prophet, statsforecast, skforecast
 # =============================================================================
 
 @pytest.mark.timeseries
@@ -257,8 +361,20 @@ def test_example_07_timeseries_analysis():
     )
 
 
+@pytest.mark.timeseries
+def test_example_29_forecasting_toolkit():
+    """statsforecast, mlforecast, skforecast, arch, tslearn."""
+    run_example(
+        '29_forecasting_toolkit.py',
+        expected_outputs=[
+            'forecast_toolkit.png',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
-# NLP target — spaCy, NLTK, transformers, sentence-transformers
+# NLP target — spaCy, NLTK, transformers, sentence-transformers, datasets, PEFT
 # =============================================================================
 
 @pytest.mark.nlp
@@ -277,8 +393,20 @@ def test_example_14_nlp_text_analysis():
     )
 
 
+@pytest.mark.nlp
+def test_example_30_nlp_toolkit():
+    """rapidfuzz, lingua, datasets, PEFT LoRA, KeyBERT on the baked MiniLM."""
+    run_example(
+        '30_nlp_toolkit.py',
+        expected_outputs=[
+            'nlp_toolkit.json',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
-# SPEECH target — whisper, gTTS, torchaudio, SpeechRecognition
+# SPEECH target — whisper, gTTS, torchaudio, SpeechRecognition, jiwer, silero-vad
 # =============================================================================
 
 @pytest.mark.speech
@@ -296,6 +424,17 @@ def test_example_19_speech_processing():
             'speech_waveforms.png',
         ],
         timeout=300,
+    )
+
+
+@pytest.mark.speech
+def test_example_31_speech_metrics_vad():
+    """jiwer error rates, silero-vad segments, parselmouth voice quality."""
+    run_example(
+        '31_speech_metrics_vad.py',
+        expected_outputs=[
+            'speech_quality.json',
+        ],
     )
 
 

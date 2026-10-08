@@ -413,6 +413,8 @@ LABEL org.opencontainers.image.description="ds-face: Face detection, recognition
 USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
+    # PortAudio for sounddevice, which mediapipe imports
+    libportaudio2 \
     libgfortran5 \
     libopenblas0 \
     liblapack3 \
@@ -513,6 +515,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     libsndfile1 \
     ffmpeg \
     espeak-ng \
+    # Face (mediapipe -> sounddevice)
+    libportaudio2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

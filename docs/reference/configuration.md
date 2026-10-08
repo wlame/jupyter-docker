@@ -183,9 +183,11 @@ because a downstream library caps a dependency.
 | `diffusers` 0.39 in full | `diffusers` ≥ 0.40 needs `huggingface-hub` ≥ 1.23; `transformers` 4.57.6 needs `huggingface-hub` < 1.0. | `diffusers` override → `0.39.0` on `full`; `face` ships `0.40.0`. |
 | spaCy 3.8.14 in full | spaCy ≥ 3.8.15 needs `click` ≥ 8.2.1; `gtts` 2.5.4 needs `click` < 8.2. | `spacy` override → `3.8.14` on `full`; `nlp` ships `3.8.16`. |
 | `bokeh < 3.10` | `panel` 1.9.4 cap. | `bokeh` pinned to `3.9.2`. |
+| `pandas < 3` in timeseries/full | `statsforecast`, `mlforecast`, and `skforecast` cap it. | `pandas` override → `2.3.3` on `timeseries` and `full`; every other target ships `3.0.6`. |
+| Cloud filesystems held in full | `datasets` 5.0.1 (nlp) caps `fsspec` at 2026.6.0; `s3fs` pins `fsspec` exactly. | `s3fs` → `2026.6.0` and `gcsfs` → `2026.7.0` on `full`; `dataio` ships the newest. |
 | `h5py < 3.15` in full | `tensorflow` 2.21 cap; only `full` merges both stacks. | `h5py` override → `3.14.0` on `full`; `dataio` ships `3.16.0`. |
 | `opencv-python-headless` 4.13 in face/full | OpenCV 5 dropped the bundled haarcascade files `deepface` needs. | `opencv-python-headless` override → `4.13.0.90` on `face` and `full`. |
-| GUI `opencv-python` excluded on vision/face | It double-installs `cv2` over the pinned headless build (same paths, corrupted mix). | `exclude-dependencies = ["opencv-python"]` on `vision` and `face`. |
+| GUI `opencv-python` / `opencv-contrib-python` excluded on vision/face | They double-install `cv2` over the pinned headless build (same paths, corrupted mix); `mediapipe` pulls the contrib build. | `exclude-dependencies` on `vision` (`opencv-python`) and `face` (both). |
 | `torchcodec` + FFmpeg only in audio/speech/full | `torchaudio` ≥ 2.10 delegates load/save to `torchcodec`, which needs FFmpeg shared libs present only in those stages. | `torchcodec` `introduced-by = ["audio", "speech"]` (and `full`). |
 | `nvidia-nccl-cu13` kept on ml/timeseries | `xgboost` ≥ 3.4 depends on it (~200 MB, distributed GPU only). Excluding it on `ml` would also remove it from `deeplearn` and `full`, where torch needs it. | No exclusion; the comment on `xgboost` explains the cost. |
 | Python 3.13 only for deeplearn/face/full | `tensorflow` 2.21 has no cp314 wheels (and `face` also needs `tf-keras` 2.22). | `python = ["3.13"]` on `deeplearn`, `face`, and `full`. |

@@ -75,14 +75,19 @@ Base Python environment with common utilities for data science. Every specialize
 target builds on this stage, so JupyterLab and the shared utility belt below are
 present everywhere.
 
-**Notable libraries:** JupyterLab, IPython, and Jupyter; `requests` / `httpx` /
-`aiohttp` HTTP clients; Pydantic; loguru and tqdm.
+**Notable libraries:** JupyterLab, IPython, and Jupyter, with the JupyterLab
+extensions every image gets — Jupytext (pair notebooks with `.py` files),
+jupyterlab-git + nbdime (Git UI and notebook-aware diffs), jupyter-resource-usage
+(memory/CPU indicator), and jupyterlab-lsp + python-lsp-server (completion,
+hover, diagnostics); `requests` / `httpx` / `aiohttp` HTTP clients; Pydantic;
+loguru and tqdm.
 
 ??? note "Full package list (base)"
-    aiohttp, beautifulsoup4, httpx, ipython, joblib, jupyter, jupyterlab, loguru,
-    lxml, more-itertools, orjson, pendulum, pip, pydantic, pytest, pytest-timeout,
-    python-dateutil, python-dotenv, pytz, pyyaml, requests, simplejson, toolz,
-    tqdm, ujson, xmltodict.
+    aiohttp, beautifulsoup4, httpx, ipython, joblib, jupyter, jupyter-resource-usage,
+    jupyterlab, jupyterlab-git, jupyterlab-lsp, jupytext, loguru, lxml,
+    more-itertools, nbdime, orjson, pendulum, pip, pydantic, pytest, pytest-timeout,
+    python-dateutil, python-dotenv, python-lsp-server, pytz, pyyaml, requests,
+    simplejson, toolz, tqdm, ujson, xmltodict.
 
 ## scientific
 
@@ -90,8 +95,10 @@ present everywhere.
 
 Scientific computing with NumPy, SciPy, and Pandas.
 
-**Adds:** NumPy, SciPy, Pandas, Statsmodels, SymPy, and Matplotlib. System
-libraries: OpenBLAS, LAPACK, and libgfortran for the numerical stack.
+**Adds:** NumPy, SciPy, Pandas, Statsmodels, SymPy, and Matplotlib, plus the
+modern tabular and array stack — polars, DuckDB, PyArrow (which also backs pandas 3's
+default string type), xarray, pint (units), and pandas' numexpr/bottleneck
+accelerators. System libraries: OpenBLAS, LAPACK, and libgfortran.
 
 ## visualization
 
@@ -99,9 +106,12 @@ libraries: OpenBLAS, LAPACK, and libgfortran for the numerical stack.
 
 Data visualization with Matplotlib, Seaborn, Plotly, and Bokeh.
 
-**Adds:** Matplotlib, Seaborn, Plotly, Bokeh, Altair, HoloViews, hvPlot, and Panel.
-Because its parent is `base` (not `scientific`), it re-declares NumPy and Pandas for
-its own examples. System libraries: FreeType, libpng, libjpeg-turbo.
+**Adds:** Matplotlib, Seaborn, Plotly, Bokeh, Altair, HoloViews, hvPlot, and Panel,
+plus plotnine (ggplot2 grammar), great-tables, datashader (millions of points),
+vl-convert (static Altair export), and the JupyterLab renderers ipympl
+(`%matplotlib widget`) and jupyter-bokeh. Because its parent is `base` (not
+`scientific`), it re-declares NumPy and Pandas for its own examples. System
+libraries: FreeType, libpng, libjpeg-turbo.
 
 ## dataio
 
@@ -109,8 +119,12 @@ its own examples. System libraries: FreeType, libpng, libjpeg-turbo.
 
 Data I/O for Parquet, HDF5, Excel, and databases.
 
-**Adds:** PyArrow, fastparquet, h5py, PyTables, openpyxl, xlrd, and SQLAlchemy
-(plus NumPy and Pandas). System libraries: HDF5.
+**Adds:** PyArrow, fastparquet, h5py, PyTables, openpyxl, xlrd, and SQLAlchemy, plus
+polars and DuckDB, Delta Lake tables (deltalake), fast Excel reading (python-calamine)
+and formatted writing (xlsxwriter), SPSS/SAS/Stata files (pyreadstat), zarr and
+netCDF4, cloud filesystems for fsspec (s3fs, gcsfs, adlfs), database drivers
+(psycopg with its binary build, pymysql), and connectorx for fast SQL-to-DataFrame
+loading (plus NumPy and Pandas). System libraries: HDF5.
 
 ## ml
 
@@ -118,7 +132,9 @@ Data I/O for Parquet, HDF5, Excel, and databases.
 
 Classical machine learning with scikit-learn, XGBoost, and LightGBM.
 
-**Adds:** scikit-learn, XGBoost, LightGBM, imbalanced-learn, and Optuna. XGBoost
+**Adds:** scikit-learn, XGBoost, LightGBM, imbalanced-learn, and Optuna, plus
+CatBoost, SHAP (explanations), MAPIE (conformal prediction intervals), UMAP, skrub
+(DataFrame preparation), and skops (safe model persistence). XGBoost
 pulls the ~200 MB `nvidia-nccl-cu13` wheel (distributed GPU only); it stays, because
 `deeplearn` and `full` inherit this target's exclusions and torch needs it.
 
@@ -128,8 +144,10 @@ pulls the ~200 MB `nvidia-nccl-cu13` wheel (distributed GPU only); it stays, bec
 
 Deep learning with PyTorch and TensorFlow.
 
-**Adds:** PyTorch, TorchVision, TorchAudio, TensorFlow, and Keras. This is the only
-target that stacks the full classical-ML and deep-learning frameworks together.
+**Adds:** PyTorch, TorchVision, TorchAudio, TensorFlow, and Keras, plus Lightning,
+torchmetrics, Accelerate, einops, TensorBoard, and ONNX + onnxruntime for portable
+inference. This is the only target that stacks the full classical-ML and
+deep-learning frameworks together.
 
 ## vision
 
@@ -138,7 +156,8 @@ target that stacks the full classical-ML and deep-learning frameworks together.
 Computer vision and image processing.
 
 **Adds:** OpenCV (headless), Pillow, scikit-image, imageio, and Ultralytics (YOLOv8),
-plus NumPy. The GUI `opencv-python` wheel is excluded so it cannot double-install
+plus timm (backbones), kornia (differentiable image ops), supervision (detection
+annotation), OpenCLIP, onnxruntime, and NumPy. The GUI `opencv-python` wheel is excluded so it cannot double-install
 `cv2` over the pinned headless build. System libraries: libGL and glib for OpenCV.
 
 !!! note "Pre-baked weights"
@@ -152,12 +171,13 @@ plus NumPy. The GUI `opencv-python` wheel is excluded so it cannot double-instal
 Audio processing and analysis.
 
 **Adds:** PyTorch, TorchAudio, torchcodec, librosa, soundfile, pydub, audioread, and
-numba (plus NumPy and Matplotlib). System libraries: libsndfile and FFmpeg — the
+numba, plus pedalboard (studio effects and fast audio I/O), pyloudnorm (loudness),
+noisereduce, and praat-parselmouth (Praat phonetics) (plus NumPy and Matplotlib). System libraries: libsndfile and FFmpeg — the
 latter provides the shared libraries torchcodec needs for audio decode.
 
 ??? note "Full package list (audio)"
-    audioread, librosa, matplotlib, numba, numpy, pydub, soundfile, torch,
-    torchaudio, torchcodec.
+    audioread, librosa, matplotlib, noisereduce, numba, numpy, pedalboard,
+    praat-parselmouth, pydub, pyloudnorm, soundfile, torch, torchaudio, torchcodec.
 
 ## geospatial
 
@@ -165,7 +185,9 @@ latter provides the shared libraries torchcodec needs for audio decode.
 
 Geospatial analysis and mapping.
 
-**Adds:** Cartopy, GeoPandas, Shapely, PyProj, Folium, and GeoViews. System
+**Adds:** Cartopy, GeoPandas, Shapely, PyProj, Folium, and GeoViews, plus the raster
+stack (rasterio, rioxarray on the inherited xarray), Uber H3, mapclassify,
+OSMnx, contextily (basemaps), geodatasets, and lonboard (GPU-rendered maps). System
 libraries: GEOS, PROJ (with data), and GDAL.
 
 ## timeseries
@@ -174,12 +196,17 @@ libraries: GEOS, PROJ (with data), and GDAL.
 
 Time series analysis and forecasting.
 
-**Adds:** sktime, tsfresh, pmdarima, and Prophet, plus the classical-ML family
-(scikit-learn, XGBoost, LightGBM, imbalanced-learn, Optuna) and numba.
+**Adds:** sktime, tsfresh, pmdarima, and Prophet, plus statsforecast and mlforecast
+(Nixtla), skforecast, arch (volatility models), tslearn, the classical-ML family
+(scikit-learn, XGBoost, LightGBM, imbalanced-learn, Optuna), and numba.
+
+!!! note "pandas 2.x"
+    statsforecast, mlforecast, and skforecast require pandas < 3, so this target
+    (and `full`) holds pandas 2.3.3 while the other targets run pandas 3.
 
 ??? note "Full package list (timeseries)"
-    imbalanced-learn, lightgbm, numba, optuna, pmdarima, prophet, scikit-learn,
-    sktime, tsfresh, xgboost.
+    arch, imbalanced-learn, lightgbm, mlforecast, numba, optuna, pmdarima, prophet,
+    scikit-learn, skforecast, sktime, statsforecast, tsfresh, tslearn, xgboost.
 
 ## nlp
 
@@ -188,7 +215,9 @@ Time series analysis and forecasting.
 Natural language processing.
 
 **Adds:** spaCy (with the `en_core_web_sm` model), Transformers, sentence-transformers,
-NLTK, and tokenizers, plus PyTorch. Because its parent is `base` (not `scientific`), it
+NLTK, and tokenizers, plus the Hugging Face training stack (datasets, evaluate,
+Accelerate, PEFT), rapidfuzz, lingua (language detection), tiktoken, BERTopic, KeyBERT,
+and PyTorch. Because its parent is `base` (not `scientific`), it
 re-declares NumPy and Matplotlib for its own examples. System libraries: OpenBLAS, LAPACK,
 and libgfortran.
 
@@ -203,7 +232,8 @@ and libgfortran.
 Speech recognition and text-to-speech synthesis.
 
 **Adds:** openai-whisper, faster-whisper, SpeechRecognition, coqui-tts, gTTS,
-piper-tts, pyannote-audio, and SpeechBrain, plus PyTorch/TorchAudio/torchcodec and
+piper-tts, pyannote-audio, and SpeechBrain, plus jiwer (WER/CER), silero-vad (voice
+activity detection), praat-parselmouth, PyTorch/TorchAudio/torchcodec, and
 Transformers. System libraries: libsndfile, FFmpeg, and espeak-ng (for TTS).
 
 !!! note "Version overrides and pre-baked weights"
@@ -212,9 +242,9 @@ Transformers. System libraries: libsndfile, FFmpeg, and espeak-ng (for TTS).
     [Configuration](configuration.md).
 
 ??? note "Full package list (speech)"
-    coqui-tts, faster-whisper, gtts, matplotlib, numba, numpy, openai-whisper,
-    piper-tts, pyannote-audio, soundfile, speechbrain, speechrecognition, torch,
-    torchaudio, torchcodec, transformers.
+    coqui-tts, faster-whisper, gtts, jiwer, matplotlib, numba, numpy, openai-whisper,
+    piper-tts, praat-parselmouth, pyannote-audio, silero-vad, soundfile, speechbrain,
+    speechrecognition, torch, torchaudio, torchcodec, transformers.
 
 ## face
 
@@ -223,8 +253,9 @@ Transformers. System libraries: libsndfile, FFmpeg, and espeak-ng (for TTS).
 Face detection, recognition, analysis, and generation.
 
 **Adds:** DeepFace, dlib, MTCNN, RetinaFace, face-alignment, and diffusers (for face
-generation), plus TensorFlow/Keras/tf-keras, PyTorch/TorchVision, OpenCV, Pillow,
-and scikit-image. dlib has no wheel, so it is compiled from source in a throwaway
+generation), plus InsightFace and MediaPipe with onnxruntime,
+TensorFlow/Keras/tf-keras, PyTorch/TorchVision, OpenCV, Pillow, and scikit-image.
+InsightFace and MediaPipe download their models on first use. dlib has no wheel, so it is compiled from source in a throwaway
 builder stage and only the finished virtual environment ships in the runtime image.
 
 !!! note "Version overrides and pre-baked weights"
@@ -233,9 +264,19 @@ builder stage and only the finished virtual environment ships in the runtime ima
     models are intentionally not baked. See [Configuration](configuration.md).
 
 ??? note "Full package list (face)"
-    deepface, diffusers, dlib, face-alignment, keras, matplotlib, mtcnn, numpy,
-    opencv-python-headless, pillow, retina-face, scikit-image, tensorflow, tf-keras,
-    torch, torchvision.
+    deepface, diffusers, dlib, face-alignment, insightface, keras, matplotlib,
+    mediapipe, mtcnn, numpy, onnxruntime, opencv-python-headless, pillow,
+    retina-face, scikit-image, tensorflow, tf-keras, torch, torchvision.
+
+## Licenses and large wheels
+
+Most packages are permissively licensed. A few are copyleft, which matters if you
+redistribute an image or code linked against them: Ultralytics (`vision`, `full`)
+is AGPL-3.0; pedalboard and praat-parselmouth (`audio`, `speech`, `full`) are
+GPL-3.0; psycopg (`dataio`, `full`) is LGPL-3.0. Some additions are large on their
+own: lingua's language models (~160 MB, `nlp`), CatBoost (~90 MB, `ml`),
+connectorx (~55 MB, `dataio`), and XGBoost's `nvidia-nccl-cu13` (~200 MB, `ml`,
+`timeseries`).
 
 ## full
 

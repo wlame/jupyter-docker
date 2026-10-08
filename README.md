@@ -127,6 +127,9 @@ Essential utilities included in all specialized targets.
 | python-dotenv | .env file loading |
 | python-dateutil, pytz, pendulum | Date/time utilities |
 | joblib, toolz, more-itertools | Utilities |
+| Jupytext, jupyterlab-git, nbdime | Notebook ↔ `.py` pairing, Git UI, notebook diffs |
+| jupyterlab-lsp, python-lsp-server | Completion, hover, diagnostics |
+| jupyter-resource-usage | Memory/CPU indicator |
 
 ### Scientific (Numerical Computing)
 
@@ -139,6 +142,9 @@ Core libraries for numerical and statistical computing.
 | Pandas | DataFrames |
 | Statsmodels | Statistical models |
 | SymPy | Symbolic mathematics |
+| polars, DuckDB, PyArrow | Fast DataFrames, SQL over DataFrames, Arrow |
+| xarray, pint | Labeled N-D arrays, physical units |
+| numexpr, bottleneck | pandas accelerators |
 
 ### Visualization (Charts & Dashboards)
 
@@ -153,6 +159,11 @@ Interactive and static visualization libraries.
 | HoloViews, hvPlot | Declarative visualization |
 | Panel | Dashboards |
 | Altair | Declarative statistical viz |
+| plotnine | ggplot2 grammar of graphics |
+| great-tables | Publication-quality tables |
+| datashader | Rendering millions of points |
+| vl-convert | Static Altair export |
+| ipympl, jupyter-bokeh | Interactive matplotlib and Bokeh widgets |
 
 ### DataIO (Data Formats & Databases)
 
@@ -165,6 +176,13 @@ Read and write various data formats.
 | h5py, PyTables | HDF5 format |
 | openpyxl, xlrd | Excel files |
 | SQLAlchemy | Database ORM |
+| polars, DuckDB | Fast DataFrames and SQL |
+| deltalake | Delta Lake tables |
+| python-calamine, xlsxwriter | Fast Excel reading, formatted Excel writing |
+| pyreadstat | SPSS / SAS / Stata files |
+| zarr, netCDF4 | Chunked and scientific arrays |
+| s3fs, gcsfs, adlfs | Cloud storage for fsspec |
+| psycopg, pymysql, connectorx | Database drivers, fast SQL loading |
 
 ### ML (Machine Learning)
 
@@ -177,6 +195,11 @@ Classical machine learning algorithms.
 | LightGBM | Fast gradient boosting |
 | imbalanced-learn | Imbalanced datasets |
 | Optuna | Hyperparameter optimization |
+| CatBoost | Gradient boosting with categorical features |
+| SHAP | Model explanations |
+| MAPIE | Conformal prediction intervals |
+| UMAP | Non-linear embeddings |
+| skrub, skops | DataFrame preparation, safe model persistence |
 
 ### DeepLearn (Neural Networks)
 
@@ -189,6 +212,9 @@ Deep learning frameworks.
 | TorchAudio | Audio for PyTorch |
 | TensorFlow | ML platform |
 | Keras | High-level neural network API |
+| Lightning, torchmetrics | Training loops and metrics |
+| Accelerate, einops | Device handling, tensor reshaping |
+| ONNX, onnxruntime, TensorBoard | Portable models, fast inference, dashboards |
 
 ### Vision (Image Processing)
 
@@ -201,6 +227,10 @@ Computer vision and image manipulation.
 | scikit-image | Image algorithms |
 | imageio | Image I/O |
 | Ultralytics | YOLOv8 object detection |
+| timm, OpenCLIP | Backbones and image–text models |
+| kornia | Differentiable image ops and augmentation |
+| supervision | Detection annotation and tracking |
+| onnxruntime | Fast inference for exported models |
 
 ### Audio (Audio Processing)
 
@@ -214,6 +244,10 @@ Audio analysis and manipulation.
 | soundfile | Audio file I/O |
 | pydub | Audio manipulation |
 | audioread | Audio decoding |
+| pedalboard | Studio effects, augmentation, audio I/O |
+| pyloudnorm | Loudness measurement |
+| noisereduce | Spectral-gating denoise |
+| praat-parselmouth | Praat phonetics (pitch, formants) |
 
 ### Geospatial (Maps & GIS)
 
@@ -227,6 +261,12 @@ Geographic data processing and visualization.
 | PyProj | Coordinate transformations |
 | Folium | Interactive maps |
 | GeoViews | Geographic visualization |
+| rasterio, rioxarray | Raster data |
+| H3 | Hexagonal spatial indexing |
+| mapclassify | Choropleth classification |
+| OSMnx | OpenStreetMap street networks |
+| contextily, geodatasets | Basemaps, sample data |
+| lonboard | GPU-rendered maps |
 
 ### TimeSeries (Time Series Analysis)
 
@@ -238,6 +278,10 @@ Time series modeling and forecasting.
 | sktime | Time series ML |
 | pmdarima | Auto-ARIMA |
 | Prophet | Forecasting |
+| statsforecast, mlforecast | Fast statistical and ML forecasting (Nixtla) |
+| skforecast | Forecasting with scikit-learn regressors |
+| arch | Volatility (GARCH) models |
+| tslearn | Time-series clustering and DTW |
 
 ### NLP (Natural Language Processing)
 
@@ -250,6 +294,11 @@ Text processing and language models.
 | Transformers | Hugging Face models |
 | sentence-transformers | Sentence embeddings |
 | tokenizers | Fast tokenization |
+| datasets, evaluate | Hugging Face datasets and metrics |
+| Accelerate, PEFT | Fine-tuning, LoRA adapters |
+| rapidfuzz, lingua | Fuzzy matching, language detection |
+| tiktoken | OpenAI tokenizers |
+| BERTopic, KeyBERT | Topic modelling, keyword extraction |
 
 ### Speech (Speech Recognition & TTS)
 
@@ -266,6 +315,9 @@ Speech-to-text and text-to-speech.
 | pyannote-audio | Speaker diarization |
 | speechbrain | All-in-one speech toolkit |
 | torchcodec | Audio decoding for torchaudio I/O |
+| jiwer | WER / CER for evaluating ASR |
+| silero-vad | Voice activity detection |
+| praat-parselmouth | Prosody and pitch analysis |
 
 ### Face (Face Detection & Recognition)
 
@@ -279,6 +331,7 @@ Face detection, recognition, analysis, and generation.
 | RetinaFace | Face detection with landmarks |
 | face-alignment | 2D/3D face landmarks (PyTorch) |
 | diffusers | Face generation (Stable Diffusion) |
+| InsightFace, MediaPipe | Face recognition, face mesh and landmarks |
 
 ### Full (Complete Environment)
 
@@ -375,6 +428,17 @@ jupytext (`just nb`) and CI verifies they stay in sync:
 | `18_sqlalchemy_database` | SQLAlchemy ORM, Parquet, HDF5 |
 | `19_speech_processing` | Whisper ASR, gTTS, torchaudio |
 | `20_face_analysis` | dlib, DeepFace, face-alignment |
+| `21_polars_duckdb_xarray` | polars, DuckDB, Arrow, xarray, pint |
+| `22_plotnine_tables_datashader` | plotnine, great-tables, datashader, vl-convert |
+| `23_modern_data_formats` | Delta Lake, Excel, SPSS, zarr, netCDF, connectorx |
+| `24_ml_explain_and_uncertainty` | CatBoost, SHAP, MAPIE, UMAP, skrub, skops |
+| `25_lightning_onnx` | Lightning, torchmetrics, Accelerate, einops, ONNX |
+| `26_vision_backbones_kornia` | timm, kornia, supervision, OpenCLIP |
+| `27_audio_effects_loudness` | pedalboard, pyloudnorm, noisereduce, parselmouth |
+| `28_geospatial_raster_h3` | rasterio, rioxarray, H3, mapclassify, OSMnx, lonboard |
+| `29_forecasting_toolkit` | statsforecast, mlforecast, skforecast, arch, tslearn |
+| `30_nlp_toolkit` | rapidfuzz, lingua, datasets, PEFT, KeyBERT |
+| `31_speech_metrics_vad` | jiwer, silero-vad, parselmouth |
 
 ## Choosing the Right Target
 
