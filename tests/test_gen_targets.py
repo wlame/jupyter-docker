@@ -278,3 +278,35 @@ def test_lock_environments_cover_linux_images_and_apple_silicon(target):
     environments = pyproject(target)['tool']['uv']['environments']
     assert "sys_platform == 'linux'" in environments
     assert any("sys_platform == 'darwin'" in env and 'arm64' in env for env in environments)
+
+
+def test_verify_script_reports_non_import_errors_and_keeps_going(python_matrix_root: Path, tmp_path: Path):
+    matrix = python_matrix_root / 'targets' / 'matrix.toml'
+    matrix.write_text(matrix.read_text() + """
+[packages."boom"]
+version = "1.0"
+module = "boom"
+introduced-by = ["base"]
+
+[packages."stdlib-json"]
+version = "1.0"
+module = "json"
+introduced-by = ["base"]
+""")
+    modules = tmp_path / 'modules'
+    modules.mkdir()
+    (modules / 'boom.py').write_text("raise FileNotFoundError('package.json missing')\n")
+
+    generated = run_gen(root=python_matrix_root)
+    verify = subprocess.run(
+        [sys.executable, str(python_matrix_root / 'targets' / 'base' / 'verify_imports.py')],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={'PYTHONPATH': str(modules), 'PATH': ''},
+    )
+
+    assert generated.returncode == 0, generated.stderr
+    assert verify.returncode == 1
+    assert 'boom: FileNotFoundError: package.json missing' in verify.stdout
+    assert '1 passed, 1 failed' in verify.stdout

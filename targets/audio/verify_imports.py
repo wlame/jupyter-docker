@@ -64,10 +64,11 @@ def verify_imports():
             __import__(module_name)
             print(f"  \u2713 {package_name}")
             passed += 1
-        except ImportError as e:
-            print(f"  \u2717 {package_name}: {e}")
+        except Exception as e:  # any import-time failure counts, not only ImportError
+            message = f"{type(e).__name__}: {e}"
+            print(f"  \u2717 {package_name}: {message}")
             failed += 1
-            errors.append((package_name, str(e)))
+            errors.append((package_name, message))
 
     print("=" * 60)
     print(f"Results: {passed} passed, {failed} failed")
