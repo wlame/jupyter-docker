@@ -20,8 +20,10 @@
 # Every Dockerfile stage shares the base interpreter, so all targets move together;
 # changing it also means editing the base/builder apt lists and the justfile.
 requires-python = ">=3.13"
-# Supply-chain guard: never resolve packages published after this date.
-exclude-newer = "2026-07-04"
+# Supply-chain guard: never resolve packages published after this instant.
+# Keep it a full UTC timestamp: uv reads a bare date in the machine's local
+# timezone, so lockfiles would then differ between machines and CI.
+exclude-newer = "2026-07-05T00:00:00Z"
 
 # --- Target tree -------------------------------------------------------------
 

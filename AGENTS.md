@@ -30,6 +30,8 @@ any drift between them, the lockfiles, and the matrix.
 - `[settings] exclude-newer` blocks packages published after its date. A pin
   newer than that date fails to lock until you bump it, and a bump re-resolves
   all 14 lockfiles.
+- Keep `exclude-newer` a full UTC timestamp (`…T00:00:00Z`). uv reads a bare
+  date in the local timezone, so lockfiles would differ between machines and CI.
 - Images run `uv sync --locked` and never resolve at build time.
 
 ## Targets and the Dockerfile

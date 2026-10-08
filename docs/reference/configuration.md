@@ -34,13 +34,13 @@ generated `pyproject.toml`.
 | Key | Meaning | Example |
 |-----|---------|---------|
 | `requires-python` | Minimum Python version; emitted into each pyproject's `[project]` as `requires-python`. | `">=3.13"` |
-| `exclude-newer` | Supply-chain guard emitted into `[tool.uv]`. `uv` refuses to resolve any package published after this date, so a freshly published malicious release can't slip in. Bump it when upgrading. | `"2026-07-04"` |
+| `exclude-newer` | Supply-chain guard emitted into `[tool.uv]`. `uv` refuses to resolve any package published after this instant, so a freshly published malicious release can't slip in. Bump it when upgrading. Write a full UTC timestamp: uv reads a bare date in the machine's local timezone, so lockfiles would differ between machines and CI. | `"2026-07-05T00:00:00Z"` |
 
 ```toml
 [settings]
 requires-python = ">=3.13"
-# Supply-chain guard: never resolve packages published after this date.
-exclude-newer = "2026-07-04"
+# Supply-chain guard: never resolve packages published after this instant.
+exclude-newer = "2026-07-05T00:00:00Z"
 ```
 
 ## `[targets.<name>]`
