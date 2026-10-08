@@ -113,3 +113,13 @@ run target port="8888":
 # Scan a built image for HIGH/CRITICAL CVEs (requires trivy)
 scan target:
     trivy image --severity HIGH,CRITICAL --ignore-unfixed {{image_prefix}}-{{target}}
+
+# ── Docs (MkDocs + Material) ─────────────────────────────────────────────────
+
+# Build the docs site (strict — fails on any warning)
+docs-build:
+    uv run --no-project --with-requirements=requirements-docs.txt mkdocs build --strict
+
+# Serve the docs locally with live reload
+docs-serve:
+    uv run --no-project --with-requirements=requirements-docs.txt mkdocs serve

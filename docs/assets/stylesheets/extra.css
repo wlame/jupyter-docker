@@ -1,0 +1,8 @@
+/* Organization baseline — keep shallow */
+:root {
+  -webkit-font-smoothing: antialiased;
+}
+
+.md-code__content {
+  border-radius: 4px;
+}

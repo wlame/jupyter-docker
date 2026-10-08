@@ -1,0 +1,142 @@
+# ghdoc: version=1.2.0 engine=mkdocs color-scheme=teal versioned=no updated=2026-07-19
+# Organization documentation standard — see the ghdoc skill. Build: mkdocs build --strict
+
+site_name: jupyter-docker
+site_description: Modular, multi-target Docker images for data science with Python 3.13 — build only what you need.
+site_url: https://wlame.github.io/jupyter-docker/
+
+repo_name: wlame/jupyter-docker
+repo_url: https://github.com/wlame/jupyter-docker
+edit_uri: edit/main/docs/
+
+strict: true
+use_directory_urls: true
+
+theme:
+  name: material
+  language: en
+  # To use an image logo, drop it at docs/assets/logo.svg and add:
+  #   logo: assets/logo.svg
+  #   favicon: assets/favicon.svg
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/cube-outline
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.action.edit
+    - content.action.view
+    - content.tooltips
+    - toc.follow
+
+plugins:
+  - search
+  - tags
+  - privacy
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: date
+      fallback_to_build_date: true
+  - git-authors
+  - redirects:
+      redirect_maps: {}
+  - glightbox
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - footnotes
+  - tables
+  - def_list
+  - abbr
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.caret
+  - pymdownx.tilde
+
+nav:
+  - Home: index.md
+  - About: about.md
+  - Getting started: getting-started.md
+  - Use cases:
+      - use-cases/index.md
+      - Run JupyterLab: use-cases/run-jupyterlab.md
+      - Pick the right target: use-cases/pick-a-target.md
+      - GPU deep learning: use-cases/gpu-deep-learning.md
+      - Extend the matrix: use-cases/extend-the-matrix.md
+  - Concepts:
+      - Architecture: concepts/architecture.md
+      - Build & data flow: concepts/data-flow.md
+  - Reference:
+      - Image targets: reference/targets.md
+      - Configuration (matrix.toml): reference/configuration.md
+      - CLI & dev commands: reference/cli.md
+  - Operations:
+      - Deployment & publishing: operations/deployment.md
+  - Troubleshooting: troubleshooting.md
+  - Contributing: contributing.md
+  - Changelog: changelog.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/wlame/jupyter-docker
+    - icon: fontawesome/brands/docker
+      link: https://github.com/wlame/jupyter-docker/pkgs/container/jupyter-docker
+  generator: false
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript: []
