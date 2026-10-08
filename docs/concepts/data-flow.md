@@ -50,9 +50,9 @@ For each `targets/<t>/`, `uv lock` (the pinned uv 0.12.23, run through `uvx`) re
 `uv sync --locked`, so these 14 lockfiles are what make image builds
 reproducible — resolution happens here, never at `docker build` time.
 
-### 4. `just build <t>` — build the image
+### 4. `just build <t> [python]` — build the image
 
-`DOCKER_BUILDKIT=1 docker build --target <t>` produces the `ds-<t>` image. Each
+`DOCKER_BUILDKIT=1 docker build --build-arg PYTHON_VERSION=<python> --target <t>` produces the `ds-<t>` image (the Python defaults to the target's first matrix version). Each
 stage installs its OS libraries and runs `uv sync --locked` against the committed
 lockfile. BuildKit is required for the uv cache mounts (see
 [Architecture](architecture.md)).
@@ -65,9 +65,10 @@ marked `<t>` in `tests/test_examples.py`.
 
 ### 6. CI publishes to GHCR
 
-On a push to `main`, CI rebuilds and tests the target, then pushes it to
-`ghcr.io/wlame/jupyter-docker:<t>` (plus an immutable `:<t>-<sha>` tag). See
-[Deployment](../operations/deployment.md) for pulling published images.
+On a push to `main`, CI rebuilds and tests every target once per Python version it
+supports, then pushes `ghcr.io/wlame/jupyter-docker:<t>-py<X.Y>` (plus an immutable
+`-<sha>` tag); the default Python's build also takes the plain `:<t>` and `:<t>-<sha>`
+tags. See [Deployment](../operations/deployment.md) for pulling published images.
 
 ## The fast host gate: `just ci`
 

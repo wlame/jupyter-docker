@@ -58,16 +58,16 @@ to slim the image, these imports break across every target that inherits `ml`.
 
 ---
 
-### `libpython3.13.so.1.0: cannot open shared object file`
+### `libpython3.X.so.1.0: cannot open shared object file`
 
 **Symptom**: importing torchcodec (used by torchaudio ≥ 2.10) fails with this
 error on the `audio`, `speech`, or `full` images.
 
 **Cause**: torchcodec's compiled extension links `libpython` directly. That shared
-object lives in the `libpython3.13` system package, which the base image installs
+object lives in the `libpython3.X` system package (matching the image's Python), which the base image installs
 for exactly this reason.
 
-**Fix**: keep `libpython3.13` in the base stage's `apt-get install` list.
+**Fix**: keep `libpython${PYTHON_VERSION}` in the base stage's `apt-get install` list.
 
 ---
 

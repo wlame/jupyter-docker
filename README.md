@@ -1,6 +1,6 @@
 # Data Science Jupyter Notebook Environment
 
-A modular, multi-target Docker environment for data science with Python 3.13. Build only what you need - from a lightweight base image to a comprehensive full environment.
+A modular, multi-target Docker environment for data science on Python 3.14 (and 3.13). Build only what you need - from a lightweight base image to a comprehensive full environment.
 
 **Package Manager**: [uv](https://docs.astral.sh/uv/) - Fast Python package manager from Astral
 
@@ -9,8 +9,10 @@ A modular, multi-target Docker environment for data science with Python 3.13. Bu
 ### Use Prebuilt Images
 
 Prebuilt images are published to GitHub Container Registry on every push to `main`
-and rebuilt weekly to pick up OS security patches. Every push also publishes an
-immutable `<target>-<short-sha>` tag for pinning and rollback:
+and rebuilt weekly to pick up OS security patches. Each target is published for
+every Python it supports: `:<target>` is its default (3.14 for most targets),
+`:<target>-py3.13` / `:<target>-py3.14` pick one explicitly, and every push also
+adds immutable `-<short-sha>` tags for pinning and rollback:
 
 ```bash
 docker run -p 8888:8888 \
@@ -19,16 +21,24 @@ docker run -p 8888:8888 \
   ghcr.io/wlame/jupyter-docker:scientific
 ```
 
-See [Available Targets](#available-targets) for the full list. Replace `scientific` with any target name.
+See [Available Targets](#available-targets) for the full list. Replace `scientific` with any target name, or
+append `-py3.13` to choose Python 3.13 (`deeplearn`, `face`, and `full` are 3.13-only for now).
 
 ### Build from Source
 
 ```bash
-# Build only what you need
-docker build --target base -t ds-base .
+# Build only what you need (each on its default Python from the matrix)
+just build base
+just build scientific
+just build ml 3.13      # pick a Python explicitly
+just build full         # TensorFlow targets default to 3.13
+```
+
+Without `just`, pass the Python as a build argument (default 3.14):
+
+```bash
 docker build --target scientific -t ds-scientific .
-docker build --target ml -t ds-ml .
-docker build --target full -t ds-full .
+docker build --build-arg PYTHON_VERSION=3.13 --target full -t ds-full .
 ```
 
 ### Run the Container
@@ -304,8 +314,8 @@ docker build --target scientific -t ds-scientific .
 # Build with no cache
 docker build --no-cache --target ml -t ds-ml .
 
-# Build full environment
-docker build --target full -t ds-full .
+# Build on Python 3.13 (required for the TensorFlow targets: deeplearn, face, full)
+docker build --build-arg PYTHON_VERSION=3.13 --target full -t ds-full .
 ```
 
 ### Run Commands
@@ -386,7 +396,7 @@ jupytext (`just nb`) and CI verifies they stay in sync:
 ## Container Details
 
 - **Base Image**: Ubuntu 24.04
-- **Python**: 3.13 (via deadsnakes PPA)
+- **Python**: 3.14 by default, 3.13 alongside it (via deadsnakes PPA); `deeplearn`, `face`, and `full` are 3.13-only until TensorFlow supports 3.14
 - **Package Manager**: uv
 - **User**: `jupyter` (non-root, UID 1000 — bind mounts keep host ownership)
 - **Working Directory**: `/home/jupyter`

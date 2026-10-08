@@ -48,7 +48,7 @@ want everything in one place, but it is the exception rather than the default.
 `targets/matrix.toml` is read by a generator (`scripts/gen_targets.py`) that writes the
 per-target `pyproject.toml`, `verify_imports.py`, and lockfiles. A single multi-stage
 `Dockerfile` then builds each target as a Docker stage, installing its pinned
-dependencies with `uv sync --locked` on top of an Ubuntu 24.04 + Python 3.13 base.
+dependencies with `uv sync --locked` on top of an Ubuntu 24.04 base with the selected Python (3.14 or 3.13).
 
 ```mermaid
 flowchart TD
@@ -76,9 +76,10 @@ versus a layered family you compose from:
 
 ## Known limitations
 
-- **Python 3.13 only** — TensorFlow 2.21, which `deeplearn`, `face`, and `full` ship,
-  publishes no cp314 wheels. Every stage shares the `base` image's interpreter, so the
-  whole family stays on 3.13 until the TensorFlow stack supports 3.14.
+- **TensorFlow targets are 3.13-only** — TensorFlow 2.21, which `deeplearn`, `face`,
+  and `full` ship, publishes no cp314 wheels. Those three build for Python 3.13 only
+  until TensorFlow 2.22 (and tf-keras 2.22 for `face`) are released; every other
+  target builds for both 3.14 and 3.13.
 - **Heavy targets are large** — image size climbs with the stack: deep learning, speech,
   vision, and face targets run to several gigabytes, up to roughly 5.3 GB compressed for
   `full`. This is inherent to bundling frameworks like PyTorch and TensorFlow.

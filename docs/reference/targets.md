@@ -20,12 +20,20 @@ you pull only the libraries you need — from a ~330 MB `base` to a ~5.3 GB `ful
 docker pull ghcr.io/wlame/jupyter-docker:scientific
 ```
 
-Images are rebuilt on every push to `main` (and weekly for OS patches). Alongside
-each moving `:<target>` tag, an immutable `:<target>-<short-sha>` tag is published
-for pinning and rollback:
+Each target is published for every Python version it supports. The plain tag is
+the target's default Python; a `-py<X.Y>` suffix picks one explicitly:
 
 ```bash
-docker pull ghcr.io/wlame/jupyter-docker:scientific-a1b2c3d
+docker pull ghcr.io/wlame/jupyter-docker:scientific          # default (3.14)
+docker pull ghcr.io/wlame/jupyter-docker:scientific-py3.13   # Python 3.13
+```
+
+Images are rebuilt on every push to `main` (and weekly for OS patches). Alongside
+each moving tag, an immutable `-<short-sha>` tag is published for pinning and
+rollback:
+
+```bash
+docker pull ghcr.io/wlame/jupyter-docker:scientific-py3.14-a1b2c3d
 ```
 
 !!! note "Version overrides per target"
@@ -36,30 +44,32 @@ docker pull ghcr.io/wlame/jupyter-docker:scientific-a1b2c3d
 
 ## Summary
 
-| Target | Inherits from | Approx. compressed size | Focus |
-|---|---|---|---|
-| `base` | — (root) | ~330 MB | Common Python utilities for data science |
-| `scientific` | `base` | ~530 MB | NumPy, SciPy, Pandas numerical computing |
-| `visualization` | `base` | ~470 MB | Matplotlib, Seaborn, Plotly, Bokeh charts |
-| `dataio` | `base` | ~465 MB | Parquet, HDF5, Excel, and database I/O |
-| `ml` | `scientific` | ~655 MB | scikit-learn, XGBoost, LightGBM |
-| `deeplearn` | `ml` | ~3900 MB | PyTorch and TensorFlow |
-| `vision` | `base` | ~4680 MB | Computer vision and image processing |
-| `audio` | `base` | ~3360 MB | Audio processing and analysis |
-| `geospatial` | `scientific` | ~750 MB | Geospatial analysis and mapping |
-| `timeseries` | `scientific` | ~810 MB | Time series analysis and forecasting |
-| `nlp` | `base` | ~3390 MB | Natural language processing |
-| `speech` | `base` | ~3680 MB | Speech recognition and text-to-speech |
-| `face` | `base` | ~4130 MB | Face detection, recognition, and analysis |
-| `full` | — (root, union) | ~5260 MB | Everything combined |
+| Target | Inherits from | Python (default first) | Approx. compressed size | Focus |
+|---|---|---|---|---|
+| `base` | — (root) | 3.14, 3.13 | ~330 MB | Common Python utilities for data science |
+| `scientific` | `base` | 3.14, 3.13 | ~530 MB | NumPy, SciPy, Pandas numerical computing |
+| `visualization` | `base` | 3.14, 3.13 | ~470 MB | Matplotlib, Seaborn, Plotly, Bokeh charts |
+| `dataio` | `base` | 3.14, 3.13 | ~465 MB | Parquet, HDF5, Excel, and database I/O |
+| `ml` | `scientific` | 3.14, 3.13 | ~655 MB | scikit-learn, XGBoost, LightGBM |
+| `deeplearn` | `ml` | 3.13 | ~3900 MB | PyTorch and TensorFlow |
+| `vision` | `base` | 3.14, 3.13 | ~4680 MB | Computer vision and image processing |
+| `audio` | `base` | 3.14, 3.13 | ~3360 MB | Audio processing and analysis |
+| `geospatial` | `scientific` | 3.14, 3.13 | ~750 MB | Geospatial analysis and mapping |
+| `timeseries` | `scientific` | 3.14, 3.13 | ~810 MB | Time series analysis and forecasting |
+| `nlp` | `base` | 3.14, 3.13 | ~3390 MB | Natural language processing |
+| `speech` | `base` | 3.14, 3.13 | ~3680 MB | Speech recognition and text-to-speech |
+| `face` | `base` | 3.13 | ~4130 MB | Face detection, recognition, and analysis |
+| `full` | — (root, union) | 3.13 | ~5260 MB | Everything combined |
 
-Sizes are approximate compressed pull sizes from GHCR and vary between rebuilds.
+Sizes are approximate compressed pull sizes from GHCR (measured before the
+October 2026 refresh) and vary between rebuilds. `deeplearn`, `face`, and `full`
+are 3.13-only because TensorFlow 2.21 ships no Python 3.14 wheels.
 For help choosing, see [Pick a target](../use-cases/pick-a-target.md); for how the
 inheritance tree is built, see [Architecture](../concepts/architecture.md).
 
 ## base
 
-**Inherits from:** — (root stage on Ubuntu 24.04, Python 3.13)
+**Inherits from:** — (root stage on Ubuntu 24.04 with the selected Python)
 
 Base Python environment with common utilities for data science. Every specialized
 target builds on this stage, so JupyterLab and the shared utility belt below are

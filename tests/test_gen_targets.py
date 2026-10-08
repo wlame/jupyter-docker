@@ -15,6 +15,7 @@ import tomllib
 from pathlib import Path
 
 import pytest
+from packaging.specifiers import SpecifierSet
 
 REPO_ROOT = Path(__file__).parent.parent
 GEN = REPO_ROOT / 'scripts' / 'gen_targets.py'
@@ -212,3 +213,61 @@ def test_python_versions_rejects_unknown_target(python_matrix_root: Path):
 
     assert result.returncode != 0
     assert 'unknown target' in result.stderr
+
+
+def pyproject(target: str) -> dict:
+    with open(REPO_ROOT / 'targets' / target / 'pyproject.toml', 'rb') as f:
+        return tomllib.load(f)
+
+
+PYTHON_MATRIX = json.loads(run_gen('--python-matrix').stdout)
+
+
+@pytest.mark.parametrize('target', ALL_TARGETS)
+def test_requires_python_admits_exactly_the_target_versions(target):
+    versions = PYTHON_MATRIX[target]
+    spec = SpecifierSet(pyproject(target)['project']['requires-python'])
+    minors = sorted(int(v.split('.')[1]) for v in versions)
+
+    assert all(f'{v}.0' in spec for v in versions), (target, str(spec))
+    assert f'3.{minors[0] - 1}.0' not in spec, (target, str(spec))
+    assert f'3.{minors[-1] + 1}.0' not in spec, (target, str(spec))
+
+
+@pytest.mark.parametrize('target', ALL_TARGETS)
+def test_required_environments_list_each_target_version(target):
+    environments = pyproject(target)['tool']['uv']['required-environments']
+    listed = [re.search(r"python_version == '([\d.]+)'", env).group(1) for env in environments]
+
+    assert sorted(listed) == sorted(PYTHON_MATRIX[target])
+    assert all("sys_platform == 'linux'" in env and "platform_machine == 'x86_64'" in env for env in environments)
+
+
+@pytest.mark.parametrize('child,parent', CHILD_PARENT)
+def test_child_python_versions_are_subset_of_parent(child, parent):
+    extra = set(PYTHON_MATRIX[child]) - set(PYTHON_MATRIX[parent])
+    assert not extra, f"{child} lists Python {sorted(extra)} that its parent {parent} does not build"
+
+
+@pytest.mark.parametrize(
+    'edit,expected',
+    [
+        # a child may not add a version its parent lacks
+        (('python = ["3.13"]\n\n[targets.grandchild]', 'python = ["3.13"]\n\n[targets.grandchild]\npython = ["3.14"]'), 'grandchild'),
+        # every version must appear in [settings]
+        (('python = ["3.13"]\n\n[targets.grandchild]', 'python = ["3.12"]\n\n[targets.grandchild]'), '3.12'),
+        # [settings] must declare the list
+        (('python = ["3.14", "3.13"]\nexclude-newer', 'exclude-newer'), 'settings'),
+    ],
+    ids=['child-outside-parent', 'version-not-in-settings', 'settings-missing-python'],
+)
+def test_matrix_with_invalid_python_versions_is_rejected(python_matrix_root: Path, edit, expected):
+    matrix = python_matrix_root / 'targets' / 'matrix.toml'
+    old, new = edit
+    assert old in matrix.read_text()
+    matrix.write_text(matrix.read_text().replace(old, new))
+
+    result = run_gen('--python-matrix', root=python_matrix_root)
+
+    assert result.returncode != 0
+    assert expected in result.stderr

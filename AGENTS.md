@@ -1,7 +1,7 @@
 # AGENTS.md
 
 One multi-stage `Dockerfile` builds 14 JupyterLab images ("targets") for data
-science on Ubuntu 24.04 with Python 3.13 (deadsnakes) and uv, published as
+science on Ubuntu 24.04 with Python 3.14 and 3.13 (deadsnakes) and uv, published as
 `ghcr.io/wlame/jupyter-docker:<target>`. `just` is the dev entrypoint; run it
 bare to list recipes.
 
@@ -33,6 +33,9 @@ any drift between them, the lockfiles, and the matrix.
 - Keep `exclude-newer` a full UTC timestamp (`…T00:00:00Z`). uv reads a bare
   date in the local timezone, so lockfiles would differ between machines and CI.
 - Images run `uv sync --locked` and never resolve at build time.
+- Every pyproject carries `required-environments` for each of its Python versions
+  on linux x86_64, so a pin without a wheel for one of them fails `just lock`
+  instead of failing an image build.
 
 ## Targets and the Dockerfile
 
@@ -41,9 +44,14 @@ any drift between them, the lockfiles, and the matrix.
   `scientific` → `geospatial` / `timeseries`; the rest sit directly on `base`.
   `full` is `FROM base` and installs the union of every package and every
   system library.
-- The interpreter belongs to `base`, so every stage shares it and a Python
-  version change moves all 14 targets at once. Why the family is on 3.13: the
-  comment on `[settings] requires-python` in the matrix.
+- Python versions are data: `[settings] python` (newest first; the first is the
+  default and owns the plain `:<target>` tag), narrowed per target with its own
+  `python` key. The interpreter belongs to the whole `FROM` chain, so a child
+  lists only versions its parent builds; the generator rejects anything else.
+  `deeplearn`, `face`, and `full` are 3.13-only (see their matrix comments).
+- The Dockerfile's `ARG PYTHON_VERSION` defaults to 3.14; `just build <t> [python]`,
+  `build-all.sh --python=X.Y`, and CI (`just python-matrix`) pick each target's
+  versions from the matrix, so prefer those over a raw `docker build`.
 - Runtime images ship no compilers. Packages install from wheels; `dlib` (the
   one source build) compiles in `face-builder` / `full-builder`, and only the
   finished `.venv` is copied across (`UV_LINK_MODE=copy` keeps it relocatable).
@@ -65,8 +73,8 @@ any drift between them, the lockfiles, and the matrix.
   first, and example 20 runs face-alignment (torch) before DeepFace
   (TensorFlow). Keep that order in any new code mixing both stacks.
 - torchcodec (torchaudio's I/O backend) needs FFmpeg shared libraries and
-  `libpython3.13` at runtime; FFmpeg is installed only in `audio`, `speech`,
-  and `full`.
+  `libpython3.X` (the image's Python) at runtime; FFmpeg is installed only in
+  `audio`, `speech`, and `full`.
 
 ## Examples and tests
 
@@ -89,8 +97,9 @@ any drift between them, the lockfiles, and the matrix.
 ## Verifying a change
 
 - `just ci` — gen-check, lock-check, nb-check, lint, generator tests. No Docker.
-- `just build <t>` then `just test <t>` — builds the image, then runs its verify
-  script and its marked example tests inside it. BuildKit is required.
+- `just build <t> [python]` then `just test <t>` — builds the image (default:
+  the target's first Python), then runs its verify script and its marked
+  example tests inside it. BuildKit is required.
 - `just docs-build` — strict MkDocs build; any warning fails it.
 - On an Apple-silicon host, local builds are arm64 and pull different wheels
   (no CUDA stack), so they prove nothing about the published amd64 images. CI's

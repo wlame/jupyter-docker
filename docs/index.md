@@ -9,7 +9,7 @@ hide:
 
 # jupyter-docker
 
-Modular, multi-target Docker images for data science with Python 3.13. Build only what you need.
+Modular, multi-target Docker images for data science on Python 3.14 (and 3.13). Build only what you need.
 
 General-purpose data science notebook images bundle every library under one roof, so
 you pull gigabytes of tooling you will never import. `jupyter-docker` splits the stack
@@ -20,7 +20,7 @@ its work actually needs.
 Every target is defined once in [`targets/matrix.toml`](reference/configuration.md), the single source of truth for
 dependencies. Per-target `pyproject.toml`, import-verification scripts, and committed
 `uv.lock` files are generated from it, giving reproducible `uv sync --locked` builds.
-Images run JupyterLab as a non-root user on Ubuntu 24.04 with Python 3.13, and are
+Images run JupyterLab as a non-root user on Ubuntu 24.04 with Python 3.14 or 3.13, and are
 published to GitHub Container Registry on every push to `main`.
 
 <br>
@@ -35,7 +35,7 @@ published to GitHub Container Registry on every push to `main`.
 - **14 composable targets** — an inheritance tree from a ~330 MB `base` to a ~5.3 GB `full` image (compressed); build only what you need.
 - **Single source of truth** — all dependencies live in `targets/matrix.toml`; per-target files are generated, never hand-edited.
 - **Reproducible builds** — a committed `uv.lock` per target; the Dockerfile runs `uv sync --locked` and never resolves at build time.
-- **Python 3.13 on Ubuntu 24.04** — via the deadsnakes PPA, with packages managed by a version-pinned uv 0.12.23.
+- **Choose your Python** — each target is published for every Python it supports: 3.14 by default, 3.13 alongside it (TensorFlow targets are 3.13-only for now). Ubuntu 24.04, deadsnakes, and a version-pinned uv 0.12.23.
 - **JupyterLab out of the box** — token-authenticated, running as a non-root `jupyter` user (UID 1000).
 - **Prebuilt images on GHCR** — published to `ghcr.io/wlame/jupyter-docker:<target>` on every push to `main`, rebuilt weekly for OS security patches.
 - **Toolchain-free runtime images** — packages install from prebuilt wheels; the one source build (`dlib`) happens in a throwaway builder stage, so no image ships compilers or headers.

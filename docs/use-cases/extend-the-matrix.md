@@ -127,6 +127,25 @@ Set `introduced-by` to the narrowest target that needs the library. Adding to
 `["scientific"]` keeps it out of unrelated images like `vision` or `audio` while
 still reaching `ml`, `deeplearn`, `geospatial`, and `timeseries`.
 
+### Limit a target to some Python versions
+
+Targets build for every version in `[settings] python` unless they narrow it. When
+a library has no wheels for one Python yet, narrow the target that needs it (its
+descendants inherit the narrower list):
+
+```toml
+[targets.deeplearn]
+parent = "ml"
+description = "Deep learning with PyTorch and TensorFlow"
+# tensorflow 2.21 ships no cp314 wheels; widen once tensorflow 2.22 is released.
+python = ["3.13"]
+```
+
+A child may only list versions its parent builds, since it is built `FROM` the
+parent's image; `just gen` rejects a matrix that breaks this. `just lock` then
+fails loudly if any pin lacks a wheel for a listed Python, because every pyproject
+carries a `required-environments` entry per version.
+
 ### Pin a different version for one target
 
 When one target needs an older version to satisfy a constraint, add an

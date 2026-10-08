@@ -8,7 +8,7 @@
 name = "datascience-ml"
 version = "1.0.0"
 description = "Classical machine learning with scikit-learn, XGBoost, and LightGBM"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.15"
 
 dependencies = [
     # --- base ---
@@ -56,6 +56,11 @@ dependencies = [
 [tool.uv]
 # Supply-chain guard: never resolve packages published after this date
 exclude-newer = "2026-10-01T00:00:00Z"
+# Lock fails unless every listed Python can install on the image platform
+required-environments = [
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.14'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.13'",
+]
 
 [build-system]
 requires = ["hatchling"]

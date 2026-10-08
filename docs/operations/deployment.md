@@ -8,7 +8,7 @@ tags:
 # Deployment and publishing
 
 How to pull, run, and operate the prebuilt images in production, and how the
-project publishes them. Every image ships Ubuntu 24.04 with Python 3.13 and its
+project publishes them. Every image ships Ubuntu 24.04 with Python 3.14 or 3.13 and its
 target's libraries preinstalled, runs JupyterLab as a non-root user, and exposes
 a single port and health check — so deployment is a plain `docker run` plus a few
 production guardrails.
@@ -83,25 +83,29 @@ therefore owned by UID 1000 on the host.
 
 ## Image tags and rollback
 
-Every push to `main` publishes two tags per target:
+Every push to `main` publishes, for each target and each Python it supports, a
+Python-specific tag pair; the target's default Python also gets the plain pair:
 
 | Tag form | Example | Mutability | Use it for |
 |---|---|---|---|
-| `:<target>` | `ghcr.io/wlame/jupyter-docker:scientific` | **Mutable** — moves to the latest build | Development, always-current pulls |
-| `:<target>-<short-sha>` | `ghcr.io/wlame/jupyter-docker:scientific-a1b2c3d` | **Immutable** — one specific commit (7-char short SHA) | Production pinning and rollback |
+| `:<target>-py<X.Y>` | `ghcr.io/wlame/jupyter-docker:scientific-py3.13` | **Mutable** — moves to the latest build of that Python | Development on a chosen Python |
+| `:<target>-py<X.Y>-<short-sha>` | `ghcr.io/wlame/jupyter-docker:scientific-py3.13-a1b2c3d` | **Immutable** — one commit, one Python | Production pinning and rollback |
+| `:<target>` | `ghcr.io/wlame/jupyter-docker:scientific` | **Mutable** — the default Python's latest build | Always-current pulls |
+| `:<target>-<short-sha>` | `ghcr.io/wlame/jupyter-docker:scientific-a1b2c3d` | **Immutable** — one commit, default Python | Pinning when you accept the default |
 
-**In production, pin the immutable SHA tag.** It maps to exactly one build, so a
-deploy is reproducible and a rollback is just redeploying the previous
-`:<target>-<short-sha>` tag:
+**In production, pin an immutable SHA tag, preferably the `-py<X.Y>-<short-sha>`
+form.** It maps to exactly one build and one interpreter, so a deploy is
+reproducible and a rollback is just redeploying the previous tag:
 
 ```bash
-docker pull ghcr.io/wlame/jupyter-docker:scientific-a1b2c3d
+docker pull ghcr.io/wlame/jupyter-docker:scientific-py3.14-a1b2c3d
 ```
 
 !!! warning "The `:<target>` tag moves under you"
     Because the plain target tag is reused on every rebuild — including the weekly
     OS-patch rebuild — two `docker pull` calls of `:scientific` days apart can
-    return different images. Never pin production to it.
+    return different images. The plain tag can also change Python when a target's
+    default moves (as it did from 3.13 to 3.14). Never pin production to it.
 
 Published images are also **rebuilt weekly** (a scheduled CI run every Monday at
 05:30 UTC) so the mutable `:<target>` tags pick up Ubuntu security patches without

@@ -93,8 +93,10 @@ Every stage descends from `base`, which fixes the common foundation:
 
 - **Ubuntu 24.04**, digest-pinned (`ubuntu:24.04@sha256:534baea6…`) for
   reproducible rebuilds.
-- **Python 3.13** from the deadsnakes PPA (a `python` symlink points at it; the
-  distro `/usr/bin/python3` is left alone so `python3-apt` keeps working).
+- **Python 3.14 or 3.13** from the deadsnakes PPA, selected by the
+  `PYTHON_VERSION` build argument (default 3.14). A `python` symlink points at it
+  and `UV_PYTHON` tells uv to use it; the distro `/usr/bin/python3` is left alone
+  so `python3-apt` keeps working.
 - **uv 0.12.23**, copied from the official `ghcr.io/astral-sh/uv:0.12.23`
   distroless image rather than curl-installed.
 - A **non-root `jupyter` user at UID 1000**, replacing the stock `ubuntu` user, so
@@ -109,7 +111,7 @@ Every stage descends from `base`, which fixes the common foundation:
 
 Only the runtime shared libraries the build toolchain used to pull in transitively
 are kept in `base`: `libgomp1` (OpenMP runtime for scikit-learn, XGBoost,
-LightGBM) and `libpython3.13` (needed by extensions that link `libpython`
+LightGBM) and `libpython3.X` for the selected Python (needed by extensions that link `libpython`
 directly, e.g. torchcodec's custom-ops library).
 
 !!! note "BuildKit is required"
@@ -126,7 +128,7 @@ two-stage pattern:
 
 1. A throwaway **builder stage** (`face-builder` / `full-builder`) is `FROM base`
    and adds the full C/C++ toolchain — `build-essential`, `cmake`,
-   `python3.13-dev`, and the relevant `-dev` header packages — then runs
+   `python3.X-dev` for the selected Python, and the relevant `-dev` header packages — then runs
    `uv sync` to compile `dlib` and everything else into `/home/jupyter/.venv`.
 2. The **published stage** (`face` / `full`) is also `FROM base`, installs only the
    **runtime** shared `.so` libraries (e.g. `libgl1`, `libopenblas0`), and then
@@ -139,7 +141,7 @@ compiled `dlib` without ever shipping a compiler in the final image.
 
 ```mermaid
 flowchart TD
-    b[base] --> fb[face-builder<br/>build-essential, cmake, python3.13-dev]
+    b[base] --> fb[face-builder<br/>build-essential, cmake, python3.X-dev]
     fb -->|"uv sync compiles dlib"| venv[".venv with compiled dlib"]
     b --> f[face<br/>runtime .so libs only]
     venv -->|"COPY --from=face-builder .venv"| f
@@ -149,17 +151,32 @@ flowchart TD
 the union of every specialized target's runtime libraries (geospatial, HDF5,
 audio, speech, and vision).
 
+## One image per Python version
+
+The interpreter belongs to the whole `FROM` chain: `deeplearn` is built `FROM ml`,
+`FROM scientific`, `FROM base`, so all four share one Python. A target therefore
+lists the Python versions it supports in the matrix (`python`, newest first, the
+first being its default), a child may list only versions its parent builds, and
+every supported version is built as a separate image. Today `deeplearn`, `face`,
+and `full` are 3.13-only (TensorFlow 2.21 has no cp314 wheels); every other
+target builds for 3.14 and 3.13.
+
 ## From build to published image
 
-`just build <target>` produces a local `ds-<target>` image. In CI, each target's
-build-and-test runs, and on `main` the image is pushed to GHCR under both a
-moving `:target` tag and an immutable `:target-<sha>` tag. CI is tiered:
+`just build <target> [python]` produces local `ds-<target>` and
+`ds-<target>-py<X.Y>` images, defaulting to the target's first Python. In CI, a
+`plan` job reads every target's versions from the matrix (`just python-matrix`),
+and each target job runs once per version, in parallel. On `main` every build is
+pushed to GHCR as `:<target>-py<X.Y>` plus an immutable `:<target>-py<X.Y>-<sha>`;
+the default Python's build also owns the plain `:<target>` and `:<target>-<sha>`
+tags. CI is tiered:
 
-- **Tier 0 — fast gates** (`lint`, `consistency`): no Docker builds; the
+- **Tier 0 — fast gates** (`lint`, `consistency`, `plan`): no Docker builds; the
   `consistency` job runs the same drift checks as `just ci`.
 - **Tier 1+** — `base` builds first, then every other target builds on top of it,
-  each with a registry layer cache. A Trivy scan runs report-only, and a weekly
-  scheduled rebuild refreshes published images with OS security patches.
+  each Python version with its own registry layer cache. A Trivy scan runs
+  report-only, and a weekly scheduled rebuild refreshes published images with OS
+  security patches.
 
 For how a change propagates through this pipeline step by step, see
 [Data flow](data-flow.md).

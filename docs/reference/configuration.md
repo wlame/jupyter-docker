@@ -28,19 +28,18 @@ The matrix has three sections:
 
 ## `[settings]`
 
-Global values applied to every target. Both are emitted verbatim into each
-generated `pyproject.toml`.
+Global values applied to every target.
 
 | Key | Meaning | Example |
 |-----|---------|---------|
-| `requires-python` | Minimum Python version; emitted into each pyproject's `[project]` as `requires-python`. | `">=3.13"` |
+| `python` | Python versions targets are built for, newest first. The first is the **default**: the version behind the plain `:<target>` image tag. A target can narrow the list (see below). Each version becomes one `required-environments` entry, and the list sets the generated `requires-python` (`>=3.13,<3.15` for two versions, `==3.13.*` for one). | `["3.14", "3.13"]` |
 | `exclude-newer` | Supply-chain guard emitted into `[tool.uv]`. `uv` refuses to resolve any package published after this instant, so a freshly published malicious release can't slip in. Bump it when upgrading. Write a full UTC timestamp: uv reads a bare date in the machine's local timezone, so lockfiles would differ between machines and CI. | `"2026-07-05T00:00:00Z"` |
 
 ```toml
 [settings]
-requires-python = ">=3.13"
+python = ["3.14", "3.13"]
 # Supply-chain guard: never resolve packages published after this instant.
-exclude-newer = "2026-07-05T00:00:00Z"
+exclude-newer = "2026-10-01T00:00:00Z"
 ```
 
 ## `[targets.<name>]`
@@ -52,6 +51,7 @@ the target name and the published image tag (`ghcr.io/wlame/jupyter-docker:<name
 |-----|---------|---------|
 | `parent` | The target this one inherits from. A child gets **all** of its parent's packages plus its own. Use `""` for a root — only `base` and `full` are roots (`full` is `FROM base` and installs the union of every package). | `"scientific"` |
 | `description` | Human-readable summary. Becomes the image `LABEL` and the generated pyproject's `description`. | `"Classical machine learning with scikit-learn, XGBoost, and LightGBM"` |
+| `python` | Optional. Narrows the Python versions this target (and its descendants) is built for. Every version must appear in `[settings] python`, and a child may list only versions its parent builds, because a child stage is built `FROM` its parent's image. The generator rejects a matrix that breaks either rule. | `["3.13"]` |
 | `exclude-dependencies` | Transitive packages to force out of resolution. Rendered into `[tool.uv]` as `override-dependencies` entries carrying the never-true marker `sys_platform == 'never'`, so uv drops them on every platform. Unioned along the lineage (and across all targets for `full`). | `["opencv-python"]` |
 
 ```toml
@@ -125,9 +125,22 @@ full = "4.13.0.90"                      # full merges the face stack, same hold
 ## How it's consumed
 
 `scripts/gen_targets.py` reads the matrix and materializes, for each of the 14
-targets, a `pyproject.toml` (dependency list, `exclude-newer`,
-`override-dependencies`, `[tool.uv.sources]`) and a `verify_imports.py` (every
-declared `module`, torch-family first).
+targets, a `pyproject.toml` (dependency list, `requires-python`, `exclude-newer`,
+`required-environments`, `override-dependencies`, `[tool.uv.sources]`) and a
+`verify_imports.py` (every declared `module`, torch-family first).
+
+`required-environments` lists one `linux` / `x86_64` environment per Python
+version the target builds for. With it, `uv lock` fails unless every locked package
+can install on each of those Pythons — so a pin with no cp314 wheel is caught when
+locking, not halfway through an image build:
+
+```toml
+[tool.uv]
+required-environments = [
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.14'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.13'",
+]
+```
 
 ```bash
 just gen                              # or: python3 scripts/gen_targets.py
@@ -169,7 +182,7 @@ because a downstream library caps a dependency.
 | GUI `opencv-python` excluded on vision/face | It double-installs `cv2` over the pinned headless build (same paths, corrupted mix). | `exclude-dependencies = ["opencv-python"]` on `vision` and `face`. |
 | `torchcodec` + FFmpeg only in audio/speech/full | `torchaudio` ≥ 2.10 delegates load/save to `torchcodec`, which needs FFmpeg shared libs present only in those stages. | `torchcodec` `introduced-by = ["audio", "speech"]` (and `full`). |
 | `nvidia-nccl-cu13` kept on ml/timeseries | `xgboost` ≥ 3.4 depends on it (~200 MB, distributed GPU only). Excluding it on `ml` would also remove it from `deeplearn` and `full`, where torch needs it. | No exclusion; the comment on `xgboost` explains the cost. |
-| Python 3.14 blocked | `tensorflow` 2.21 (in `deeplearn`, `face`, `full`) has no cp314 wheels, and every stage shares the `base` interpreter. | `requires-python = ">=3.13"` in `[settings]`; Python 3.13 in the Dockerfile `base` stage. |
+| Python 3.13 only for deeplearn/face/full | `tensorflow` 2.21 has no cp314 wheels (and `face` also needs `tf-keras` 2.22). | `python = ["3.13"]` on `deeplearn`, `face`, and `full`. |
 
 !!! warning "These holds are deliberate — verify before 'fixing'"
     Every pin and exclusion above exists because a specific library caps a

@@ -20,7 +20,7 @@ prebuilt image from GitHub Container Registry or by building one target locally.
   the `deeplearn` target and `--gpus all`). Not needed for CPU-only use.
 
 !!! note "Everything runs inside the container"
-    The images ship Ubuntu 24.04 with Python 3.13 and all libraries preinstalled,
+    The images ship Ubuntu 24.04 with Python 3.14 or 3.13 and all libraries preinstalled,
     so the only thing your host needs is Docker. There is no Python, `pip`, or
     virtualenv to set up on the host for the pull-and-run path.
 
@@ -48,6 +48,13 @@ throughout — swap in any target name from the [image targets](reference/target
       ghcr.io/wlame/jupyter-docker:scientific
     ```
 
+    The plain tag is the target's default Python (3.14 for most targets). To pick a
+    version explicitly, add `-py<X.Y>`:
+
+    ```bash
+    docker run --rm -p 8888:8888 ghcr.io/wlame/jupyter-docker:scientific-py3.13
+    ```
+
     To pin the login token instead of using the random per-start one, pass
     `JUPYTER_TOKEN`:
 
@@ -65,10 +72,17 @@ throughout — swap in any target name from the [image targets](reference/target
     just build scientific
     ```
 
-    That recipe is exactly:
+    That builds the target's default Python. Name a version to build another one:
 
     ```bash
-    DOCKER_BUILDKIT=1 docker build --target scientific -t ds-scientific .
+    just build scientific 3.13
+    ```
+
+    The recipe runs, for the default:
+
+    ```bash
+    DOCKER_BUILDKIT=1 docker build --build-arg PYTHON_VERSION=3.14 --target scientific \
+        -t ds-scientific -t ds-scientific-py3.14 .
     ```
 
     Then start it with the standard `notebooks/` and `data/` mounts on port 8888:

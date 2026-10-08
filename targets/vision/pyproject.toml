@@ -8,7 +8,7 @@
 name = "datascience-vision"
 version = "1.0.0"
 description = "Computer vision and image processing"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.15"
 
 dependencies = [
     # --- base ---
@@ -50,6 +50,11 @@ dependencies = [
 [tool.uv]
 # Supply-chain guard: never resolve packages published after this date
 exclude-newer = "2026-10-01T00:00:00Z"
+# Lock fails unless every listed Python can install on the image platform
+required-environments = [
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.14'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.13'",
+]
 # Transitive dependencies excluded via a never-true marker
 # (see exclude-dependencies comments in targets/matrix.toml)
 override-dependencies = [

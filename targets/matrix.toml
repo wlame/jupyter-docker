@@ -16,10 +16,10 @@
 # =============================================================================
 
 [settings]
-# Python 3.14: tensorflow 2.21 (deeplearn, face, full) ships no cp314 wheels.
-# Every Dockerfile stage shares the base interpreter, so all targets move together;
-# changing it also means editing the base/builder apt lists and the justfile.
-requires-python = ">=3.13"
+# Python versions targets are built for, newest first; the first is the default
+# (the plain :<target> image tag). A target narrows the list with its own
+# `python` key, and a child may only list versions its parent supports.
+python = ["3.14", "3.13"]
 # Supply-chain guard: never resolve packages published after this instant.
 # Keep it a full UTC timestamp: uv reads a bare date in the machine's local
 # timezone, so lockfiles would then differ between machines and CI.
@@ -50,6 +50,8 @@ description = "Classical machine learning with scikit-learn, XGBoost, and LightG
 [targets.deeplearn]
 parent = "ml"
 description = "Deep learning with PyTorch and TensorFlow"
+# tensorflow 2.21 ships no cp314 wheels; widen once tensorflow 2.22 is released.
+python = ["3.13"]
 
 [targets.vision]
 parent = "base"
@@ -81,6 +83,9 @@ description = "Speech recognition and text-to-speech synthesis"
 [targets.face]
 parent = "base"
 description = "Face detection, recognition, analysis, and generation"
+# tensorflow 2.21 ships no cp314 wheels; widen once tensorflow 2.22 and
+# tf-keras 2.22 are released.
+python = ["3.13"]
 # deepface/retina-face/face-alignment require GUI opencv-python — same cv2
 # double-install problem as vision.
 exclude-dependencies = ["opencv-python"]
@@ -88,6 +93,8 @@ exclude-dependencies = ["opencv-python"]
 [targets.full]
 parent = ""
 description = "Complete data science environment with all libraries"
+# tensorflow 2.21 ships no cp314 wheels; widen once tensorflow 2.22 is released.
+python = ["3.13"]
 
 # --- Packages ----------------------------------------------------------------
 

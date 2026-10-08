@@ -21,8 +21,9 @@ import sys
 import tomllib
 from pathlib import Path
 
-# Python versions for a matrix that declares none in [settings] or on its targets.
-DEFAULT_PYTHON_VERSIONS = ['3.13']
+# uv must find wheels (or a source build) for every listed Python on this platform,
+# the one the published images run on.
+IMAGE_PLATFORM_MARKER = "sys_platform == 'linux' and platform_machine == 'x86_64'"
 
 GENERATED_HEADER_TOML = """\
 # -----------------------------------------------------------------------------
@@ -103,9 +104,38 @@ def load_matrix(root: Path) -> dict:
         for t in spec.get('overrides', {}):
             if t not in targets:
                 errors.append(f"package {pkg}: unknown target {t!r} in overrides")
+    errors += validate_python_versions(matrix)
     if errors:
         raise SystemExit("matrix.toml is invalid:\n  " + "\n  ".join(errors))
     return matrix
+
+
+def validate_python_versions(matrix: dict) -> list[str]:
+    """Check the `python` lists in [settings] and on targets; return error messages.
+
+    Rules: [settings] declares a non-empty `python` list; every version a target
+    lists also appears in [settings]; and a child lists only versions its parent
+    supports, because a child stage is built FROM its parent's image.
+    """
+    declared = matrix['settings'].get('python')
+    if not declared:
+        return ["[settings] python: missing or empty (list the versions targets build for)"]
+    errors = []
+    targets = matrix['targets']
+    for name, target in targets.items():
+        own = target.get('python')
+        if own is None:
+            continue
+        unknown = [v for v in own if v not in declared]
+        if unknown:
+            errors.append(f"target {name}: python {unknown} not in [settings] python {declared}")
+        parent = target['parent']
+        if not parent or parent not in targets:
+            continue  # roots have nothing to inherit; unknown parents are reported above
+        outside = [v for v in own if v not in python_versions(parent, matrix)]
+        if outside:
+            errors.append(f"target {name}: python {outside} not built by its parent {parent}")
+    return errors
 
 
 def lineage(target: str, targets: dict) -> list[str]:
@@ -131,7 +161,21 @@ def python_versions(target: str, matrix: dict) -> list[str]:
         if versions:
             return list(versions)
         cursor = targets[cursor]['parent']
-    return list(matrix['settings'].get('python', DEFAULT_PYTHON_VERSIONS))
+    return list(matrix['settings']['python'])
+
+
+def version_key(version: str) -> tuple[int, ...]:
+    """Sortable key for a "3.N" version string."""
+    return tuple(int(part) for part in version.split('.'))
+
+
+def requires_python(versions: list[str]) -> str:
+    """The narrowest requires-python specifier covering every listed version."""
+    ordered = sorted(versions, key=version_key)
+    if len(ordered) == 1:
+        return f'=={ordered[0]}.*'
+    major, minor = version_key(ordered[-1])
+    return f'>={ordered[0]},<{major}.{minor + 1}'
 
 
 def python_matrix(matrix: dict) -> dict[str, list[str]]:
@@ -220,7 +264,7 @@ def render_pyproject(target: str, matrix: dict) -> str:
         f'name = "datascience-{target}"',
         'version = "1.0.0"',
         f'description = "{targets[target]["description"]}"',
-        f'requires-python = "{settings["requires-python"]}"',
+        f'requires-python = "{requires_python(python_versions(target, matrix))}"',
         '',
         'dependencies = [',
     ]
@@ -235,7 +279,14 @@ def render_pyproject(target: str, matrix: dict) -> str:
         '[tool.uv]',
         '# Supply-chain guard: never resolve packages published after this date',
         f'exclude-newer = "{settings["exclude-newer"]}"',
+        '# Lock fails unless every listed Python can install on the image platform',
+        'required-environments = [',
     ]
+    lines += [
+        f'    "{IMAGE_PLATFORM_MARKER} and python_version == \'{version}\'",'
+        for version in python_versions(target, matrix)
+    ]
+    lines += [']']
     excluded = excluded_dependencies(target, matrix)
     if excluded:
         lines += [

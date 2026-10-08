@@ -25,10 +25,12 @@
 #
 # PYTHON_VERSION selects the interpreter for the whole stage chain. Each target
 # supports the versions listed for it in the matrix (`just build <target>` and
-# CI pick them from there); pass another with --build-arg PYTHON_VERSION=3.x.
+# CI pick them from there). The default suits most targets; the TensorFlow ones
+# (deeplearn, face, full) are 3.13-only, so a raw docker build of those needs
+# --build-arg PYTHON_VERSION=3.13 (uv's requires-python check stops it otherwise).
 # =============================================================================
 
-ARG PYTHON_VERSION=3.13
+ARG PYTHON_VERSION=3.14
 
 # =============================================================================
 # BASE: Common utilities for all data science work
