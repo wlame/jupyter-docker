@@ -122,10 +122,10 @@ docker run -d --gpus all -p 8888:8888 --name jupyter \
   ghcr.io/wlame/jupyter-docker:deeplearn
 ```
 
-Without `--gpus all` the same image runs CPU-only. See
+Without `--gpus all` the same image runs CPU-only. The GPU path is PyTorch: its
+wheels bundle the CUDA 13.0 runtime, so the host needs an R580-or-newer NVIDIA
+driver and nothing else; TensorFlow in these images runs on the CPU. See
 [GPU deep learning](../use-cases/gpu-deep-learning.md) for the full walkthrough.
-
-<!-- TODO: document the CUDA runtime / driver version the deeplearn image expects, and any GPU-specific base-image or env requirements, once confirmed against the image contents. -->
 
 ## Health checks
 
