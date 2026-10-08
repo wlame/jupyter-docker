@@ -59,7 +59,7 @@ CHILD_PARENT = [
 
 def test_check_mode_passes_on_current_repo():
     result = subprocess.run(
-        [sys.executable, str(GEN), '--check'], capture_output=True, text=True
+        [sys.executable, str(GEN), '--check'], capture_output=True, text=True, check=False
     )
     assert result.returncode == 0, result.stdout + result.stderr
 
@@ -116,6 +116,7 @@ def test_check_mode_detects_manual_edit(repo_copy: Path):
         [sys.executable, str(GEN), '--check', '--root', str(repo_copy)],
         capture_output=True,
         text=True,
+        check=False,
     )
 
     assert result.returncode == 1
@@ -128,12 +129,13 @@ def test_write_mode_restores_drifted_file_and_is_idempotent(repo_copy: Path):
     pyproject.write_text(original + '\n# manual edit\n')
 
     write = subprocess.run(
-        [sys.executable, str(GEN), '--root', str(repo_copy)], capture_output=True, text=True
+        [sys.executable, str(GEN), '--root', str(repo_copy)], capture_output=True, text=True, check=False
     )
     check = subprocess.run(
         [sys.executable, str(GEN), '--check', '--root', str(repo_copy)],
         capture_output=True,
         text=True,
+        check=False,
     )
 
     assert write.returncode == 0

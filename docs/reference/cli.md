@@ -21,7 +21,7 @@ and the target generator (`scripts/gen_targets.py`) documented below.
 
 Run `just` with no arguments to list every recipe. Each recipe below shows its
 arguments and the underlying command it runs (with `justfile` variables resolved:
-`image_prefix = ds`, `jupytext_version = 1.19.4`, `pytest_version = 9.1.1`).
+`image_prefix = ds`, `jupytext_version = 1.19.4`, `pytest_version = 9.1.1`, `ruff_version = 0.16.10`).
 
 | Recipe | Args | Description | Underlying command |
 |---|---|---|---|
@@ -32,7 +32,7 @@ arguments and the underlying command it runs (with `justfile` variables resolved
 | `lock-check` | — | Verify all lockfiles are up to date (CI gate) | `uv lock --check` in each `targets/*/` |
 | `nb` | — | Regenerate example notebooks from their `.py` sources | `uvx --with jupytext==1.19.4 jupytext --to notebook <f>` for each `examples/[0-9]*.py` |
 | `nb-check` | — | Verify notebooks are in sync with their `.py` sources (CI gate) | round-trips each `.ipynb` back through `jupytext --to py:light` and `diff`s it against the committed `.py` |
-| `lint` | — | Lint Python always; shell/Dockerfile linters run when installed (CI enforces both) | `uvx ruff check scripts/ tests/`; then `shellcheck build-all.sh scripts/bake_models.sh` and `hadolint --ignore DL3008 Dockerfile` if installed |
+| `lint` | — | Lint Python always; shell/Dockerfile linters run when installed (CI enforces both) | `uvx ruff@0.16.10 check scripts/ tests/` (rules from `ruff.toml`); then `shellcheck build-all.sh scripts/bake_models.sh` and `hadolint --ignore DL3008 Dockerfile` if installed |
 | `test-gen` | — | Run the generator test suite on the host (no Docker needed) | `uv run --no-project --python 3.13 --with pytest==9.1.1 python -m pytest tests/test_gen_targets.py -q` |
 | `ci` | — | Every fast no-Docker gate that CI tier 0 enforces | runs `gen-check`, `lock-check`, `nb-check`, `lint`, `test-gen` |
 | `build` | `target` | Build one target image as `ds-<target>` | `DOCKER_BUILDKIT=1 docker build --target <target> -t ds-<target> .` |
