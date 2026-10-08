@@ -10,8 +10,6 @@ Contributions are welcome — dependency updates, new examples, docs, and fixes.
 This is a short guide; the [CLI & dev commands](reference/cli.md) reference and the
 [Extend the matrix](use-cases/extend-the-matrix.md) walkthrough cover the details.
 
-<!-- TODO: link root CONTRIBUTING.md if added -->
-
 ## Dev setup
 
 ```bash

@@ -123,9 +123,9 @@ one per target, and move data between them through mounted folders.
 
 ### Inspect what a target actually contains
 
-The full per-target library catalog — every package and its version — lives in
-the [Image targets](../reference/targets.md) reference and is generated from
-[`targets/matrix.toml`](../reference/configuration.md).
+The [Image targets](../reference/targets.md) reference lists every target's
+libraries. Exact versions live in [`targets/matrix.toml`](../reference/configuration.md)
+and in each target's committed `targets/<name>/uv.lock`.
 
 ## Related pages
 

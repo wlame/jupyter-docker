@@ -76,8 +76,9 @@ versus a layered family you compose from:
 
 ## Known limitations
 
-- **Python 3.13 only** — Python 3.14 is currently blocked because spaCy and TensorFlow do
-  not yet publish cp314 wheels. The whole family stays on 3.13 until they do.
+- **Python 3.13 only** — TensorFlow 2.21, which `deeplearn`, `face`, and `full` ship,
+  publishes no cp314 wheels. Every stage shares the `base` image's interpreter, so the
+  whole family stays on 3.13 until the TensorFlow stack supports 3.14.
 - **Heavy targets are large** — image size climbs with the stack: deep learning, speech,
   vision, and face targets run to several gigabytes, up to roughly 5.3 GB compressed for
   `full`. This is inherent to bundling frameworks like PyTorch and TensorFlow.
