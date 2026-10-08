@@ -45,7 +45,7 @@ declared package (torch-family modules first, so they load before TensorFlow).
 
 ### 3. `just lock` — re-resolve the lockfiles
 
-For each `targets/<t>/`, `uv lock --python 3.13` re-resolves the committed
+For each `targets/<t>/`, `uv lock` (the pinned uv 0.12.23, run through `uvx`) re-resolves the committed
 `uv.lock` from the freshly generated `pyproject.toml`. The Dockerfile builds with
 `uv sync --locked`, so these 14 lockfiles are what make image builds
 reproducible — resolution happens here, never at `docker build` time.

@@ -21,15 +21,15 @@ and the target generator (`scripts/gen_targets.py`) documented below.
 
 Run `just` with no arguments to list every recipe. Each recipe below shows its
 arguments and the underlying command it runs (with `justfile` variables resolved:
-`image_prefix = ds`, `jupytext_version = 1.19.4`, `pytest_version = 9.1.1`, `ruff_version = 0.16.10`).
+`image_prefix = ds`, `jupytext_version = 1.19.4`, `pytest_version = 9.1.1`, `ruff_version = 0.16.10`, `uv_version = 0.12.23`).
 
 | Recipe | Args | Description | Underlying command |
 |---|---|---|---|
 | `default` | — | List available recipes | `just --list --unsorted` |
 | `gen` | — | Regenerate per-target `pyproject.toml` / `verify_imports.py` from the matrix | `python3 scripts/gen_targets.py` |
 | `gen-check` | — | Verify generated files match the matrix (CI gate) | `python3 scripts/gen_targets.py --check` |
-| `lock` | — | Re-resolve every target's `uv.lock` (run after editing the matrix) | `uv lock --python 3.13` in each `targets/*/` |
-| `lock-check` | — | Verify all lockfiles are up to date (CI gate) | `uv lock --check` in each `targets/*/` |
+| `lock` | — | Re-resolve every target's `uv.lock` (run after editing the matrix) | `uvx uv@0.12.23 lock` in each `targets/*/` |
+| `lock-check` | — | Verify all lockfiles are up to date (CI gate) | `uvx uv@0.12.23 lock --check` in each `targets/*/` |
 | `nb` | — | Regenerate example notebooks from their `.py` sources | `uvx --with jupytext==1.19.4 jupytext --to notebook <f>` for each `examples/[0-9]*.py` |
 | `nb-check` | — | Verify notebooks are in sync with their `.py` sources (CI gate) | round-trips each `.ipynb` back through `jupytext --to py:light` and `diff`s it against the committed `.py` |
 | `lint` | — | Lint Python always; shell/Dockerfile linters run when installed (CI enforces both) | `uvx ruff@0.16.10 check scripts/ tests/` (rules from `ruff.toml`); then `shellcheck build-all.sh scripts/bake_models.sh` and `hadolint --ignore DL3008 Dockerfile` if installed |

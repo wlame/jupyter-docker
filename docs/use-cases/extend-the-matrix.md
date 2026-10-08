@@ -80,7 +80,7 @@ read-only CI gate that fails if these drift from the matrix.
 just lock
 ```
 
-This re-runs `uv lock --python 3.13` in every target directory so each committed
+This re-runs `uv lock` (with the pinned uv 0.12.23) in every target directory so each committed
 `uv.lock` reflects the new dependency. Images build from these lockfiles with
 `uv sync --locked` and never resolve at build time.
 

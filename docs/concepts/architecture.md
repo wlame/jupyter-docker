@@ -95,7 +95,7 @@ Every stage descends from `base`, which fixes the common foundation:
   reproducible rebuilds.
 - **Python 3.13** from the deadsnakes PPA (a `python` symlink points at it; the
   distro `/usr/bin/python3` is left alone so `python3-apt` keeps working).
-- **uv 0.11.28**, copied from the official `ghcr.io/astral-sh/uv:0.11.28`
+- **uv 0.12.23**, copied from the official `ghcr.io/astral-sh/uv:0.12.23`
   distroless image rather than curl-installed.
 - A **non-root `jupyter` user at UID 1000**, replacing the stock `ubuntu` user, so
   bind-mounted host directories keep sane ownership and `.venv` stays

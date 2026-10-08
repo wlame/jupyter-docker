@@ -72,7 +72,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 RUN ln -s /usr/bin/python3.13 /usr/local/bin/python
 
 # Install uv (version-pinned copy from the official distroless image)
-COPY --from=ghcr.io/astral-sh/uv:0.11.28 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.12.23 /uv /uvx /usr/local/bin/
 
 # Create the non-root user at UID 1000 (replacing the stock ubuntu user) so
 # bind-mounted host directories keep sane ownership.

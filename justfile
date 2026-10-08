@@ -6,6 +6,8 @@ image_prefix := "ds"
 jupytext_version := "1.19.4"
 pytest_version := "9.1.1"
 ruff_version := "0.16.10"
+# Same uv as the Dockerfile and CI, so locally written lockfiles match CI byte for byte.
+uv_version := "0.12.23"
 
 set shell := ["bash", "-uc"]
 
@@ -29,7 +31,7 @@ lock:
     set -euo pipefail
     for d in targets/*/; do
         echo "── ${d}"
-        (cd "${d}" && uv lock --python 3.13)
+        (cd "${d}" && uvx uv@{{uv_version}} lock)
     done
 
 # Verify all lockfiles are up to date (CI gate)
@@ -38,7 +40,7 @@ lock-check:
     set -euo pipefail
     for d in targets/*/; do
         echo "── ${d}"
-        (cd "${d}" && uv lock --check)
+        (cd "${d}" && uvx uv@{{uv_version}} lock --check)
     done
 
 # Regenerate example notebooks from their .py sources
