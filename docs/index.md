@@ -7,7 +7,9 @@ hide:
   - toc
 ---
 
-# Data Science Jupyter Notebook Environment — modular, multi-target Docker images for data science with Python 3.13. Build only what you need.
+# jupyter-docker
+
+Modular, multi-target Docker images for data science with Python 3.13. Build only what you need.
 
 General-purpose data science notebook images bundle every library under one roof, so
 you pull gigabytes of tooling you will never import. `jupyter-docker` splits the stack
@@ -36,7 +38,7 @@ published to GitHub Container Registry on every push to `main`.
 - **Python 3.13 on Ubuntu 24.04** — via the deadsnakes PPA, with packages managed by a version-pinned uv 0.11.28.
 - **JupyterLab out of the box** — token-authenticated, running as a non-root `jupyter` user (UID 1000).
 - **Prebuilt images on GHCR** — published to `ghcr.io/wlame/jupyter-docker:<target>` on every push to `main`, rebuilt weekly for OS security patches.
-- **Toolchain-free runtime images** — every target installs from prebuilt wheels, so images ship no compilers or headers.
+- **Toolchain-free runtime images** — packages install from prebuilt wheels; the one source build (`dlib`) happens in a throwaway builder stage, so no image ships compilers or headers.
 
 ---
 

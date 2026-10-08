@@ -168,7 +168,7 @@ because a downstream library caps a dependency.
 | GUI `opencv-python` excluded on vision/face | It double-installs `cv2` over the pinned headless build (same paths, corrupted mix). | `exclude-dependencies = ["opencv-python"]` on `vision` and `face`. |
 | `torchcodec` + FFmpeg only in audio/speech/full | `torchaudio` ≥ 2.10 delegates load/save to `torchcodec`, which needs FFmpeg shared libs present only in those stages. | `torchcodec` `introduced-by = ["audio", "speech"]` (and `full`). |
 | `nvidia-nccl-cu12` excluded on ml/timeseries | `xgboost` 3.3 pulls it (distributed-GPU only); dead weight on CPU and it clashes with torch's `cu13` wheels. | `exclude-dependencies = ["nvidia-nccl-cu12"]` on `ml` and `timeseries`. |
-| Python 3.14 blocked | `spacy` and `tensorflow` have no cp314 wheels yet. | `requires-python = ">=3.13"` in `[settings]`. |
+| Python 3.14 blocked | `tensorflow` 2.21 (in `deeplearn`, `face`, `full`) has no cp314 wheels, and every stage shares the `base` interpreter. | `requires-python = ">=3.13"` in `[settings]`; Python 3.13 in the Dockerfile `base` stage. |
 
 !!! warning "These holds are deliberate — verify before 'fixing'"
     Every pin and exclusion above exists because a specific library caps a
