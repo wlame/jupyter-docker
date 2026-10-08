@@ -271,3 +271,10 @@ def test_matrix_with_invalid_python_versions_is_rejected(python_matrix_root: Pat
 
     assert result.returncode != 0
     assert expected in result.stderr
+
+
+@pytest.mark.parametrize('target', ALL_TARGETS)
+def test_lock_environments_cover_linux_images_and_apple_silicon(target):
+    environments = pyproject(target)['tool']['uv']['environments']
+    assert "sys_platform == 'linux'" in environments
+    assert any("sys_platform == 'darwin'" in env and 'arm64' in env for env in environments)

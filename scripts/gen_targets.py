@@ -25,6 +25,14 @@ from pathlib import Path
 # the one the published images run on.
 IMAGE_PLATFORM_MARKER = "sys_platform == 'linux' and platform_machine == 'x86_64'"
 
+# Platforms each lockfile resolves for: Linux (the images) and Apple-silicon macOS
+# (local `uv sync` for development). Resolving for every platform lets caps that
+# only apply elsewhere (Windows, emscripten, Intel macOS) break real resolutions.
+LOCK_ENVIRONMENTS = [
+    "sys_platform == 'linux'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+]
+
 GENERATED_HEADER_TOML = """\
 # -----------------------------------------------------------------------------
 # GENERATED FILE — do not edit by hand.
@@ -279,6 +287,10 @@ def render_pyproject(target: str, matrix: dict) -> str:
         '[tool.uv]',
         '# Supply-chain guard: never resolve packages published after this date',
         f'exclude-newer = "{settings["exclude-newer"]}"',
+        '# Resolve only for the platforms this project runs on',
+        'environments = [',
+        *(f'    "{marker}",' for marker in LOCK_ENVIRONMENTS),
+        ']',
         '# Lock fails unless every listed Python can install on the image platform',
         'required-environments = [',
     ]

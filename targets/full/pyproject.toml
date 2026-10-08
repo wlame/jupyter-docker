@@ -127,6 +127,11 @@ dependencies = [
 [tool.uv]
 # Supply-chain guard: never resolve packages published after this date
 exclude-newer = "2026-10-01T00:00:00Z"
+# Resolve only for the platforms this project runs on
+environments = [
+    "sys_platform == 'linux'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+]
 # Lock fails unless every listed Python can install on the image platform
 required-environments = [
     "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.13'",

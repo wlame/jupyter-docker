@@ -126,8 +126,14 @@ full = "4.13.0.90"                      # full merges the face stack, same hold
 
 `scripts/gen_targets.py` reads the matrix and materializes, for each of the 14
 targets, a `pyproject.toml` (dependency list, `requires-python`, `exclude-newer`,
-`required-environments`, `override-dependencies`, `[tool.uv.sources]`) and a
-`verify_imports.py` (every declared `module`, torch-family first).
+`environments`, `required-environments`, `override-dependencies`,
+`[tool.uv.sources]`) and a `verify_imports.py` (every declared `module`,
+torch-family first).
+
+`environments` limits each lockfile to Linux (the images) and Apple-silicon macOS
+(local `uv sync` for development). Without it, uv resolves for every platform, and a
+cap a library declares only for Windows, emscripten, or Intel macOS can make an
+otherwise valid Linux resolution fail.
 
 `required-environments` lists one `linux` / `x86_64` environment per Python
 version the target builds for. With it, `uv lock` fails unless every locked package
