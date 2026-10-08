@@ -17,7 +17,6 @@ Examples:
 import pytest
 from conftest import run_example
 
-
 # =============================================================================
 # SCIENTIFIC target — numpy, scipy, pandas
 # =============================================================================

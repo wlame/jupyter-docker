@@ -5,6 +5,7 @@
 image_prefix := "ds"
 jupytext_version := "1.19.4"
 pytest_version := "9.1.1"
+ruff_version := "0.16.10"
 
 set shell := ["bash", "-uc"]
 
@@ -69,7 +70,7 @@ nb-check:
 
 # Lint Python always; shell/Dockerfile linters run when installed (CI enforces both)
 lint:
-    uvx ruff check scripts/ tests/
+    uvx ruff@{{ruff_version}} check scripts/ tests/
     @if command -v shellcheck >/dev/null; then \
         shellcheck build-all.sh scripts/bake_models.sh; \
     else \

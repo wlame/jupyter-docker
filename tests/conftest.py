@@ -7,8 +7,8 @@ Each test runs a .py example script as a subprocess and verifies:
 """
 
 import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -58,6 +58,7 @@ def run_example(
             [sys.executable, str(EXAMPLES_DIR / name)],
             capture_output=True,
             text=True,
+            check=False,
             timeout=timeout,
             cwd=str(EXAMPLES_DIR),
             env=env,
