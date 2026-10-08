@@ -27,7 +27,7 @@
 # =============================================================================
 # BASE: Common utilities for all data science work
 # =============================================================================
-FROM ubuntu:24.04@sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90 AS base
+FROM ubuntu:24.04@sha256:534baea6a22c03a63003dbc8dbe78fe34bc0d7e595d9a9dc9834884ff530eb55 AS base
 
 LABEL org.opencontainers.image.authors="wlame" \
       org.opencontainers.image.source="https://github.com/wlame/jupyter-docker" \
