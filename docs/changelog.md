@@ -32,6 +32,9 @@ To review what changed, browse the commit history on GitHub:
   `-<short-sha>`). See [Deployment & publishing](operations/deployment.md).
 - All dependencies were refreshed to the 2026-10-01 cutoff; scikit-learn is no longer
   held back in `timeseries` and `full`.
+- The committed lockfiles now resolve only for Linux (the images) and Apple-silicon
+  macOS. Local `uv sync` of a target on Windows or an Intel Mac is no longer
+  supported; use the images there.
 - About 75 libraries were added across the targets (JupyterLab Git/LSP/Jupytext
   extensions in every image; polars, DuckDB, xarray; plotnine, datashader; Delta Lake,
   zarr, cloud filesystems; CatBoost, SHAP, MAPIE, UMAP; Lightning, ONNX; timm,
