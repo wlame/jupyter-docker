@@ -62,10 +62,27 @@ jobs:
       - name: Run generator tests
         run: just test-gen
 
+  plan:
+    name: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      pythons: ${{ steps.matrix.outputs.pythons }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - name: Read each target's Python versions from the matrix
+        id: matrix
+        run: echo "pythons=$(just python-matrix)" >> "$GITHUB_OUTPUT"
+
   # ─── Tier 1 ──────────────────────────────────────────────────────────────────
   base:
-    name: base
-    needs: [lint, consistency]
+    name: base (py${{ matrix.python }})
+    needs: [plan, lint, consistency]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).base }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -76,14 +93,20 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: base
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).base[0] }}
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   # ─── Tier 2 — parallel, all FROM base ────────────────────────────────────────
   scientific:
-    name: scientific
-    needs: base
+    name: scientific (py${{ matrix.python }})
+    needs: [plan, base]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).scientific }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -94,14 +117,20 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: scientific
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).scientific[0] }}
           cache-scopes: base
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   visualization:
-    name: visualization
-    needs: base
+    name: visualization (py${{ matrix.python }})
+    needs: [plan, base]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).visualization }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -112,14 +141,20 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: visualization
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).visualization[0] }}
           cache-scopes: base
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   dataio:
-    name: dataio
-    needs: base
+    name: dataio (py${{ matrix.python }})
+    needs: [plan, base]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).dataio }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -130,14 +165,20 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: dataio
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).dataio[0] }}
           cache-scopes: base
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   vision:
-    name: vision
-    needs: base
+    name: vision (py${{ matrix.python }})
+    needs: [plan, base]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).vision }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -148,14 +189,20 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: vision
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).vision[0] }}
           cache-scopes: base
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   audio:
-    name: audio
-    needs: base
+    name: audio (py${{ matrix.python }})
+    needs: [plan, base]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).audio }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -166,6 +213,8 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: audio
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).audio[0] }}
           cache-scopes: base
           free-disk-space: 'true'
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
@@ -173,8 +222,12 @@ jobs:
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   nlp:
-    name: nlp
-    needs: base
+    name: nlp (py${{ matrix.python }})
+    needs: [plan, base]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).nlp }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -185,6 +238,8 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: nlp
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).nlp[0] }}
           cache-scopes: base
           free-disk-space: 'true'
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
@@ -192,8 +247,12 @@ jobs:
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   speech:
-    name: speech
-    needs: base
+    name: speech (py${{ matrix.python }})
+    needs: [plan, base]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).speech }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -204,6 +263,8 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: speech
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).speech[0] }}
           cache-scopes: base
           free-disk-space: 'true'
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
@@ -211,8 +272,12 @@ jobs:
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   face:
-    name: face
-    needs: base
+    name: face (py${{ matrix.python }})
+    needs: [plan, base]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).face }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:
@@ -223,6 +288,8 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: face
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).face[0] }}
           cache-scopes: base
           free-disk-space: 'true'
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
@@ -231,8 +298,12 @@ jobs:
 
   # ─── Tier 3 — parallel, FROM scientific ──────────────────────────────────────
   ml:
-    name: ml
-    needs: scientific
+    name: ml (py${{ matrix.python }})
+    needs: [plan, scientific]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).ml }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -243,14 +314,20 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: ml
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).ml[0] }}
           cache-scopes: base scientific
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   geospatial:
-    name: geospatial
-    needs: scientific
+    name: geospatial (py${{ matrix.python }})
+    needs: [plan, scientific]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).geospatial }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
@@ -261,14 +338,20 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: geospatial
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).geospatial[0] }}
           cache-scopes: base scientific
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   timeseries:
-    name: timeseries
-    needs: scientific
+    name: timeseries (py${{ matrix.python }})
+    needs: [plan, scientific]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).timeseries }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
@@ -279,6 +362,8 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: timeseries
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).timeseries[0] }}
           cache-scopes: base scientific
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           image-name: ${{ env.IMAGE_NAME }}
@@ -286,8 +371,12 @@ jobs:
 
   # ─── Tier 4 — heavyweight images ─────────────────────────────────────────────
   deeplearn:
-    name: deeplearn
-    needs: ml
+    name: deeplearn (py${{ matrix.python }})
+    needs: [plan, ml]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).deeplearn }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:
@@ -298,6 +387,8 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: deeplearn
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).deeplearn[0] }}
           cache-scopes: base scientific ml
           free-disk-space: 'true'
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
@@ -305,8 +396,12 @@ jobs:
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
   full:
-    name: full
-    needs: base
+    name: full (py${{ matrix.python }})
+    needs: [plan, base]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).full }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
@@ -317,6 +412,8 @@ jobs:
       - uses: ./.github/actions/build-and-test
         with:
           target: full
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).full[0] }}
           cache-scopes: base
           free-disk-space: 'true'
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}

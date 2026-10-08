@@ -94,9 +94,23 @@ ci: gen-check lock-check nb-check lint test-gen
 
 # ── Docker ───────────────────────────────────────────────────────────────────
 
-# Build one target image as ds-<target>
-build target:
-    DOCKER_BUILDKIT=1 docker build --target {{target}} -t {{image_prefix}}-{{target}} .
+# Print every target's Python versions as JSON (the CI build matrix)
+python-matrix:
+    @python3 scripts/gen_targets.py --python-matrix
+
+# Build one target as ds-<target> and ds-<target>-py<X.Y> (python: default = the target's first matrix version)
+build target python="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    supported="$(python3 scripts/gen_targets.py --python-versions {{target}})"
+    py="{{python}}"
+    py="${py:-${supported%% *}}"
+    if [[ " ${supported} " != *" ${py} "* ]]; then
+        echo "{{target}} supports Python ${supported// /, } — not ${py}" >&2
+        exit 1
+    fi
+    DOCKER_BUILDKIT=1 docker build --build-arg PYTHON_VERSION="${py}" --target {{target}} \
+        -t {{image_prefix}}-{{target}} -t "{{image_prefix}}-{{target}}-py${py}" .
 
 # Build and test every target (see build-all.sh for options)
 build-all *args:

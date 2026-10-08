@@ -35,7 +35,8 @@ arguments and the underlying command it runs (with `justfile` variables resolved
 | `lint` | — | Lint Python always; shell/Dockerfile linters run when installed (CI enforces both) | `uvx ruff@0.16.10 check scripts/ tests/` (rules from `ruff.toml`); then `shellcheck build-all.sh scripts/bake_models.sh` and `hadolint --ignore DL3008 Dockerfile` if installed |
 | `test-gen` | — | Run the generator test suite on the host (no Docker needed) | `uv run --no-project --python 3.13 --with pytest==9.1.1 python -m pytest tests/test_gen_targets.py -q` |
 | `ci` | — | Every fast no-Docker gate that CI tier 0 enforces | runs `gen-check`, `lock-check`, `nb-check`, `lint`, `test-gen` |
-| `build` | `target` | Build one target image as `ds-<target>` | `DOCKER_BUILDKIT=1 docker build --target <target> -t ds-<target> .` |
+| `python-matrix` | — | Print every target's Python versions as JSON (the CI build matrix) | `python3 scripts/gen_targets.py --python-matrix` |
+| `build` | `target`, `python` (default: the target's first matrix version) | Build one target as `ds-<target>` and `ds-<target>-py<X.Y>`; refuses a Python the target doesn't support | `DOCKER_BUILDKIT=1 docker build --build-arg PYTHON_VERSION=<python> --target <target> -t ds-<target> -t ds-<target>-py<python> .` |
 | `build-all` | `*args` | Build and test every target (see `build-all.sh` for options) | `./build-all.sh <args>` |
 | `test` | `target` | Run import verification + example tests against a built image | `./build-all.sh --test-only <target>` |
 | `run` | `target`, `port` (default `8888`) | Start a target's Jupyter Lab with the standard volume mounts | `docker run --rm -p <port>:8888 -v "$(pwd)/notebooks:/home/jupyter/notebooks" -v "$(pwd)/data:/home/jupyter/data" ds-<target>` |
@@ -49,7 +50,8 @@ Common invocations:
 just                      # list all recipes
 just ci                   # run every fast no-Docker gate
 just gen                  # regenerate target files after editing targets/matrix.toml
-just build scientific     # build the ds-scientific image
+just build scientific     # build ds-scientific on its default Python
+just build scientific 3.13  # build ds-scientific on Python 3.13
 just run scientific       # start JupyterLab on port 8888
 just run scientific 9000  # start JupyterLab on host port 9000
 just test scientific      # import + example tests for a built image
@@ -74,6 +76,7 @@ delegate to this script.
 |---|---|
 | `--build-only` | Build images without running tests |
 | `--test-only` | Run tests on existing images only |
+| `--python=X.Y` | Build for this Python version (default: each target's first matrix version); a target that doesn't support it fails its build |
 | `--help`, `-h` | Show the usage message and exit |
 
 With no flags the script both builds and tests. `TARGETS...` are positional
@@ -112,6 +115,7 @@ Examples (from the script header):
 ./build-all.sh --build-only # Build without testing
 ./build-all.sh --test-only  # Test existing images only
 ./build-all.sh base ml      # Build and test specific targets
+./build-all.sh --python=3.13 ml  # Build for a specific Python version
 ```
 
 ### What the test phase runs
@@ -151,12 +155,14 @@ which version) belongs to which target. Wrapped by the `just gen` and `just gen-
 recipes.
 
 ```bash
-python3 scripts/gen_targets.py [--check] [--root PATH]
+python3 scripts/gen_targets.py [--check] [--python-matrix] [--python-versions TARGET] [--root PATH]
 ```
 
 | Flag | Default | Description |
 |---|---|---|
 | `--check` | off (writes files) | Verify generated files are current instead of writing them |
+| `--python-matrix` | off | Print every target's Python versions as JSON and exit (what CI's `plan` job reads) |
+| `--python-versions TARGET` | — | Print one target's Python versions, space-separated, default first, and exit |
 | `--root PATH` | repository root (parent of `scripts/`) | Repository root containing `targets/matrix.toml` |
 
 `--check` is the drift gate: it writes nothing and exits `1` if any generated file

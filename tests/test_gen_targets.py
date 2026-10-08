@@ -6,6 +6,7 @@ mark, so the in-container example suites (`pytest -m <target>`) skip them.
 """
 
 import ast
+import json
 import re
 import shutil
 import subprocess
@@ -141,3 +142,73 @@ def test_write_mode_restores_drifted_file_and_is_idempotent(repo_copy: Path):
     assert write.returncode == 0
     assert pyproject.read_text() == original
     assert check.returncode == 0, check.stdout + check.stderr
+
+
+PYTHON_MATRIX_TOML = """
+[settings]
+python = ["3.14", "3.13"]
+exclude-newer = "2026-01-01T00:00:00Z"
+
+[targets.base]
+parent = ""
+description = "root that inherits [settings] python"
+
+[targets.narrow]
+parent = "base"
+description = "narrows the parent's list"
+python = ["3.13"]
+
+[targets.grandchild]
+parent = "narrow"
+description = "inherits the narrowed list"
+
+[packages]
+"""
+
+
+def run_gen(*args: str, root: Path = REPO_ROOT) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, str(GEN), *args, '--root', str(root)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+@pytest.fixture
+def python_matrix_root(tmp_path: Path) -> Path:
+    """A synthetic repo whose matrix exercises Python-version inheritance."""
+    (tmp_path / 'targets').mkdir()
+    (tmp_path / 'targets' / 'matrix.toml').write_text(PYTHON_MATRIX_TOML)
+    return tmp_path
+
+
+def test_python_matrix_lists_every_target():
+    result = run_gen('--python-matrix')
+    assert result.returncode == 0, result.stderr
+    assert set(json.loads(result.stdout)) == set(ALL_TARGETS)
+
+
+def test_python_matrix_inherits_from_settings_and_parents(python_matrix_root: Path):
+    result = run_gen('--python-matrix', root=python_matrix_root)
+
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout) == {
+        'base': ['3.14', '3.13'],
+        'narrow': ['3.13'],
+        'grandchild': ['3.13'],
+    }
+
+
+def test_python_versions_prints_default_first(python_matrix_root: Path):
+    result = run_gen('--python-versions', 'base', root=python_matrix_root)
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.split() == ['3.14', '3.13']
+
+
+def test_python_versions_rejects_unknown_target(python_matrix_root: Path):
+    result = run_gen('--python-versions', 'missing', root=python_matrix_root)
+
+    assert result.returncode != 0
+    assert 'unknown target' in result.stderr

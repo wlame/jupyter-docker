@@ -22,12 +22,19 @@
 # Python dependencies come from targets/<name>/pyproject.toml + uv.lock,
 # both generated from targets/matrix.toml (see scripts/gen_targets.py).
 # Requires BuildKit (cache mounts): DOCKER_BUILDKIT=1 or a buildx builder.
+#
+# PYTHON_VERSION selects the interpreter for the whole stage chain. Each target
+# supports the versions listed for it in the matrix (`just build <target>` and
+# CI pick them from there); pass another with --build-arg PYTHON_VERSION=3.x.
 # =============================================================================
+
+ARG PYTHON_VERSION=3.13
 
 # =============================================================================
 # BASE: Common utilities for all data science work
 # =============================================================================
 FROM ubuntu:24.04@sha256:534baea6a22c03a63003dbc8dbe78fe34bc0d7e595d9a9dc9834884ff530eb55 AS base
+ARG PYTHON_VERSION
 
 LABEL org.opencontainers.image.authors="wlame" \
       org.opencontainers.image.source="https://github.com/wlame/jupyter-docker" \
@@ -38,22 +45,23 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     JUPYTER_ENABLE_LAB=yes \
     UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy
+    UV_LINK_MODE=copy \
+    UV_PYTHON=python${PYTHON_VERSION}
 
-# Install Python 3.13 and basic system dependencies
+# Install the selected Python and basic system dependencies
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     && add-apt-repository -y ppa:deadsnakes/ppa \
     && apt-get update && apt-get install -y --no-install-recommends \
-    python3.13 \
-    python3.13-venv \
+    python${PYTHON_VERSION} \
+    python${PYTHON_VERSION}-venv \
     # Runtime shared libs the removed build toolchain used to pull in transitively:
     #  - libgomp1 (libgomp.so.1): OpenMP runtime for scikit-learn, xgboost, lightgbm.
-    #  - libpython3.13 (libpython3.13.so.1.0): needed by extensions that link
+    #  - libpython3.X (libpython3.X.so.1.0): needed by extensions that link
     #    libpython directly, e.g. torchcodec's custom-ops lib in audio/speech/full.
     libgomp1 \
-    libpython3.13 \
+    libpython${PYTHON_VERSION} \
     # Network utilities
     curl \
     wget \
@@ -65,11 +73,11 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 # No build toolchain here: every target installs from prebuilt wheels, so the
 # runtime images ship no compilers or headers. The only packages that compile
 # from source (dlib) live in the face/full builder stages below, which install
-# build-essential + cmake + python3.13-dev and hand off just the built venv.
+# build-essential + cmake + python3.X-dev and hand off just the built venv.
 
 # Convenience `python` on PATH; /usr/bin/python3 stays the distro 3.12 so
 # python3-apt keeps working. The venv (via uv) is the real interpreter.
-RUN ln -s /usr/bin/python3.13 /usr/local/bin/python
+RUN ln -s /usr/bin/python${PYTHON_VERSION} /usr/local/bin/python
 
 # Install uv (version-pinned copy from the official distroless image)
 COPY --from=ghcr.io/astral-sh/uv:0.12.23 /uv /uvx /usr/local/bin/
@@ -368,17 +376,18 @@ RUN bash /home/jupyter/scripts/bake_models.sh speech
 #
 # dlib has no wheel and compiles from source, so it is built in a throwaway
 # BUILDER stage that carries the C/C++ toolchain (build-essential, cmake) plus
-# python3.13-dev for the Python bindings. The published `face` image then copies
+# python3.X-dev for the Python bindings. The published `face` image then copies
 # only the finished venv, so no compiler or header package ships in the runtime.
 # =============================================================================
 FROM base AS face-builder
+ARG PYTHON_VERSION
 
 USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
-    python3.13-dev \
+    python${PYTHON_VERSION}-dev \
     gfortran \
     libopenblas-dev \
     liblapack-dev \
@@ -436,6 +445,7 @@ RUN bash /home/jupyter/scripts/bake_models.sh face
 # copies only the finished venv and installs the runtime shared libraries.
 # =============================================================================
 FROM base AS full-builder
+ARG PYTHON_VERSION
 
 USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
@@ -443,7 +453,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     # Build toolchain (dlib compiles from source; also builds pure-python sdists)
     build-essential \
     cmake \
-    python3.13-dev \
+    python${PYTHON_VERSION}-dev \
     # Scientific computing
     gfortran \
     libopenblas-dev \

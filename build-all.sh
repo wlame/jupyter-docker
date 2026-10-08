@@ -7,6 +7,7 @@
 #   ./build-all.sh --build-only # Build without testing
 #   ./build-all.sh --test-only  # Test existing images only
 #   ./build-all.sh base ml      # Build and test specific targets
+#   ./build-all.sh --python=3.13 ml  # Build for a specific Python version
 # =============================================================================
 
 set -e
@@ -107,17 +108,31 @@ print_warning() {
     echo -e "${YELLOW}⚠ $1${NC}"
 }
 
+# Python versions a target supports, space-separated, default first (from the matrix).
+target_python_versions() {
+    python3 scripts/gen_targets.py --python-versions "$1"
+}
+
 build_target() {
     local target=$1
     local image_name="${IMAGE_PREFIX}-${target}"
+    local supported python_version
+    supported="$(target_python_versions "${target}")"
+    python_version="${PYTHON_VERSION:-${supported%% *}}"
+
+    if [[ " ${supported} " != *" ${python_version} "* ]]; then
+        set_build_result "$target" "failed"
+        print_error "${target} supports Python ${supported// /, } — not ${python_version}"
+        return 1
+    fi
 
     echo ""
-    echo -e "${YELLOW}Building target: ${target}${NC}"
+    echo -e "${YELLOW}Building target: ${target} (Python ${python_version})${NC}"
     echo "  Image: ${image_name}"
-    echo "  Command: docker build --target ${target} -t ${image_name} -f ${DOCKERFILE} ."
+    echo "  Command: docker build --build-arg PYTHON_VERSION=${python_version} --target ${target} -t ${image_name} -f ${DOCKERFILE} ."
     echo ""
 
-    if docker build --target "${target}" -t "${image_name}" -f "${DOCKERFILE}" .; then
+    if docker build --build-arg PYTHON_VERSION="${python_version}" --target "${target}" -t "${image_name}" -f "${DOCKERFILE}" .; then
         set_build_result "$target" "success"
         print_success "Built ${image_name}"
         return 0
@@ -283,6 +298,7 @@ show_usage() {
     echo "Options:"
     echo "  --build-only    Build images without running tests"
     echo "  --test-only     Run tests on existing images only"
+    echo "  --python=X.Y    Build for this Python version (default: each target's first matrix version)"
     echo "  --help          Show this help message"
     echo ""
     echo "Available targets:"
@@ -295,11 +311,13 @@ show_usage() {
     echo "  $0 --build-only       # Build all targets without testing"
     echo "  $0 base scientific    # Build and test only base and scientific"
     echo "  $0 --test-only full   # Test only the full image"
+    echo "  $0 --python=3.13 ml   # Build and test ml on Python 3.13"
 }
 
 # Parse arguments
 RUN_BUILD=true
 RUN_TESTS=true
+PYTHON_VERSION=""
 TARGETS=()
 
 while [[ $# -gt 0 ]]; do
@@ -310,6 +328,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --test-only)
             RUN_BUILD=false
+            shift
+            ;;
+        --python=*)
+            PYTHON_VERSION="${1#--python=}"
             shift
             ;;
         --help|-h)
@@ -352,6 +374,7 @@ fi
 # Main execution
 print_header "Data Science Docker Build System"
 echo "Targets: ${TARGETS[*]}"
+echo "Python: ${PYTHON_VERSION:-default per target}"
 echo "Build: ${RUN_BUILD}"
 echo "Test: ${RUN_TESTS}"
 

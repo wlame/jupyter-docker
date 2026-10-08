@@ -1,11 +1,18 @@
 name: 'Build and Test Docker Target'
 description: >
-  Build a single Docker target with registry layer-caching, run its test suite,
-  scan it with Trivy, and optionally push it (plus a :target-<sha> tag) to ghcr.io.
+  Build one Docker target for one Python version with registry layer-caching,
+  run its test suite, scan it with Trivy, and optionally push it to ghcr.io as
+  :<target>-py<X.Y> (+ -<sha>), and as :<target> (+ -<sha>) for the default Python.
 
 inputs:
   target:
     description: 'Docker build target name (base, scientific, ml, …)'
+    required: true
+  python-version:
+    description: 'Python version to build (the PYTHON_VERSION build arg, e.g. 3.14)'
+    required: true
+  default-python:
+    description: "The target's default Python version; that build also gets the plain :<target> tags"
     required: true
   cache-scopes:
     description: 'Extra cache scope names beyond this target, space-separated (e.g. "base scientific")'
@@ -56,28 +63,31 @@ runs:
       env:
         IMAGE: ${{ inputs.image-name }}
         TARGET: ${{ inputs.target }}
+        PY: ${{ inputs.python-version }}
         EXTRA_SCOPES: ${{ inputs.cache-scopes }}
         PUSH: ${{ inputs.push }}
       run: |
+        # Cache scopes are per Python version: a 3.13 and a 3.14 chain share no layers.
         {
           echo 'cache_from<<EOF'
-          echo "type=registry,ref=${IMAGE}/buildcache:${TARGET}"
+          echo "type=registry,ref=${IMAGE}/buildcache:${TARGET}-py${PY}"
           for scope in ${EXTRA_SCOPES}; do
-            echo "type=registry,ref=${IMAGE}/buildcache:${scope}"
+            echo "type=registry,ref=${IMAGE}/buildcache:${scope}-py${PY}"
           done
           echo 'EOF'
         } >> "$GITHUB_OUTPUT"
         if [ "${PUSH}" = "true" ]; then
-          echo "cache_to=type=registry,ref=${IMAGE}/buildcache:${TARGET},mode=max" >> "$GITHUB_OUTPUT"
+          echo "cache_to=type=registry,ref=${IMAGE}/buildcache:${TARGET}-py${PY},mode=max" >> "$GITHUB_OUTPUT"
         else
           echo "cache_to=" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Build ${{ inputs.target }}
+    - name: Build ${{ inputs.target }} (Python ${{ inputs.python-version }})
       uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
         context: .
         target: ${{ inputs.target }}
+        build-args: PYTHON_VERSION=${{ inputs.python-version }}
         tags: ds-${{ inputs.target }}
         load: true
         cache-from: ${{ steps.cache.outputs.cache_from }}
@@ -95,6 +105,7 @@ runs:
       continue-on-error: true
       env:
         TARGET: ${{ inputs.target }}
+        PY: ${{ inputs.python-version }}
       run: |
         img="ds-${TARGET}"
         uncompressed=$(docker image inspect "$img" --format '{{.Size}}')
@@ -103,7 +114,7 @@ runs:
         c_mb=$(( compressed / 1024 / 1024 ))
         echo "size ${img}: uncompressed=${u_mb}MB compressed(gzip)=${c_mb}MB"
         {
-          echo "### Image size — ${TARGET}"
+          echo "### Image size — ${TARGET} (Python ${PY})"
           echo ""
           echo "| metric | MB |"
           echo "| --- | --- |"
@@ -123,20 +134,34 @@ runs:
         # Multi-GB ML images (deeplearn, face, full) exceed Trivy's 5m default.
         timeout: 30m
 
-    - name: Push ${{ inputs.target }} to ghcr.io
+    - name: Push ${{ inputs.target }} (Python ${{ inputs.python-version }}) to ghcr.io
       if: inputs.push == 'true'
       shell: bash
       env:
         IMAGE: ${{ inputs.image-name }}
         TARGET: ${{ inputs.target }}
+        PY: ${{ inputs.python-version }}
+        DEFAULT_PY: ${{ inputs.default-python }}
       run: |
         SHORT_SHA="${GITHUB_SHA::7}"
-        docker tag "ds-${TARGET}" "${IMAGE}:${TARGET}"
-        docker tag "ds-${TARGET}" "${IMAGE}:${TARGET}-${SHORT_SHA}"
+        tags=("${IMAGE}:${TARGET}-py${PY}" "${IMAGE}:${TARGET}-py${PY}-${SHORT_SHA}")
+        # The default Python's build also owns the plain tags users pull by name.
+        if [ "${PY}" = "${DEFAULT_PY}" ]; then
+          tags+=("${IMAGE}:${TARGET}" "${IMAGE}:${TARGET}-${SHORT_SHA}")
+        fi
+        for tag in "${tags[@]}"; do
+          docker tag "ds-${TARGET}" "${tag}"
+        done
         # ghcr occasionally races on blobs shared between parallel jobs
         # ("unknown blob"); a short retry rides it out.
+        push_all() {
+          local tag
+          for tag in "${tags[@]}"; do
+            docker push "${tag}" || return 1
+          done
+        }
         for attempt in 1 2 3; do
-          if docker push "${IMAGE}:${TARGET}" && docker push "${IMAGE}:${TARGET}-${SHORT_SHA}"; then
+          if push_all; then
             exit 0
           fi
           echo "push attempt ${attempt} failed; retrying in $((attempt * 20))s"

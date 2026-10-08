@@ -7,16 +7,22 @@ Dockerfile actually consumes, so the generated files can never drift from the
 matrix — CI runs it with --check to enforce that.
 
 Usage:
-    python3 scripts/gen_targets.py          # rewrite generated files in place
-    python3 scripts/gen_targets.py --check  # exit 1 if any file would change
+    python3 scripts/gen_targets.py                       # rewrite generated files in place
+    python3 scripts/gen_targets.py --check               # exit 1 if any file would change
+    python3 scripts/gen_targets.py --python-matrix       # {target: [python, ...]} as JSON (CI)
+    python3 scripts/gen_targets.py --python-versions ml  # "3.14 3.13" (first = default)
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import tomllib
 from pathlib import Path
+
+# Python versions for a matrix that declares none in [settings] or on its targets.
+DEFAULT_PYTHON_VERSIONS = ['3.13']
 
 GENERATED_HEADER_TOML = """\
 # -----------------------------------------------------------------------------
@@ -110,6 +116,27 @@ def lineage(target: str, targets: dict) -> list[str]:
         chain.append(cursor)
         cursor = targets[cursor]['parent']
     return list(reversed(chain))
+
+
+def python_versions(target: str, matrix: dict) -> list[str]:
+    """Python versions a target is built for, newest first; the first is its default.
+
+    A target without its own `python` list inherits its parent's, and a root
+    target inherits `[settings] python`.
+    """
+    targets = matrix['targets']
+    cursor = target
+    while cursor:
+        versions = targets[cursor].get('python')
+        if versions:
+            return list(versions)
+        cursor = targets[cursor]['parent']
+    return list(matrix['settings'].get('python', DEFAULT_PYTHON_VERSIONS))
+
+
+def python_matrix(matrix: dict) -> dict[str, list[str]]:
+    """Every target's Python versions, keyed by target name (the CI build matrix)."""
+    return {target: python_versions(target, matrix) for target in matrix['targets']}
 
 
 def target_order(targets: dict) -> list[str]:
@@ -286,12 +313,32 @@ def main() -> None:
         help='verify generated files are current instead of writing them',
     )
     parser.add_argument(
+        '--python-matrix',
+        action='store_true',
+        help='print every target\'s Python versions as JSON and exit',
+    )
+    parser.add_argument(
+        '--python-versions',
+        metavar='TARGET',
+        help='print one target\'s Python versions, space-separated, default first, and exit',
+    )
+    parser.add_argument(
         '--root',
         type=Path,
         default=Path(__file__).resolve().parent.parent,
         help='repository root containing targets/matrix.toml',
     )
     args = parser.parse_args()
+
+    if args.python_matrix:
+        print(json.dumps(python_matrix(load_matrix(args.root)), separators=(',', ':')))
+        return
+    if args.python_versions:
+        matrix = load_matrix(args.root)
+        if args.python_versions not in matrix['targets']:
+            raise SystemExit(f"unknown target {args.python_versions!r}; known: {', '.join(matrix['targets'])}")
+        print(' '.join(python_versions(args.python_versions, matrix)))
+        return
 
     stale = generate(args.root, check=args.check)
     if args.check and stale:
