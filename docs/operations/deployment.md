@@ -134,7 +134,7 @@ single monitoring surface the container exposes:
 
 ```
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD curl -fsS http://localhost:8888/api || exit 1
+    CMD ["sh", "-c", "curl -fsS http://localhost:8888/api || exit 1"]
 ```
 
 The probe waits `60s` after start before failures count, then polls every `30s`
