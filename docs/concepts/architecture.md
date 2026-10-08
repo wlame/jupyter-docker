@@ -91,7 +91,7 @@ per-target package listing.
 
 Every stage descends from `base`, which fixes the common foundation:
 
-- **Ubuntu 24.04**, digest-pinned (`ubuntu:24.04@sha256:4fbb8e6a…`) for
+- **Ubuntu 24.04**, digest-pinned (`ubuntu:24.04@sha256:534baea6…`) for
   reproducible rebuilds.
 - **Python 3.13** from the deadsnakes PPA (a `python` symlink points at it; the
   distro `/usr/bin/python3` is left alone so `python3-apt` keeps working).
