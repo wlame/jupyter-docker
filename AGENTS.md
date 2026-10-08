@@ -1,123 +1,119 @@
-# AGENTS.md — orientation for coding agents
+# AGENTS.md
 
-Multi-target Docker image family for data science: one `Dockerfile` with 14 build
-targets (Jupyter Lab on Ubuntu 24.04, Python 3.13 via deadsnakes, uv for packages),
-published to `ghcr.io/wlame/jupyter-docker:<target>`.
+One multi-stage `Dockerfile` builds 14 JupyterLab images ("targets") for data
+science on Ubuntu 24.04 with Python 3.13 (deadsnakes) and uv, published as
+`ghcr.io/wlame/jupyter-docker:<target>`. `just` is the dev entrypoint; run it
+bare to list recipes.
 
-## The one rule that matters
+## Dependencies live in the matrix
 
-**`targets/matrix.toml` is the single source of truth for Python dependencies.**
-Every `targets/<name>/pyproject.toml` and `targets/<name>/verify_imports.py` is
-GENERATED from it by `scripts/gen_targets.py`. Never edit those files by hand —
-edit the matrix, then:
-
-```bash
-just gen     # regenerate pyprojects + verify scripts
-just lock    # re-resolve all 14 committed uv.lock files
-just ci      # every fast gate CI enforces (gen/lock/nb checks, lint, tests)
-```
-
-CI (`consistency` job) fails if generated files or lockfiles drift from the matrix.
-
-## Core concepts
-
-- **Target**: one Docker build stage = one curated Python environment.
-  Inheritance tree (also in `[targets.*]` of the matrix): `base` → everything;
-  `scientific` → `ml` → `deeplearn`; `scientific` → `geospatial`/`timeseries`;
-  the rest inherit `base` directly. `full` is `FROM base` and installs the union
-  of every package and every system library.
-- **Package entry** (`[packages."name"]` in the matrix): `version`, `module`
-  (import name for verification), `introduced-by` (targets that add it — all
-  descendants inherit it), optional `overrides` (per-target version pins with a
-  comment explaining the constraint), optional `source-url` (direct wheel URL,
-  e.g. the spaCy model).
-- **Committed lockfiles**: `targets/<t>/uv.lock`; the Dockerfile runs
-  `uv sync --locked` — images are reproducible and never resolve at build time.
-- **Verification**: each image gets `scripts/verify_<t>.py` which imports every
-  declared package; `build-all.sh --test-only <t>` runs it plus the pytest
-  examples marked `<t>` in `tests/test_examples.py`.
-
-## The constraint web (why some versions are held back)
-
-Documented as comments in the matrix; do not "fix" them without checking:
-
-- `numpy < 2.5`: required by numba 0.66 and sktime 1.0 (matrix holds 2.4.x).
-- `scikit-learn < 1.8` and `pandas < 3`: required by sktime — `timeseries` and
-  `full` carry overrides; other targets run sklearn 1.9 / pandas 3.
-- `tokenizers <= 0.23.0`: capped by transformers 5.13 (0.23.0 was never
-  released, so 0.22.x is the effective ceiling).
-- `h5py < 3.15` in `full` only: tensorflow 2.21's cap; dataio ships 3.16.
-- `torchcodec` pairs with torch minor versions and needs FFmpeg shared libs —
-  only in `audio`/`speech`/`full` (their stages install ffmpeg).
-- `[tool.uv] exclude-newer` (generated into every pyproject): resolution refuses
-  packages published in the last ~7 days; bump the date in `[settings]` when
-  upgrading.
-- Python 3.14 is blocked by spacy and tensorflow (no cp314 wheels yet).
-
-## Build / run / test
+`targets/matrix.toml` is the single source of truth for Python dependencies.
+`scripts/gen_targets.py` generates `targets/<t>/pyproject.toml` and
+`targets/<t>/verify_imports.py` from it, and `uv lock` resolves the committed
+`targets/<t>/uv.lock` from those. Change dependencies by editing the matrix, then:
 
 ```bash
-just                    # list all recipes
-just build scientific   # docker build one target (BuildKit required: cache mounts)
-just test scientific    # verify imports + run marked example tests in the image
-just run scientific     # start Jupyter Lab with standard mounts
-./build-all.sh          # build + test everything (see --help)
+just gen    # regenerate pyprojects + verify scripts
+just lock   # re-resolve all 14 lockfiles
+just ci     # every fast gate CI enforces
 ```
 
-There is no way to fully verify image changes without Docker; CI
-(`.github/workflows/ci.yml`) is the arbiter. Jobs are tiered: lint+consistency →
-base → per-target builds with registry layer-cache (`ghcr.io/.../buildcache:<scope>`),
-Trivy scan (report-only), and pushes on main (`:target` + immutable
-`:target-<sha>`), plus a weekly scheduled rebuild.
+The generated files carry a do-not-edit header; CI's `consistency` job fails on
+any drift between them, the lockfiles, and the matrix.
 
-## Model weights (offline tests)
+- A package lands in each target named in its `introduced-by` and in all their
+  descendants; `full` gets every package. Key reference:
+  `docs/reference/configuration.md`.
+- Held-back pins and per-target `overrides` are deliberate. Each carries a matrix
+  comment naming the library that caps it; confirm that cap has lifted upstream
+  before raising the pin.
+- `[settings] exclude-newer` blocks packages published after its date. A pin
+  newer than that date fails to lock until you bump it, and a bump re-resolves
+  all 14 lockfiles.
+- Images run `uv sync --locked` and never resolve at build time.
 
-Examples that need model weights get them **pre-baked at build time** so the
-tests run without network. `scripts/bake_models.sh <target>` runs in the
-vision/nlp/speech/face/full stages after `uv sync`, fetching each model into its
-library's **default cache** under `/home/jupyter` (as the jupyter user), so no
-runtime env var is needed to find them:
+## Targets and the Dockerfile
 
-- vision → `yolov8n.pt` (curl + sha256, the one checksum-pinned file)
-- nlp → NLTK corpora (`~/nltk_data`) + sentence-transformers MiniLM (`~/.cache/huggingface`)
-- speech → Whisper `tiny` (`~/.cache/whisper`)
-- face → face-alignment s3fd + 2DFAN (`~/.cache/torch/hub`)
+- The tree is `[targets.*] parent` in the matrix, mirrored by each stage's
+  `FROM`: `base` → everything; `scientific` → `ml` → `deeplearn`;
+  `scientific` → `geospatial` / `timeseries`; the rest sit directly on `base`.
+  `full` is `FROM base` and installs the union of every package and every
+  system library.
+- The interpreter belongs to `base`, so every stage shares it and a Python
+  version change moves all 14 targets at once. Why the family is on 3.13: the
+  comment on `[settings] requires-python` in the matrix.
+- Runtime images ship no compilers. Packages install from wheels; `dlib` (the
+  one source build) compiles in `face-builder` / `full-builder`, and only the
+  finished `.venv` is copied across (`UV_LINK_MODE=copy` keeps it relocatable).
+  A new package that must compile belongs in a builder stage too.
+- A shared library a wheel loads at runtime goes in that target's `apt-get`
+  list and in `full`'s.
+- The container user is `jupyter`, UID 1000, and `uv sync` runs as that user so
+  `pip install` keeps working inside notebooks.
+- Jupyter generates a random token per start (`JUPYTER_TOKEN` overrides); keep
+  the config free of `token = ''`.
+- `.dockerignore` uses Docker semantics: bare names match only at the context
+  root, so nested excludes need `**/` (e.g. `**/.venv`).
 
-Not baked: DeepFace's ~1.5 GB attribute models (reliably hosted, and example 20
-already skips them offline). The pytest run sets `HF_HUB_OFFLINE=1` (in
-build-all.sh, not the image) so a Hub outage can't flake the MiniLM load. When
-adding an example that downloads a model, add it to `bake_models.sh` and keep the
-download call as a fallback for when the example runs outside the image.
+## Runtime gotchas
+
+- **Import torch before TensorFlow in one process** — the reverse order
+  segfaults (a C++ symbol clash between their bundled runtimes). Torch-family
+  packages carry `verify-first = true` so generated verify scripts import them
+  first, and example 20 runs face-alignment (torch) before DeepFace
+  (TensorFlow). Keep that order in any new code mixing both stacks.
+- torchcodec (torchaudio's I/O backend) needs FFmpeg shared libraries and
+  `libpython3.13` at runtime; FFmpeg is installed only in `audio`, `speech`,
+  and `full`.
 
 ## Examples and tests
 
-- `examples/NN_*.py` are the source of truth; the paired `.ipynb` files are
-  jupytext-generated (`just nb`, checked by `just nb-check` via ipynb→py
-  round-trip, since notebook regeneration is not byte-stable).
-- Examples must write outputs to `OUTPUT_DIR` (derived from `__file__`), never
-  hardcoded paths.
-- Tests marked `slow` touch the network (model downloads, gTTS). Example 19's
-  gTTS section skips loudly on network failure — never add placeholder outputs
-  to make a test pass.
-- `tests/test_gen_targets.py` (unmarked, host-run) locks in the generator
-  invariants: child ⊇ parent, full ⊇ everything, verify-scripts cover all
-  declared deps, everything pinned or URL-sourced.
+- `examples/NN_*.py` are the source; the paired `.ipynb` files are generated by
+  `just nb` and checked by `just nb-check`.
+- Examples write outputs under `OUTPUT_DIR`, derived from `__file__`.
+- Each example has a test in `tests/test_examples.py` marked with its target;
+  tests marked `slow` touch the network. A network-dependent section skips
+  loudly when offline; a test passes only on real outputs.
+- Model weights are pre-baked at build time by `scripts/bake_models.sh` into
+  each library's default cache, and the in-image pytest run sets
+  `HF_HUB_OFFLINE=1`. An example that needs a new model gets a bake entry, and
+  keeps its download call as a fallback for runs outside the image.
+- `tests/test_gen_targets.py` (host-run) holds the generator invariants: child ⊇
+  parent, `full` ⊇ everything, verify scripts cover every declared package,
+  everything pinned or URL-sourced.
+- `build-all.sh` captures pytest's exit code with `|| pytest_exit=$?` so it
+  stays correct under `set -e`; keep that pattern when editing.
 
-## Gotchas
+## Verifying a change
 
-- **Import torch before TensorFlow in the same process** — the reverse order
-  segfaults (C++ symbol clash between their bundled runtimes). The matrix marks
-  torch-family packages `verify-first = true` so generated verify scripts order
-  them correctly, and example 20 runs face-alignment (torch) before DeepFace
-  (TensorFlow). Keep that ordering in any new example mixing both stacks.
+- `just ci` — gen-check, lock-check, nb-check, lint, generator tests. No Docker.
+- `just build <t>` then `just test <t>` — builds the image, then runs its verify
+  script and its marked example tests inside it. BuildKit is required.
+- `just docs-build` — strict MkDocs build; any warning fails it.
+- On an Apple-silicon host, local builds are arm64 and pull different wheels
+  (no CUDA stack), so they prove nothing about the published amd64 images. CI's
+  per-target build-and-test jobs are the arbiter for image contents and size.
 
-- The container user is `jupyter`, UID 1000; `uv sync` runs as that user so the
-  venv stays writable (`pip install` works in notebooks). Keep it that way.
-- Jupyter auth: a random token is generated per start (`JUPYTER_TOKEN` overrides).
-  Do not reintroduce `token = ''` into the config.
-- `.dockerignore` uses Docker semantics: bare names only match at the context
-  root — nested excludes need `**/` (e.g. `**/.venv`).
-- `build-all.sh` relies on `set -e`-safe exit-code capture (`|| pytest_exit=$?`);
-  keep that pattern when editing.
-- Commit messages: single imperative sentence ending with a period, no
-  conventional-commit prefixes, no trailers.
+## Docs
+
+`docs/` is the user-facing MkDocs Material site (nav in `mkdocs.yml`, deployed
+to GitHub Pages by `.github/workflows/docs.yml`). When a change alters what a
+page describes — targets, recipes, the constraint table, sizes, the Python
+version — update that page in the same change. `README.md` is the short GitHub
+landing page.
+
+## Commits
+
+One imperative sentence ending with a period, with no conventional-commit
+prefix and no trailers.
+
+## Where things live
+
+- `Dockerfile` — one stage per target, plus `face-builder` and `full-builder`
+- `targets/matrix.toml`, `targets/<t>/` — dependency source and generated files
+- `scripts/` — `gen_targets.py` (generator), `bake_models.sh` (model weights)
+- `build-all.sh` — build and test driver behind `just build-all` / `just test` and CI
+- `.github/workflows/ci.yml`, `.github/actions/build-and-test/` — tiered CI:
+  lint + consistency, then per-target builds with registry cache, Trivy
+  (report-only), pushes on `main` (`:<t>` and `:<t>-<sha>`), weekly rebuild
+- `examples/`, `tests/`, `docs/`
