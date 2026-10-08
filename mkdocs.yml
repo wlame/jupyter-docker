@@ -1,5 +1,5 @@
 # ghdoc: version=1.2.0 engine=mkdocs color-scheme=teal versioned=no updated=2026-07-19
-# Organization documentation standard — see the ghdoc skill. Build: mkdocs build --strict
+# Organization documentation standard — see the ghdoc skill. Build: just docs-build
 
 site_name: jupyter-docker
 site_description: Modular, multi-target Docker images for data science with Python 3.13 — build only what you need.
