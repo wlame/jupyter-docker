@@ -30,8 +30,7 @@ docker pull ghcr.io/wlame/jupyter-docker:scientific-a1b2c3d
 
 !!! note "Version overrides per target"
     A few packages are pinned to older versions in specific targets to satisfy real
-    dependency constraints — for example `timeseries` and `full` hold scikit-learn
-    1.7.2 and pandas 2.3.3, `face` and `full` use OpenCV 4.13, and `speech` and
+    dependency constraints — for example `face` and `full` use OpenCV 4.13, and `speech` and
     `full` use transformers 4.57.6. See [Configuration](configuration.md) for the
     full constraint web.
 
@@ -109,9 +108,9 @@ Data I/O for Parquet, HDF5, Excel, and databases.
 
 Classical machine learning with scikit-learn, XGBoost, and LightGBM.
 
-**Adds:** scikit-learn, XGBoost, LightGBM, imbalanced-learn, and Optuna. The
-distributed-GPU-only `nvidia-nccl-cu12` wheel that XGBoost would pull is excluded
-as dead weight on this CPU image.
+**Adds:** scikit-learn, XGBoost, LightGBM, imbalanced-learn, and Optuna. XGBoost
+pulls the ~200 MB `nvidia-nccl-cu13` wheel (distributed GPU only); it stays, because
+`deeplearn` and `full` inherit this target's exclusions and torch needs it.
 
 ## deeplearn
 
@@ -167,11 +166,6 @@ Time series analysis and forecasting.
 
 **Adds:** sktime, tsfresh, pmdarima, and Prophet, plus the classical-ML family
 (scikit-learn, XGBoost, LightGBM, imbalanced-learn, Optuna) and numba.
-
-!!! note "Version overrides"
-    sktime caps its dependencies, so this target holds scikit-learn 1.7.2 and pandas
-    2.3.3 rather than the newer versions the other targets carry. See
-    [Configuration](configuration.md).
 
 ??? note "Full package list (timeseries)"
     imbalanced-learn, lightgbm, numba, optuna, pmdarima, prophet, scikit-learn,
@@ -243,9 +237,10 @@ libraries and the union of every package in the matrix, rather than inheriting f
 a single parent.
 
 Because it merges every stack in one environment, `full` carries the same
-constraint-driven pins as the individual targets — scikit-learn 1.7.2 and pandas
-2.3.3 (from `timeseries`), OpenCV 4.13 (from `face`), and transformers 4.57.6 (from
-`speech`), among others. Every target's model weights (YOLOv8n, NLTK + MiniLM,
+constraint-driven pins as the individual targets — OpenCV 4.13 (from `face`) and
+transformers 4.57.6 (from `speech`) — plus the holds transformers 4 forces on its
+neighbours here: tokenizers 0.22, diffusers 0.39, sentence-transformers 5.2, and
+spaCy 3.8.14. Every target's model weights (YOLOv8n, NLTK + MiniLM,
 Whisper tiny, face-alignment) are pre-baked. See [Configuration](configuration.md)
 for the complete override table.
 

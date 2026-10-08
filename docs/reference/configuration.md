@@ -52,15 +52,15 @@ the target name and the published image tag (`ghcr.io/wlame/jupyter-docker:<name
 |-----|---------|---------|
 | `parent` | The target this one inherits from. A child gets **all** of its parent's packages plus its own. Use `""` for a root — only `base` and `full` are roots (`full` is `FROM base` and installs the union of every package). | `"scientific"` |
 | `description` | Human-readable summary. Becomes the image `LABEL` and the generated pyproject's `description`. | `"Classical machine learning with scikit-learn, XGBoost, and LightGBM"` |
-| `exclude-dependencies` | Transitive packages to force out of resolution. Rendered into `[tool.uv]` as `override-dependencies` entries carrying the never-true marker `sys_platform == 'never'`, so uv drops them on every platform. Unioned along the lineage (and across all targets for `full`). | `["nvidia-nccl-cu12"]` |
+| `exclude-dependencies` | Transitive packages to force out of resolution. Rendered into `[tool.uv]` as `override-dependencies` entries carrying the never-true marker `sys_platform == 'never'`, so uv drops them on every platform. Unioned along the lineage (and across all targets for `full`). | `["opencv-python"]` |
 
 ```toml
-[targets.ml]
-parent = "scientific"
-description = "Classical machine learning with scikit-learn, XGBoost, and LightGBM"
-# xgboost 3.3 pulls nvidia-nccl-cu12 (distributed-GPU only); it collides with
-# torch's nvidia-nccl-cu13 wheels in deeplearn and is dead weight on CPU images.
-exclude-dependencies = ["nvidia-nccl-cu12"]
+[targets.vision]
+parent = "base"
+description = "Computer vision and image processing"
+# ultralytics requires GUI opencv-python, which double-installs cv2 over our
+# pinned opencv-python-headless (same paths, corrupted mix).
+exclude-dependencies = ["opencv-python"]
 ```
 
 An `exclude-dependencies` entry becomes, in the generated `pyproject.toml`:
@@ -69,7 +69,7 @@ An `exclude-dependencies` entry becomes, in the generated `pyproject.toml`:
 [tool.uv]
 # ...
 override-dependencies = [
-    "nvidia-nccl-cu12 ; sys_platform == 'never'",
+    "opencv-python ; sys_platform == 'never'",
 ]
 ```
 
@@ -107,18 +107,19 @@ introduced-by = ["base"]   # added in base, so every target inherits it
 
 ### A package with overrides
 
-`scikit-learn` runs at 1.9.0 on the `ml` stack, but the `sktime` constraint in
-`timeseries` and `full` forces those two targets back to 1.7.2:
+`opencv-python-headless` runs at OpenCV 5 in `vision`, but DeepFace needs the
+Haar cascade files OpenCV 5 no longer ships, so `face` and `full` stay on 4.13:
 
 ```toml
-[packages."scikit-learn"]
-version = "1.9.0"                       # default pin (ml and its descendants)
-module = "sklearn"                      # import name ≠ package name
-introduced-by = ["ml", "timeseries"]    # added in both ml and timeseries
-# sktime constrains scikit-learn below 1.8; affected targets hold 1.7.2.
-[packages."scikit-learn".overrides]
-timeseries = "1.7.2"                    # timeseries holds the older release
-full = "1.7.2"                          # full merges the sktime stack, same hold
+[packages."opencv-python-headless"]
+version = "5.0.0.93"                    # default pin (vision)
+module = "cv2"                          # import name ≠ package name
+introduced-by = ["vision", "face"]      # added in both vision and face
+# OpenCV 5 removed the bundled haarcascade files that deepface requires;
+# targets shipping deepface stay on the last 4.x release.
+[packages."opencv-python-headless".overrides]
+face = "4.13.0.90"                      # face ships deepface
+full = "4.13.0.90"                      # full merges the face stack, same hold
 ```
 
 ## How it's consumed
@@ -157,17 +158,17 @@ because a downstream library caps a dependency.
 
 | Constraint | Reason | Where in the matrix |
 |-----------|--------|---------------------|
-| `numpy < 2.5` | `numba` 0.66 and `sktime` 1.0 both require it. | `numpy` pinned to `2.4.6`. |
-| `scikit-learn < 1.8` | `sktime` cap. | `scikit-learn` override → `1.7.2` on `timeseries` and `full`. |
-| `pandas < 3` | `sktime` cap. | `pandas` override → `2.3.3` on `timeseries` and `full`. |
-| `tokenizers <= 0.23.0` | `transformers` 5.13 cap (0.23.0 was never released, so 0.22.x is the effective ceiling). | `tokenizers` pinned to `0.22.2`. |
-| `transformers < 5` in speech/full | `coqui-tts` needs it (`isin_mps_friendly` removed in 5.0). | `transformers` override → `4.57.6` on `speech` and `full`; `nlp` stays on `5.13.0`. |
+| `transformers < 5` in speech/full | `coqui-tts` needs it (`isin_mps_friendly` removed in 5.0). | `transformers` override → `4.57.6` on `speech` and `full`; `nlp` stays on `5.18.0`. |
 | `sentence-transformers` held on 4-compatible release | Its 5.3+ requires `transformers` 5, which `full` can't ship. | `sentence-transformers` override → `5.2.0` on `full`. |
+| `tokenizers <= 0.23.0` in full | `transformers` 4.57.6 (held for coqui-tts) caps it. | `tokenizers` override → `0.22.2` on `full`; `nlp` ships `0.23.2`. |
+| `diffusers` 0.39 in full | `diffusers` ≥ 0.40 needs `huggingface-hub` ≥ 1.23; `transformers` 4.57.6 needs `huggingface-hub` < 1.0. | `diffusers` override → `0.39.0` on `full`; `face` ships `0.40.0`. |
+| spaCy 3.8.14 in full | spaCy ≥ 3.8.15 needs `click` ≥ 8.2.1; `gtts` 2.5.4 needs `click` < 8.2. | `spacy` override → `3.8.14` on `full`; `nlp` ships `3.8.16`. |
+| `bokeh < 3.10` | `panel` 1.9.4 cap. | `bokeh` pinned to `3.9.2`. |
 | `h5py < 3.15` in full | `tensorflow` 2.21 cap; only `full` merges both stacks. | `h5py` override → `3.14.0` on `full`; `dataio` ships `3.16.0`. |
 | `opencv-python-headless` 4.13 in face/full | OpenCV 5 dropped the bundled haarcascade files `deepface` needs. | `opencv-python-headless` override → `4.13.0.90` on `face` and `full`. |
 | GUI `opencv-python` excluded on vision/face | It double-installs `cv2` over the pinned headless build (same paths, corrupted mix). | `exclude-dependencies = ["opencv-python"]` on `vision` and `face`. |
 | `torchcodec` + FFmpeg only in audio/speech/full | `torchaudio` ≥ 2.10 delegates load/save to `torchcodec`, which needs FFmpeg shared libs present only in those stages. | `torchcodec` `introduced-by = ["audio", "speech"]` (and `full`). |
-| `nvidia-nccl-cu12` excluded on ml/timeseries | `xgboost` 3.3 pulls it (distributed-GPU only); dead weight on CPU and it clashes with torch's `cu13` wheels. | `exclude-dependencies = ["nvidia-nccl-cu12"]` on `ml` and `timeseries`. |
+| `nvidia-nccl-cu13` kept on ml/timeseries | `xgboost` ≥ 3.4 depends on it (~200 MB, distributed GPU only). Excluding it on `ml` would also remove it from `deeplearn` and `full`, where torch needs it. | No exclusion; the comment on `xgboost` explains the cost. |
 | Python 3.14 blocked | `tensorflow` 2.21 (in `deeplearn`, `face`, `full`) has no cp314 wheels, and every stage shares the `base` interpreter. | `requires-python = ">=3.13"` in `[settings]`; Python 3.13 in the Dockerfile `base` stage. |
 
 !!! warning "These holds are deliberate — verify before 'fixing'"

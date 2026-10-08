@@ -23,7 +23,7 @@ requires-python = ">=3.13"
 # Supply-chain guard: never resolve packages published after this instant.
 # Keep it a full UTC timestamp: uv reads a bare date in the machine's local
 # timezone, so lockfiles would then differ between machines and CI.
-exclude-newer = "2026-07-05T00:00:00Z"
+exclude-newer = "2026-10-01T00:00:00Z"
 
 # --- Target tree -------------------------------------------------------------
 
@@ -46,9 +46,6 @@ description = "Data I/O for Parquet, HDF5, Excel, and databases"
 [targets.ml]
 parent = "scientific"
 description = "Classical machine learning with scikit-learn, XGBoost, and LightGBM"
-# xgboost 3.3 pulls nvidia-nccl-cu12 (distributed-GPU only); it collides with
-# torch's nvidia-nccl-cu13 wheels in deeplearn and is dead weight on CPU images.
-exclude-dependencies = ["nvidia-nccl-cu12"]
 
 [targets.deeplearn]
 parent = "ml"
@@ -72,8 +69,6 @@ description = "Geospatial analysis and mapping"
 [targets.timeseries]
 parent = "scientific"
 description = "Time series analysis and forecasting"
-# Same xgboost nccl exclusion as the ml target.
-exclude-dependencies = ["nvidia-nccl-cu12"]
 
 [targets.nlp]
 parent = "base"
@@ -99,7 +94,7 @@ description = "Complete data science environment with all libraries"
 # ── introduced in: base ──────────────────────────────────────────────────────
 
 [packages."aiohttp"]
-version = "3.14.1"
+version = "3.14.3"
 module = "aiohttp"
 introduced-by = ["base"]
 
@@ -114,12 +109,12 @@ module = "httpx"
 introduced-by = ["base"]
 
 [packages."ipython"]
-version = "9.15.0"
+version = "9.17.1"
 module = "IPython"
 introduced-by = ["base"]
 
 [packages."joblib"]
-version = "1.5.3"
+version = "1.6.0"
 module = "joblib"
 introduced-by = ["base"]
 
@@ -129,7 +124,7 @@ module = "jupyter"
 introduced-by = ["base"]
 
 [packages."jupyterlab"]
-version = "4.6.1"
+version = "4.6.4"
 module = "jupyterlab"
 introduced-by = ["base"]
 
@@ -139,7 +134,7 @@ module = "loguru"
 introduced-by = ["base"]
 
 [packages."lxml"]
-version = "6.1.1"
+version = "6.1.3"
 module = "lxml"
 introduced-by = ["base"]
 
@@ -149,7 +144,7 @@ module = "more_itertools"
 introduced-by = ["base"]
 
 [packages."orjson"]
-version = "3.11.9"
+version = "3.12.0"
 module = "orjson"
 introduced-by = ["base"]
 
@@ -159,12 +154,12 @@ module = "pendulum"
 introduced-by = ["base"]
 
 [packages."pip"]
-version = "26.1.2"
+version = "26.2.1"
 module = "pip"
 introduced-by = ["base"]
 
 [packages."pydantic"]
-version = "2.13.4"
+version = "2.13.5"
 module = "pydantic"
 introduced-by = ["base"]
 
@@ -184,12 +179,12 @@ module = "dateutil"
 introduced-by = ["base"]
 
 [packages."python-dotenv"]
-version = "1.2.2"
+version = "1.2.3"
 module = "dotenv"
 introduced-by = ["base"]
 
 [packages."pytz"]
-version = "2026.2"
+version = "2026.4"
 module = "pytz"
 introduced-by = ["base"]
 
@@ -204,7 +199,7 @@ module = "requests"
 introduced-by = ["base"]
 
 [packages."simplejson"]
-version = "4.1.1"
+version = "4.1.2"
 module = "simplejson"
 introduced-by = ["base"]
 
@@ -214,12 +209,12 @@ module = "toolz"
 introduced-by = ["base"]
 
 [packages."tqdm"]
-version = "4.68.3"
+version = "4.70.1"
 module = "tqdm"
 introduced-by = ["base"]
 
 [packages."ujson"]
-version = "5.13.0"
+version = "6.0.0"
 module = "ujson"
 introduced-by = ["base"]
 
@@ -231,33 +226,28 @@ introduced-by = ["base"]
 # ── introduced in: scientific ────────────────────────────────────────────────
 
 [packages."matplotlib"]
-version = "3.11.0"
+version = "3.11.2"
 module = "matplotlib"
 introduced-by = ["scientific", "visualization", "audio", "nlp", "speech", "face"]
 
 [packages."numpy"]
-# Ceiling: numba 0.66 and sktime 1.0 both require numpy < 2.5.
-version = "2.4.6"
+version = "2.5.3"
 module = "numpy"
 introduced-by = ["scientific", "visualization", "dataio", "vision", "audio", "nlp", "speech", "face"]
 
 [packages."pandas"]
-version = "3.0.3"
+version = "3.0.6"
 module = "pandas"
 # Declared (not just transitive) in visualization/dataio: their examples import it.
 introduced-by = ["scientific", "visualization", "dataio"]
-# sktime 1.0 requires pandas < 3.
-[packages."pandas".overrides]
-timeseries = "2.3.3"
-full = "2.3.3"
 
 [packages."scipy"]
-version = "1.18.0"
+version = "1.18.1"
 module = "scipy"
 introduced-by = ["scientific"]
 
 [packages."statsmodels"]
-version = "0.14.6"
+version = "0.15.0"
 module = "statsmodels"
 introduced-by = ["scientific"]
 
@@ -269,17 +259,18 @@ introduced-by = ["scientific"]
 # ── introduced in: visualization ─────────────────────────────────────────────
 
 [packages."altair"]
-version = "6.2.2"
+version = "6.3.0"
 module = "altair"
 introduced-by = ["visualization"]
 
 [packages."bokeh"]
-version = "3.9.1"
+# panel 1.9.4 requires bokeh < 3.10.
+version = "3.9.2"
 module = "bokeh"
 introduced-by = ["visualization"]
 
 [packages."holoviews"]
-version = "1.23.1"
+version = "1.23.2"
 module = "holoviews"
 introduced-by = ["visualization"]
 
@@ -289,12 +280,12 @@ module = "hvplot"
 introduced-by = ["visualization"]
 
 [packages."panel"]
-version = "1.9.3"
+version = "1.9.4"
 module = "panel"
 introduced-by = ["visualization"]
 
 [packages."plotly"]
-version = "6.8.0"
+version = "7.1.0"
 module = "plotly"
 introduced-by = ["visualization"]
 
@@ -306,7 +297,7 @@ introduced-by = ["visualization"]
 # ── introduced in: dataio ────────────────────────────────────────────────────
 
 [packages."fastparquet"]
-version = "2026.5.0"
+version = "2026.9.0"
 module = "fastparquet"
 introduced-by = ["dataio"]
 
@@ -324,12 +315,12 @@ module = "openpyxl"
 introduced-by = ["dataio"]
 
 [packages."pyarrow"]
-version = "24.0.0"
+version = "25.0.1"
 module = "pyarrow"
 introduced-by = ["dataio"]
 
 [packages."sqlalchemy"]
-version = "2.0.51"
+version = "2.1.1"
 module = "sqlalchemy"
 introduced-by = ["dataio"]
 
@@ -351,33 +342,32 @@ module = "imblearn"
 introduced-by = ["ml", "timeseries"]
 
 [packages."lightgbm"]
-version = "4.6.0"
+version = "4.7.0"
 module = "lightgbm"
 introduced-by = ["ml", "timeseries"]
 
 [packages."optuna"]
-version = "4.9.0"
+version = "5.0.0"
 module = "optuna"
 introduced-by = ["ml", "timeseries"]
 
 [packages."scikit-learn"]
-version = "1.9.0"
+version = "1.9.1"
 module = "sklearn"
 introduced-by = ["ml", "timeseries"]
-# sktime constrains scikit-learn below 1.8; affected targets hold 1.7.2.
-[packages."scikit-learn".overrides]
-timeseries = "1.7.2"
-full = "1.7.2"
 
 [packages."xgboost"]
-version = "3.3.0"
+version = "3.4.1"
 module = "xgboost"
 introduced-by = ["ml", "timeseries"]
+# xgboost >= 3.4 depends on nvidia-nccl-cu13 (~200 MB, distributed GPU only), the
+# same NCCL torch uses. It cannot be excluded on ml: deeplearn and full inherit
+# ml's exclusions and torch needs the library, so the CPU images carry it.
 
 # ── introduced in: deeplearn ─────────────────────────────────────────────────
 
 [packages."keras"]
-version = "3.15.0"
+version = "3.15.1"
 module = "keras"
 introduced-by = ["deeplearn", "face"]
 
@@ -389,7 +379,7 @@ introduced-by = ["deeplearn", "face"]
 # Torch native modules must import before TensorFlow in one process
 # (C++ symbol clash segfaults); verify-first orders them ahead in verify scripts.
 [packages."torch"]
-version = "2.12.1"
+version = "2.14.1"
 verify-first = true
 module = "torch"
 introduced-by = ["deeplearn", "audio", "nlp", "speech", "face"]
@@ -403,13 +393,13 @@ introduced-by = ["deeplearn", "audio", "speech"]
 # torchaudio >= 2.10 delegates load/save to torchcodec (needs FFmpeg shared
 # libraries at runtime — present in the audio/speech/full stages only).
 [packages."torchcodec"]
-version = "0.14.0"
+version = "0.17.0"
 verify-first = true
 module = "torchcodec"
 introduced-by = ["audio", "speech"]
 
 [packages."torchvision"]
-version = "0.27.1"
+version = "0.29.1"
 verify-first = true
 module = "torchvision"
 introduced-by = ["deeplearn", "face"]
@@ -417,7 +407,7 @@ introduced-by = ["deeplearn", "face"]
 # ── introduced in: vision ────────────────────────────────────────────────────
 
 [packages."imageio"]
-version = "2.37.3"
+version = "2.38.0"
 module = "imageio"
 introduced-by = ["vision"]
 
@@ -442,7 +432,7 @@ module = "skimage"
 introduced-by = ["vision", "face"]
 
 [packages."ultralytics"]
-version = "8.4.87"
+version = "8.4.170"
 module = "ultralytics"
 introduced-by = ["vision"]
 
@@ -454,12 +444,12 @@ module = "audioread"
 introduced-by = ["audio"]
 
 [packages."librosa"]
-version = "0.11.0"
+version = "1.0.0"
 module = "librosa"
 introduced-by = ["audio"]
 
 [packages."numba"]
-version = "0.66.0"
+version = "0.68.0"
 module = "numba"
 introduced-by = ["audio", "timeseries", "speech"]
 
@@ -476,7 +466,7 @@ introduced-by = ["audio", "speech"]
 # ── introduced in: geospatial ────────────────────────────────────────────────
 
 [packages."cartopy"]
-version = "0.25.0"
+version = "0.26.0"
 module = "cartopy"
 introduced-by = ["geospatial"]
 
@@ -486,7 +476,7 @@ module = "folium"
 introduced-by = ["geospatial"]
 
 [packages."geopandas"]
-version = "1.1.4"
+version = "1.2.0"
 module = "geopandas"
 introduced-by = ["geospatial"]
 
@@ -496,7 +486,7 @@ module = "geoviews"
 introduced-by = ["geospatial"]
 
 [packages."pyproj"]
-version = "3.7.2"
+version = "3.8.0"
 module = "pyproj"
 introduced-by = ["geospatial"]
 
@@ -513,12 +503,12 @@ module = "pmdarima"
 introduced-by = ["timeseries"]
 
 [packages."prophet"]
-version = "1.3.0"
+version = "1.4.0"
 module = "prophet"
 introduced-by = ["timeseries"]
 
 [packages."sktime"]
-version = "1.0.1"
+version = "1.2.0"
 module = "sktime"
 introduced-by = ["timeseries"]
 
@@ -535,12 +525,12 @@ introduced-by = ["nlp"]
 source-url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl"
 
 [packages."nltk"]
-version = "3.9.4"
+version = "3.10.3"
 module = "nltk"
 introduced-by = ["nlp"]
 
 [packages."sentence-transformers"]
-version = "5.6.0"
+version = "6.1.0"
 module = "sentence_transformers"
 introduced-by = ["nlp"]
 # sentence-transformers >= 5.3 requires transformers 5; full holds transformers 4
@@ -549,18 +539,24 @@ introduced-by = ["nlp"]
 full = "5.2.0"
 
 [packages."spacy"]
-version = "3.8.14"
+version = "3.8.16"
 module = "spacy"
 introduced-by = ["nlp"]
+# spacy >= 3.8.15 requires click >= 8.2.1, but gtts 2.5.4 (speech) requires
+# click < 8.2; full ships both, so it keeps the last spaCy without that floor.
+[packages."spacy".overrides]
+full = "3.8.14"
 
 [packages."tokenizers"]
-# transformers 5.13 requires tokenizers <= 0.23.0 (0.23.1+ too new; 0.23.0 unreleased).
-version = "0.22.2"
+version = "0.23.2"
 module = "tokenizers"
 introduced-by = ["nlp"]
+# full holds transformers 4.57.6 (coqui-tts), which requires tokenizers <= 0.23.0.
+[packages."tokenizers".overrides]
+full = "0.22.2"
 
 [packages."transformers"]
-version = "5.13.0"
+version = "5.18.0"
 module = "transformers"
 # Declared in speech too: coqui-tts imports it and would otherwise float to 5.x.
 introduced-by = ["nlp", "speech"]
@@ -593,7 +589,7 @@ module = "whisper"
 introduced-by = ["speech"]
 
 [packages."piper-tts"]
-version = "1.4.2"
+version = "1.8.0"
 module = "piper"
 introduced-by = ["speech"]
 
@@ -603,7 +599,7 @@ module = "pyannote.audio"
 introduced-by = ["speech"]
 
 [packages."speechbrain"]
-version = "1.1.0"
+version = "1.1.1"
 module = "speechbrain"
 introduced-by = ["speech"]
 
@@ -615,14 +611,18 @@ introduced-by = ["speech"]
 # ── introduced in: face ──────────────────────────────────────────────────────
 
 [packages."deepface"]
-version = "0.0.100"
+version = "0.0.101"
 module = "deepface"
 introduced-by = ["face"]
 
 [packages."diffusers"]
-version = "0.39.0"
+version = "0.40.0"
 module = "diffusers"
 introduced-by = ["face"]
+# diffusers >= 0.40 requires huggingface-hub >= 1.23, but full holds transformers
+# 4.57.6 (coqui-tts), which requires huggingface-hub < 1.0.
+[packages."diffusers".overrides]
+full = "0.39.0"
 
 [packages."dlib"]
 version = "20.0.1"

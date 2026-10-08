@@ -83,8 +83,8 @@ versus a layered family you compose from:
   vision, and face targets run to several gigabytes, up to roughly 5.3 GB compressed for
   `full`. This is inherent to bundling frameworks like PyTorch and TensorFlow.
 - **The constraint web pins some libraries below latest** — real upstream conflicts force
-  version holds (for example, sktime caps scikit-learn and pandas; transformers caps
-  tokenizers; TensorFlow caps h5py in `full`). These are documented as comments and
+  version holds (for example, coqui-tts needs transformers 4, which also holds back
+  tokenizers and diffusers in `full`; TensorFlow caps h5py in `full`). These are documented as comments and
   per-target `overrides` in the matrix and removed once the upstream constraint lifts.
 
 ## Status

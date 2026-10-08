@@ -105,8 +105,8 @@ See [Image targets](../reference/targets.md) for the full catalog.
 !!! tip "Reach for `full` only when you truly need everything"
     `full` (~5.3 GB) is a convenience for exploratory work that crosses many
     domains. For a focused task, a specialized target pulls and starts far faster.
-    `full` also holds a few libraries back to co-exist (e.g. it pins an older
-    pandas and transformers so time-series and TTS stacks resolve together).
+    `full` also holds a few libraries back to co-exist (e.g. it pins transformers 4
+    and its neighbours so the TTS and NLP stacks resolve together).
 
 ## Expected output
 

@@ -290,8 +290,8 @@ just lock
 just ci
 ```
 
-Version `overrides` in the matrix document real constraints (e.g. sktime capping
-scikit-learn); remove an override once the upstream constraint is gone.
+Version `overrides` in the matrix document real constraints (e.g. TensorFlow capping
+h5py in `full`); remove an override once the upstream constraint is gone.
 
 ## Docker Commands Reference
 
