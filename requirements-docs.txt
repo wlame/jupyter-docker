@@ -1,15 +1,15 @@
 # Organization documentation standard — pinned dependencies
-# Versions verified against PyPI: 2026-07-11
+# Versions verified against PyPI: 2026-10-08
 # Update intentionally; test before bumping versions.
-# Install: pip install -r requirements-docs.txt
-# Build:   mkdocs build --strict
+# Build: just docs-build   (uv installs these pins, then mkdocs build --strict)
+# Serve: just docs-serve
 
 # Core
 mkdocs==1.6.1
-mkdocs-material==9.7.6
+mkdocs-material==9.7.7
 
 # Git metadata (page freshness + authorship)
-mkdocs-git-revision-date-localized-plugin==1.5.3
+mkdocs-git-revision-date-localized-plugin==1.6.0
 mkdocs-git-authors-plugin==0.10.0
 
 # UX plugins
