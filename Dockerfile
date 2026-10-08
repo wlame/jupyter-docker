@@ -87,8 +87,10 @@ WORKDIR /home/jupyter
 COPY --chown=jupyter:jupyter targets/base/pyproject.toml targets/base/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/base/verify_imports.py /home/jupyter/scripts/verify_imports.py
 
-# Sync from the committed lockfile as the jupyter user (.venv stays user-writable)
-USER jupyter
+# Sync from the committed lockfile as the jupyter user (.venv stays user-writable).
+# USER takes numeric IDs (1000:1000 = jupyter, 0:0 = root) so runtimes such as
+# Kubernetes runAsNonRoot can verify the final user is not root.
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -108,7 +110,7 @@ RUN uv run --no-project jupyter lab --generate-config \
 
 EXPOSE 8888
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD curl -fsS http://localhost:8888/api || exit 1
+    CMD ["sh", "-c", "curl -fsS http://localhost:8888/api || exit 1"]
 CMD ["uv", "run", "--no-project", "jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
 
 
@@ -118,7 +120,7 @@ CMD ["uv", "run", "--no-project", "jupyter", "lab", "--ip=0.0.0.0", "--port=8888
 FROM base AS scientific
 LABEL org.opencontainers.image.description="ds-scientific: Scientific computing with NumPy, SciPy, and Pandas"
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     libgfortran5 \
@@ -130,7 +132,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 COPY --chown=jupyter:jupyter targets/scientific/pyproject.toml targets/scientific/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/scientific/verify_imports.py /home/jupyter/scripts/verify_scientific.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -141,7 +143,7 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 FROM base AS visualization
 LABEL org.opencontainers.image.description="ds-visualization: Data visualization with Matplotlib, Seaborn, Plotly, and Bokeh"
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     libfreetype6 \
@@ -153,7 +155,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 COPY --chown=jupyter:jupyter targets/visualization/pyproject.toml targets/visualization/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/visualization/verify_imports.py /home/jupyter/scripts/verify_visualization.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -164,7 +166,7 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 FROM base AS dataio
 LABEL org.opencontainers.image.description="ds-dataio: Data I/O for Parquet, HDF5, Excel, and databases"
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     libhdf5-103-1t64 \
@@ -175,7 +177,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 COPY --chown=jupyter:jupyter targets/dataio/pyproject.toml targets/dataio/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/dataio/verify_imports.py /home/jupyter/scripts/verify_dataio.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -189,7 +191,7 @@ LABEL org.opencontainers.image.description="ds-ml: Classical machine learning wi
 COPY --chown=jupyter:jupyter targets/ml/pyproject.toml targets/ml/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/ml/verify_imports.py /home/jupyter/scripts/verify_ml.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -203,7 +205,7 @@ LABEL org.opencontainers.image.description="ds-deeplearn: Deep learning with PyT
 COPY --chown=jupyter:jupyter targets/deeplearn/pyproject.toml targets/deeplearn/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/deeplearn/verify_imports.py /home/jupyter/scripts/verify_deeplearn.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -214,7 +216,7 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 FROM base AS vision
 LABEL org.opencontainers.image.description="ds-vision: Computer vision and image processing"
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     libgfortran5 \
@@ -231,7 +233,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 COPY --chown=jupyter:jupyter targets/vision/pyproject.toml targets/vision/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/vision/verify_imports.py /home/jupyter/scripts/verify_vision.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -245,7 +247,7 @@ RUN bash /home/jupyter/scripts/bake_models.sh vision
 FROM base AS audio
 LABEL org.opencontainers.image.description="ds-audio: Audio processing and analysis"
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     libgfortran5 \
@@ -259,7 +261,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 COPY --chown=jupyter:jupyter targets/audio/pyproject.toml targets/audio/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/audio/verify_imports.py /home/jupyter/scripts/verify_audio.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -270,7 +272,7 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 FROM scientific AS geospatial
 LABEL org.opencontainers.image.description="ds-geospatial: Geospatial analysis and mapping"
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     libfreetype6 \
@@ -287,7 +289,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 COPY --chown=jupyter:jupyter targets/geospatial/pyproject.toml targets/geospatial/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/geospatial/verify_imports.py /home/jupyter/scripts/verify_geospatial.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -301,7 +303,7 @@ LABEL org.opencontainers.image.description="ds-timeseries: Time series analysis 
 COPY --chown=jupyter:jupyter targets/timeseries/pyproject.toml targets/timeseries/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/timeseries/verify_imports.py /home/jupyter/scripts/verify_timeseries.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -312,7 +314,7 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 FROM base AS nlp
 LABEL org.opencontainers.image.description="ds-nlp: Natural language processing"
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     libgfortran5 \
@@ -324,7 +326,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 COPY --chown=jupyter:jupyter targets/nlp/pyproject.toml targets/nlp/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/nlp/verify_imports.py /home/jupyter/scripts/verify_nlp.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -338,7 +340,7 @@ RUN bash /home/jupyter/scripts/bake_models.sh nlp
 FROM base AS speech
 LABEL org.opencontainers.image.description="ds-speech: Speech recognition and text-to-speech synthesis"
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     libgfortran5 \
@@ -353,7 +355,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 COPY --chown=jupyter:jupyter targets/speech/pyproject.toml targets/speech/uv.lock /home/jupyter/
 COPY --chown=jupyter:jupyter targets/speech/verify_imports.py /home/jupyter/scripts/verify_speech.py
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
@@ -371,7 +373,7 @@ RUN bash /home/jupyter/scripts/bake_models.sh speech
 # =============================================================================
 FROM base AS face-builder
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -390,14 +392,14 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 COPY --chown=jupyter:jupyter targets/face/pyproject.toml targets/face/uv.lock /home/jupyter/
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
 FROM base AS face
 LABEL org.opencontainers.image.description="ds-face: Face detection, recognition, analysis, and generation"
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     libgfortran5 \
@@ -418,7 +420,7 @@ COPY --chown=jupyter:jupyter targets/face/verify_imports.py /home/jupyter/script
 # UV_LINK_MODE=copy, so the venv is self-contained and relocatable across stages.
 COPY --from=face-builder --chown=jupyter:jupyter /home/jupyter/.venv /home/jupyter/.venv
 
-USER jupyter
+USER 1000:1000
 # Pre-bake face-alignment weights so example tests run offline. DeepFace's
 # attribute models are intentionally NOT baked (~1.5 GB, reliably hosted, and
 # the example already skips them offline). See scripts/bake_models.sh.
@@ -435,7 +437,7 @@ RUN bash /home/jupyter/scripts/bake_models.sh face
 # =============================================================================
 FROM base AS full-builder
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     # Build toolchain (dlib compiles from source; also builds pure-python sdists)
@@ -464,14 +466,14 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 COPY --chown=jupyter:jupyter targets/full/pyproject.toml targets/full/uv.lock /home/jupyter/
 
-USER jupyter
+USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
 FROM base AS full
 LABEL org.opencontainers.image.description="ds-full: Complete data science environment with all libraries"
 
-USER root
+USER 0:0
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update && apt-get install -y --no-install-recommends \
     # Scientific computing
@@ -516,6 +518,6 @@ RUN for dir in /home/jupyter/targets/*/; do \
 # Take the fully built venv (with the compiled dlib) from the builder.
 COPY --from=full-builder --chown=jupyter:jupyter /home/jupyter/.venv /home/jupyter/.venv
 
-USER jupyter
+USER 1000:1000
 # Pre-bake every target's model weights so example tests run offline
 RUN bash /home/jupyter/scripts/bake_models.sh full
