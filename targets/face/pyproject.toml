@@ -59,7 +59,7 @@ dependencies = [
 
 [tool.uv]
 # Supply-chain guard: never resolve packages published after this date
-exclude-newer = "2026-07-04"
+exclude-newer = "2026-07-05T00:00:00Z"
 # Transitive dependencies excluded via a never-true marker
 # (see exclude-dependencies comments in targets/matrix.toml)
 override-dependencies = [

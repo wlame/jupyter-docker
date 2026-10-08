@@ -42,7 +42,7 @@ dependencies = [
 
 [tool.uv]
 # Supply-chain guard: never resolve packages published after this date
-exclude-newer = "2026-07-04"
+exclude-newer = "2026-07-05T00:00:00Z"
 
 [build-system]
 requires = ["hatchling"]
