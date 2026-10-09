@@ -149,6 +149,26 @@ just lock
 
 ---
 
+### Local build on an Apple-silicon Mac fails compiling a package
+
+**Symptom**: `just build visualization` (or another target) on an arm64 host stops
+at `uv sync` with `Failed to build <package>` and `No such file or directory: 'gcc'`
+— for example `multimark`, which great-tables pulls in.
+
+**Cause**: the lockfiles guarantee wheels for linux **x86_64**, the published
+platform. A few packages ship no linux **arm64** wheel, so an arm64 build tries to
+compile them, and the runtime stages carry no compiler.
+
+**Fix**: build for the published platform, or pull the prebuilt image:
+
+```bash
+DOCKER_DEFAULT_PLATFORM=linux/amd64 just build visualization
+```
+
+Emulated amd64 builds are slower but match what CI publishes.
+
+---
+
 ### Build fails on `--mount=type=cache` (BuildKit not enabled)
 
 **Symptom**: `docker build` errors on the Dockerfile's cache-mount syntax, or the
