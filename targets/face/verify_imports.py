@@ -8,6 +8,9 @@ Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py
 import sys
 
 IMPORTS = [
+    # --- first: torch family, before anything that may load TensorFlow ---
+    ("torch", "torch"),
+    ("torchvision", "torchvision"),
     # --- base ---
     ("aiohttp", "aiohttp"),
     ("bs4", "beautifulsoup4"),
@@ -42,8 +45,6 @@ IMPORTS = [
     ("ujson", "ujson"),
     ("xmltodict", "xmltodict"),
     # --- face ---
-    ("torch", "torch"),
-    ("torchvision", "torchvision"),
     ("deepface", "deepface"),
     ("diffusers", "diffusers"),
     ("dlib", "dlib"),

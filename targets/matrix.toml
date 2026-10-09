@@ -582,8 +582,10 @@ version = "2.21.0"
 module = "tensorflow"
 introduced-by = ["deeplearn", "face"]
 
-# Torch native modules must import before TensorFlow in one process
-# (C++ symbol clash segfaults); verify-first orders them ahead in verify scripts.
+# Torch native modules must import before TensorFlow in one process (TensorFlow
+# loaded before triton segfaults). verify-first puts them ahead of every other
+# package in verify scripts, since some packages import TensorFlow implicitly
+# (umap-learn's ParametricUMAP does whenever TensorFlow is installed).
 [packages."torch"]
 version = "2.14.1"
 verify-first = true

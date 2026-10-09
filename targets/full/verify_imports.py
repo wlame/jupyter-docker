@@ -8,6 +8,11 @@ Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py
 import sys
 
 IMPORTS = [
+    # --- first: torch family, before anything that may load TensorFlow ---
+    ("torch", "torch"),
+    ("torchaudio", "torchaudio"),
+    ("torchvision", "torchvision"),
+    ("torchcodec", "torchcodec"),
     # --- base ---
     ("aiohttp", "aiohttp"),
     ("bs4", "beautifulsoup4"),
@@ -102,9 +107,6 @@ IMPORTS = [
     ("umap", "umap-learn"),
     ("xgboost", "xgboost"),
     # --- deeplearn ---
-    ("torch", "torch"),
-    ("torchaudio", "torchaudio"),
-    ("torchvision", "torchvision"),
     ("accelerate", "accelerate"),
     ("einops", "einops"),
     ("keras", "keras"),
@@ -125,7 +127,6 @@ IMPORTS = [
     ("timm", "timm"),
     ("ultralytics", "ultralytics"),
     # --- audio ---
-    ("torchcodec", "torchcodec"),
     ("audioread", "audioread"),
     ("librosa", "librosa"),
     ("noisereduce", "noisereduce"),

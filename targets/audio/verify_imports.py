@@ -8,6 +8,10 @@ Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py
 import sys
 
 IMPORTS = [
+    # --- first: torch family, before anything that may load TensorFlow ---
+    ("torch", "torch"),
+    ("torchaudio", "torchaudio"),
+    ("torchcodec", "torchcodec"),
     # --- base ---
     ("aiohttp", "aiohttp"),
     ("bs4", "beautifulsoup4"),
@@ -42,9 +46,6 @@ IMPORTS = [
     ("ujson", "ujson"),
     ("xmltodict", "xmltodict"),
     # --- audio ---
-    ("torch", "torch"),
-    ("torchaudio", "torchaudio"),
-    ("torchcodec", "torchcodec"),
     ("audioread", "audioread"),
     ("librosa", "librosa"),
     ("matplotlib", "matplotlib"),

@@ -310,3 +310,16 @@ introduced-by = ["base"]
     assert verify.returncode == 1
     assert 'boom: FileNotFoundError: package.json missing' in verify.stdout
     assert '1 passed, 1 failed' in verify.stdout
+
+
+VERIFY_FIRST_MODULES = {spec['module'] for spec in MATRIX['packages'].values() if spec.get('verify-first')}
+
+
+@pytest.mark.parametrize('target', ALL_TARGETS)
+def test_verify_script_imports_torch_family_before_everything_else(target):
+    tree = ast.parse((REPO_ROOT / 'targets' / target / 'verify_imports.py').read_text())
+    pairs = next(n.value for n in ast.walk(tree) if isinstance(n, ast.Assign) and getattr(n.targets[0], 'id', '') == 'IMPORTS')
+    modules = [elt.elts[0].value for elt in pairs.elts]
+    flags = [m in VERIFY_FIRST_MODULES for m in modules]
+
+    assert flags == sorted(flags, reverse=True), f"{target}: a non-torch module loads before the torch family"

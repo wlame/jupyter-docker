@@ -335,11 +335,21 @@ def render_verify(target: str, matrix: dict) -> str:
     chain = target_order(targets) if target == 'full' else lineage(target, targets)
     chain = [t for t in chain if t != 'full']
 
+    groups = grouped(mat, chain)
+    # verify-first packages (the torch family) go ahead of every group, not just
+    # their own: other packages can load TensorFlow on import (umap-learn does),
+    # and TensorFlow loaded before triton segfaults the process.
+    first = [pkg for _, pkgs in groups for pkg in pkgs if mat[pkg].get('verify-first')]
     lines = [GENERATED_HEADER_PY.format(target=target), 'import sys', '', 'IMPORTS = [']
-    for group, pkgs in grouped(mat, chain):
+    if first:
+        lines.append('    # --- first: torch family, before anything that may load TensorFlow ---')
+        lines += [f'    ("{mat[pkg]["module"]}", "{pkg}"),' for pkg in first]
+    for group, pkgs in groups:
+        rest = [pkg for pkg in pkgs if not mat[pkg].get('verify-first')]
+        if not rest:
+            continue
         lines.append(f'    # --- {group} ---')
-        for pkg in pkgs:
-            lines.append(f'    ("{mat[pkg]["module"]}", "{pkg}"),')
+        lines += [f'    ("{mat[pkg]["module"]}", "{pkg}"),' for pkg in rest]
     lines.append(']')
     body = '\n'.join(lines)
     runner = VERIFY_RUNNER.format(target=target, target_upper=target.upper())
