@@ -50,6 +50,12 @@ description = "Classical machine learning with scikit-learn, XGBoost, and LightG
 [targets.deeplearn]
 parent = "ml"
 description = "Deep learning with PyTorch and TensorFlow"
+# triton (torch's GPU kernel compiler) segfaults when TensorFlow is already
+# loaded, so any TensorFlow-first import (keras, deepface, umap-learn's
+# ParametricUMAP) followed by torchvision crashes the process. torch.compile
+# needs a C/C++ compiler these images do not ship, so triton is unusable here
+# anyway; full inherits this exclusion.
+exclude-dependencies = ["triton"]
 # tensorflow 2.21 ships no cp314 wheels; widen once tensorflow 2.22 is released.
 python = ["3.13"]
 
@@ -88,7 +94,8 @@ description = "Face detection, recognition, analysis, and generation"
 python = ["3.13"]
 # deepface/retina-face/face-alignment/insightface require GUI opencv-python and
 # mediapipe requires opencv-contrib-python — same cv2 double-install problem as vision.
-exclude-dependencies = ["opencv-python", "opencv-contrib-python"]
+# triton: see the deeplearn comment (TensorFlow-then-triton segfault).
+exclude-dependencies = ["opencv-python", "opencv-contrib-python", "triton"]
 
 [targets.full]
 parent = ""

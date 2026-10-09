@@ -73,11 +73,12 @@ The `torch.cuda.is_available()` check above returns `True` when the driver,
 toolkit, and container runtime line up. If it returns `False`, the notebook is
 running on CPU — see [Troubleshooting](../troubleshooting.md).
 
-!!! warning "Import torch before TensorFlow in the same process"
-    `deeplearn` and `full` bundle both PyTorch and TensorFlow. Importing
-    TensorFlow *before* torch in one Python process can segfault from a C++ symbol
-    clash between their bundled runtimes. Import the torch-family modules first.
-    See [Troubleshooting](../troubleshooting.md) for the details.
+!!! note "No torch.compile in the TensorFlow images"
+    `deeplearn` and `full` bundle both PyTorch and TensorFlow, and triton (torch's
+    GPU kernel compiler) segfaults when TensorFlow is already loaded, so these
+    images do not install it. torch.compile also needs a C/C++ compiler that the
+    runtime images don't ship. Eager PyTorch on the GPU is unaffected. See
+    [Troubleshooting](../troubleshooting.md).
 
 ## Expected output
 
@@ -123,7 +124,7 @@ TensorFlow is installed from PyPI without its `and-cuda` extra, and the image sh
 no CUDA 12 libraries for it, so TensorFlow ignores the GPU even with `--gpus all`:
 
 ```python
-import torch  # import torch first — see the warning above
+import torch
 import tensorflow as tf
 
 print(tf.config.list_physical_devices("GPU"))  # [] in these images

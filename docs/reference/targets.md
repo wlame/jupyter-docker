@@ -147,7 +147,9 @@ Deep learning with PyTorch and TensorFlow.
 **Adds:** PyTorch, TorchVision, TorchAudio, TensorFlow, and Keras, plus Lightning,
 torchmetrics, Accelerate, einops, TensorBoard, and ONNX + onnxruntime for portable
 inference. This is the only target that stacks the full classical-ML and
-deep-learning frameworks together.
+deep-learning frameworks together. It does not install triton, which segfaults
+when TensorFlow is already loaded, so `torch.compile` is unavailable; eager PyTorch,
+including on a GPU, is unaffected.
 
 ## vision
 

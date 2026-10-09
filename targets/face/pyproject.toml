@@ -83,6 +83,7 @@ required-environments = [
 override-dependencies = [
     "opencv-python ; sys_platform == 'never'",
     "opencv-contrib-python ; sys_platform == 'never'",
+    "triton ; sys_platform == 'never'",
 ]
 
 [build-system]

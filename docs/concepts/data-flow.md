@@ -41,7 +41,7 @@ Nothing else is edited by hand. A package entry records its `version`, import
 `targets/<t>/pyproject.toml` and `targets/<t>/verify_imports.py`. It resolves each
 target's full package set by walking its lineage, so a child's files include
 everything its parent introduced. The `verify_imports.py` script imports every
-declared package (torch-family modules first, so they load before TensorFlow).
+declared package (torch-family modules first, ahead of anything that may load TensorFlow).
 
 ### 3. `just lock` — re-resolve the lockfiles
 

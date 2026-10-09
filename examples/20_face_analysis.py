@@ -131,8 +131,8 @@ print("\n" + "=" * 60)
 print("face-alignment — Landmark Extraction")
 print("=" * 60)
 
-# torch-based; must run BEFORE DeepFace loads TensorFlow — importing torch
-# native code after TensorFlow in one process segfaults (C++ symbol clash).
+# torch-based; runs before DeepFace loads TensorFlow. This image excludes triton,
+# whose import after TensorFlow segfaults, so the order is a second guard.
 import face_alignment
 
 fa = face_alignment.FaceAlignment(

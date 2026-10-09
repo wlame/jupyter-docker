@@ -32,6 +32,10 @@ To review what changed, browse the commit history on GitHub:
   `-<short-sha>`). See [Deployment & publishing](operations/deployment.md).
 - All dependencies were refreshed to the 2026-10-01 cutoff; scikit-learn is no longer
   held back in `timeseries` and `full`.
+- The TensorFlow images (`deeplearn`, `face`, `full`) no longer install triton: it
+  segfaults when TensorFlow is already loaded, which made `import umap` (and any
+  TensorFlow-first import followed by torchvision) crash. torch.compile was not
+  usable there anyway, since the runtime images ship no C/C++ compiler.
 - The committed lockfiles now resolve only for Linux (the images) and Apple-silicon
   macOS. Local `uv sync` of a target on Windows or an Intel Mac is no longer
   supported; use the images there.

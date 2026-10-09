@@ -85,13 +85,14 @@ One entry per dependency. The section name is the exact package name uv installs
 | `introduced-by` | List of targets that add the package. Every **descendant** of a listed target inherits it. `full` always gets every package regardless. | `["ml", "timeseries"]` |
 | `overrides` | Sub-table `[packages."<name>".overrides]` pinning a different version for specific targets. Remove an override once the constraint that forced it is gone. | `[packages."pandas".overrides]` |
 | `source-url` | Direct wheel URL rendered into `[tool.uv.sources]` instead of a version pin. Used for the spaCy model `en-core-web-sm`. | `"https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl"` |
-| `verify-first` | `true` for the torch family. Sorts the package ahead of the rest within its group in the verify scripts, so torch native modules import before TensorFlow in one process. | `true` |
+| `verify-first` | `true` for the torch family. Puts the package ahead of every other package in the verify scripts, so torch loads before anything that might load TensorFlow. | `true` |
 
-!!! warning "Import torch before TensorFlow"
-    Importing TensorFlow before torch in the same process segfaults (a C++ symbol
-    clash between their bundled runtimes). `verify-first = true` on the
-    torch-family packages is what keeps the generated verify scripts in the safe
-    order — do not remove it.
+!!! warning "TensorFlow and triton in one process"
+    triton (torch's GPU kernel compiler, imported by torchvision) segfaults when
+    TensorFlow is already loaded. The TensorFlow targets therefore exclude triton
+    (`exclude-dependencies` on `deeplearn` and `face`, inherited by `full`), and
+    `verify-first` keeps the generated verify scripts in the safe order as a
+    second guard. Keep both when adding packages.
 
 ### A simple package
 
@@ -186,6 +187,7 @@ because a downstream library caps a dependency.
 | `pandas < 3` in timeseries/full | `statsforecast`, `mlforecast`, and `skforecast` cap it. | `pandas` override → `2.3.3` on `timeseries` and `full`; every other target ships `3.0.6`. |
 | Cloud filesystems held in full | `datasets` 5.0.1 (nlp) caps `fsspec` at 2026.6.0; `s3fs` pins `fsspec` exactly. | `s3fs` → `2026.6.0` and `gcsfs` → `2026.7.0` on `full`; `dataio` ships the newest. |
 | `h5py < 3.15` in full | `tensorflow` 2.21 cap; only `full` merges both stacks. | `h5py` override → `3.14.0` on `full`; `dataio` ships `3.16.0`. |
+| `triton` excluded on deeplearn/face/full | triton segfaults when TensorFlow is already loaded (any TensorFlow-first import followed by torchvision). torch.compile needs a C/C++ compiler the images don't ship, so triton is unusable there anyway. | `exclude-dependencies` includes `triton` on `deeplearn` and `face`; `full` unions it. |
 | `opencv-python-headless` 4.13 in face/full | OpenCV 5 dropped the bundled haarcascade files `deepface` needs. | `opencv-python-headless` override → `4.13.0.90` on `face` and `full`. |
 | GUI `opencv-python` / `opencv-contrib-python` excluded on vision/face | They double-install `cv2` over the pinned headless build (same paths, corrupted mix); `mediapipe` pulls the contrib build. | `exclude-dependencies` on `vision` (`opencv-python`) and `face` (both). |
 | `torchcodec` + FFmpeg only in audio/speech/full | `torchaudio` ≥ 2.10 delegates load/save to `torchcodec`, which needs FFmpeg shared libs present only in those stages. | `torchcodec` `introduced-by = ["audio", "speech"]` (and `full`). |

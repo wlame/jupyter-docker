@@ -216,6 +216,7 @@ required-environments = [
 # Transitive dependencies excluded via a never-true marker
 # (see exclude-dependencies comments in targets/matrix.toml)
 override-dependencies = [
+    "triton ; sys_platform == 'never'",
     "opencv-python ; sys_platform == 'never'",
     "opencv-contrib-python ; sys_platform == 'never'",
 ]

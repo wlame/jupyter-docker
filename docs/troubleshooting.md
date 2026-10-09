@@ -24,24 +24,22 @@ the container. Each entry lists the symptom, the underlying cause, and the fix.
 
 ## Runtime import errors
 
-### Segfault when importing TensorFlow before torch
+### Segfault when TensorFlow and triton share a process
 
-**Symptom**: the process dies with a segmentation fault (no Python traceback) while
-importing TensorFlow, on the `deeplearn`, `face`, or `full` images.
+**Symptom**: the process dies with a segmentation fault (no Python traceback),
+typically while importing torchvision or calling `torch.compile` after TensorFlow,
+Keras, DeepFace, or umap-learn has been imported.
 
-**Cause**: TensorFlow and torch bundle their own native C++ runtimes, and importing
-TensorFlow *before* torch in the same process triggers a symbol clash that
-segfaults the interpreter.
+**Cause**: triton, torch's GPU kernel compiler, segfaults when TensorFlow is
+already loaded. torchvision imports it through `torch._dynamo`, and some libraries
+load TensorFlow implicitly — umap-learn's ParametricUMAP does whenever TensorFlow
+is installed.
 
-**Fix**: import torch first. The matrix marks the torch-family packages
-[`verify-first = true`](reference/configuration.md), so the generated verify scripts already order them ahead of
-TensorFlow, and example 20 (`examples/20_face_analysis.py`) runs face-alignment
-(torch) before DeepFace (TensorFlow).
-
-!!! warning "Keep torch ahead of TensorFlow in new code"
-    Any new example or notebook that mixes both stacks must import torch (or a
-    torch-based library such as face-alignment) before it imports TensorFlow or
-    DeepFace. Reversing the order reintroduces the segfault.
+**Fix**: the TensorFlow images (`deeplearn`, `face`, `full`) do not install triton,
+so the published images are not affected. torch.compile is unavailable there in
+any case: it needs a C/C++ compiler the runtime images don't ship. If you install
+triton into one of these images yourself, import torch and torchvision before
+anything that loads TensorFlow.
 
 ---
 

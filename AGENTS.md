@@ -67,11 +67,14 @@ any drift between them, the lockfiles, and the matrix.
 
 ## Runtime gotchas
 
-- **Import torch before TensorFlow in one process** — the reverse order
-  segfaults (a C++ symbol clash between their bundled runtimes). Torch-family
-  packages carry `verify-first = true` so generated verify scripts import them
-  first, and example 20 runs face-alignment (torch) before DeepFace
-  (TensorFlow). Keep that order in any new code mixing both stacks.
+- **triton segfaults when TensorFlow is already loaded.** torchvision (through
+  `torch._dynamo`) imports triton, so TensorFlow, Keras, DeepFace, or umap-learn
+  (whose ParametricUMAP imports TensorFlow) followed by torchvision kills the
+  process. The TensorFlow targets (`deeplearn`, `face`, and `full` by union)
+  exclude triton, which is unusable there anyway (torch.compile needs a compiler
+  the images lack); a new target that ships both stacks needs the same
+  exclusion. Verify scripts still import `verify-first` (torch-family) packages
+  before everything else as a second guard.
 - torchcodec (torchaudio's I/O backend) needs FFmpeg shared libraries and
   `libpython3.X` (the image's Python) at runtime; FFmpeg is installed only in
   `audio`, `speech`, and `full`.
