@@ -265,6 +265,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     liblapack3 \
     libsndfile1 \
     ffmpeg \
+    # libatomic.so.1 for pedalboard's native module
+    libatomic1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -515,6 +517,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     libsndfile1 \
     ffmpeg \
     espeak-ng \
+    libatomic1 \
     # Face (mediapipe -> sounddevice)
     libportaudio2 \
     && apt-get clean \
