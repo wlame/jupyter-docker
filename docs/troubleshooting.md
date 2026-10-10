@@ -153,7 +153,8 @@ just lock
 
 **Symptom**: `just build visualization` (or another target) on an arm64 host stops
 at `uv sync` with `Failed to build <package>` and `No such file or directory: 'gcc'`
-— for example `multimark`, which great-tables pulls in.
+— for example `multimark`, which great-tables pulls in, or `hdbscan`, which BERTopic
+pulls into `nlp` (and so `genai`) on Python 3.14.
 
 **Cause**: the lockfiles guarantee wheels for linux **x86_64**, the published
 platform. A few packages ship no linux **arm64** wheel, so an arm64 build tries to
@@ -215,7 +216,7 @@ network.
 
 **Cause**: most weights the examples need are **pre-baked into the image at build
 time** by [`scripts/bake_models.sh`](reference/cli.md) (YOLO26n for `vision`, NLTK corpora and a
-sentence-transformers MiniLM for `nlp`, Whisper `tiny` for `speech`, face-alignment
+sentence-transformers MiniLM for `nlp`, SmolLM2-135M for `genai`, Whisper `tiny` for `speech`, face-alignment
 nets for `face`) so the tests run offline. The pytest run sets `HF_HUB_OFFLINE=1`
 (in `build-all.sh`, not baked into the image) so a HuggingFace Hub outage can't
 flake the MiniLM load.
