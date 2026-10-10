@@ -48,7 +48,7 @@ nb:
     #!/usr/bin/env bash
     set -euo pipefail
     for f in examples/[0-9]*.py; do
-        uvx --with jupytext=={{jupytext_version}} jupytext --to notebook "${f}"
+        uvx --with jupytext=={{jupytext_version}} jupytext --to notebook --update "${f}"
     done
 
 # Verify notebooks are in sync with their .py sources (CI gate).
