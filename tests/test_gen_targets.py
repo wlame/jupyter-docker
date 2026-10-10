@@ -99,6 +99,42 @@ def test_every_package_version_is_exact_or_url_sourced(target):
     assert not loose, f"{target}: unpinned dependencies without a source: {loose}"
 
 
+def shipped_examples(target: str, root: Path = REPO_ROOT) -> list[str]:
+    """Example names listed in a target's generated examples.txt."""
+    lines = (root / 'targets' / target / 'examples.txt').read_text().splitlines()
+    return [line for line in lines if line and not line.startswith('#')]
+
+
+def example_test_markers() -> dict[str, set[str]]:
+    """{example name: target markers} from the tests in tests/test_examples.py."""
+    tree = ast.parse((REPO_ROOT / 'tests' / 'test_examples.py').read_text())
+    markers = {}
+    for node in tree.body:
+        if not isinstance(node, ast.FunctionDef):
+            continue
+        marks = {d.attr for d in node.decorator_list if isinstance(d, ast.Attribute)} - {'slow'}
+        calls = [n for n in ast.walk(node) if isinstance(n, ast.Call) and getattr(n.func, 'id', '') == 'run_example']
+        markers[Path(calls[0].args[0].value).stem] = marks
+    return markers
+
+
+def test_example_test_markers_match_matrix_owners():
+    owners = {stem: {name} for name, spec in MATRIX['targets'].items() for stem in spec.get('examples', [])}
+
+    assert example_test_markers() == owners
+
+
+@pytest.mark.parametrize('child,parent', CHILD_PARENT)
+def test_child_image_ships_parent_examples(child, parent):
+    assert set(shipped_examples(parent)) <= set(shipped_examples(child))
+
+
+def test_full_image_ships_every_example():
+    scripts = sorted(path.stem for path in (REPO_ROOT / 'examples').glob('[0-9][0-9]_*.py'))
+
+    assert shipped_examples('full') == scripts
+
+
 @pytest.fixture
 def repo_copy(tmp_path: Path) -> Path:
     """Minimal copy of the repo that gen_targets.py can operate on."""
@@ -342,6 +378,51 @@ exclude-newer = "2026-02-01T00:00:00Z"
     assert result.returncode == 0, result.stderr
     assert narrow['tool']['uv']['exclude-newer-package'] == {'fresh-fix': '2026-02-01T00:00:00Z'}
     assert 'exclude-newer-package' not in base['tool']['uv']
+
+
+@pytest.mark.parametrize(
+    'base_examples,narrow_examples,scripts,expected',
+    [
+        ('["01_missing"]', '[]', [], 'examples/01_missing.py does not exist'),
+        ('[]', '[]', ['02_orphan'], 'not listed in any target'),
+        ('["03_shared"]', '["03_shared"]', ['03_shared'], 'listed by several targets'),
+        ('"03_shared"', '[]', ['03_shared'], 'must be a list of example names'),
+    ],
+    ids=['missing-script', 'unowned-script', 'two-owners', 'not-a-list'],
+)
+def test_invalid_example_ownership_is_rejected(
+    python_matrix_root: Path, base_examples, narrow_examples, scripts, expected
+):
+    matrix = python_matrix_root / 'targets' / 'matrix.toml'
+    matrix.write_text(
+        matrix.read_text()
+        .replace('description = "root that inherits [settings] python"', f'description = "r"\nexamples = {base_examples}')
+        .replace('description = "narrows the parent\'s list"', f'description = "n"\nexamples = {narrow_examples}')
+    )
+    (python_matrix_root / 'examples').mkdir()
+    for stem in scripts:
+        (python_matrix_root / 'examples' / f'{stem}.py').write_text('')
+
+    result = run_gen('--python-matrix', root=python_matrix_root)
+
+    assert result.returncode != 0
+    assert expected in result.stderr
+
+
+def test_examples_list_includes_ancestor_examples(python_matrix_root: Path):
+    matrix = python_matrix_root / 'targets' / 'matrix.toml'
+    matrix.write_text(
+        matrix.read_text()
+        .replace('description = "root that inherits [settings] python"', 'description = "r"\nexamples = ["01_root"]')
+        .replace('description = "inherits the narrowed list"', 'description = "g"\nexamples = ["02_leaf"]')
+    )
+
+    result = run_gen(root=python_matrix_root)
+
+    assert result.returncode == 0, result.stderr
+    assert shipped_examples('base', root=python_matrix_root) == ['01_root']
+    assert shipped_examples('narrow', root=python_matrix_root) == ['01_root']
+    assert shipped_examples('grandchild', root=python_matrix_root) == ['01_root', '02_leaf']
 
 
 def test_package_extras_render_in_the_requirement(python_matrix_root: Path):

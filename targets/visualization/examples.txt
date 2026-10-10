@@ -1,0 +1,8 @@
+# GENERATED FILE — do not edit by hand.
+# Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py).
+# Examples copied into this target's image: its own and its ancestors', one per line.
+03_matplotlib_seaborn_viz
+04_plotly_interactive
+05_bokeh_holoviews
+16_altair_panel_viz
+22_plotnine_tables_datashader

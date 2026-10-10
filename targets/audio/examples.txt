@@ -1,0 +1,5 @@
+# GENERATED FILE — do not edit by hand.
+# Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py).
+# Examples copied into this target's image: its own and its ancestors', one per line.
+15_audio_analysis
+27_audio_effects_loudness

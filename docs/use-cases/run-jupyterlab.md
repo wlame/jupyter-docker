@@ -14,8 +14,9 @@ You have a `notebooks/` folder of work and a `data/` folder of inputs, and you
 want both to persist on your machine while the runtime lives in a container.
 
 The `scientific` target is the smallest image that carries the numerical stack,
-so it is the natural starting point. Every image already bundles the repository's
-example notebooks at `/home/jupyter/examples`, so you can run one immediately.
+so it is the natural starting point. Every image bundles the example notebooks
+its libraries can run (its own target's and its parents'; `full` has all of them)
+at `/home/jupyter/examples`, so you can run one immediately.
 
 ## Prerequisites
 

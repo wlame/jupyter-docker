@@ -8,8 +8,9 @@ tags:
 
 Every command you need to develop, generate, build, test, scan, and document
 `jupyter-docker`. The [`just`](https://github.com/casey/just) recipes are the dev
-entrypoint; they wrap the two shell scripts (`build-all.sh`, `scripts/bake_models.sh`)
-and the target generator (`scripts/gen_targets.py`) documented below.
+entrypoint; they wrap `build-all.sh` and the target generator
+(`scripts/gen_targets.py`). Two more scripts run inside image builds:
+`scripts/bake_models.sh` and `scripts/select_examples.sh`. All are documented below.
 
 !!! note "Image naming"
     The `justfile` sets `image_prefix := "ds"`, so a locally built target `T` is
@@ -32,7 +33,7 @@ arguments and the underlying command it runs (with `justfile` variables resolved
 | `lock-check` | — | Verify all lockfiles are up to date (CI gate) | `uvx uv@0.12.23 lock --check` in each `targets/*/` |
 | `nb` | — | Regenerate example notebooks from their `.py` sources | `uvx --with jupytext==1.19.4 jupytext --to notebook --update <f>` for each `examples/[0-9]*.py` (`--update` keeps existing cell IDs, so unchanged notebooks stay byte-identical) |
 | `nb-check` | — | Verify notebooks are in sync with their `.py` sources (CI gate) | round-trips each `.ipynb` back through `jupytext --to py:light` and `diff`s it against the committed `.py` |
-| `lint` | — | Lint Python always; shell/Dockerfile linters run when installed (CI enforces both) | `uvx ruff@0.16.10 check scripts/ tests/` (rules from `ruff.toml`); then `shellcheck build-all.sh scripts/bake_models.sh` and `hadolint --ignore DL3008 Dockerfile` if installed |
+| `lint` | — | Lint Python always; shell/Dockerfile linters run when installed (CI enforces both) | `uvx ruff@0.16.10 check scripts/ tests/` (rules from `ruff.toml`); then `shellcheck build-all.sh scripts/bake_models.sh scripts/select_examples.sh` and `hadolint --ignore DL3008 Dockerfile` if installed |
 | `test-gen` | — | Run the generator test suite on the host (no Docker needed) | `uv run --no-project --python 3.13 --with pytest==9.1.1 python -m pytest tests/test_gen_targets.py -q` |
 | `ci` | — | Every fast no-Docker gate that CI tier 0 enforces | runs `gen-check`, `lock-check`, `nb-check`, `lint`, `test-gen` |
 | `python-matrix` | — | Print every target's Python versions as JSON (the CI build matrix) | `python3 scripts/gen_targets.py --python-matrix` |
@@ -149,9 +150,9 @@ For each target, testing runs two steps against the built `ds-<target>` image:
 
 ## `scripts/gen_targets.py`
 
-Generates each target's `pyproject.toml` and `verify_imports.py` from
+Generates each target's `pyproject.toml`, `verify_imports.py`, and `examples.txt` from
 [`targets/matrix.toml`](configuration.md), which is the single source of truth for which package (at
-which version) belongs to which target. Wrapped by the `just gen` and `just gen-check`
+which version) and which example belongs to which target. Wrapped by the `just gen` and `just gen-check`
 recipes.
 
 ```bash
@@ -205,6 +206,22 @@ Any other target value is accepted and simply prints `no models to bake for targ
     `RUN bash /home/jupyter/scripts/bake_models.sh vision`. Only the standalone YOLO
     weight file is checksum-verified; the library-managed caches (NLTK, HuggingFace,
     Whisper, torch hub) rely on each library's own integrity checks.
+
+## `scripts/select_examples.sh`
+
+Copies one image's examples into `/home/jupyter/examples` at build time, so each
+image ships only the examples its libraries can run.
+
+```bash
+select_examples.sh <examples-dir> <examples.txt>
+```
+
+The Dockerfile runs it at the end of every stage with the repository's `examples/`
+bind-mounted and the stage's generated `targets/<target>/examples.txt`. That list
+holds the target's own examples and its ancestors' (`full` lists every example), as
+declared by the `examples` key in the matrix. The script rebuilds the directory
+from scratch, so a child stage replaces its parent's set. Example outputs from local
+runs (`examples/output/`) never reach the image.
 
 ## Related pages
 

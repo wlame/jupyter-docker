@@ -13,6 +13,9 @@
 #   * The "full" target always contains every package in this file.
 #   * overrides pin a different version for specific targets; remove an
 #     override once the constraint that forced it is gone.
+#   * examples lists the example scripts (examples/<name>.py) a target owns;
+#     its image ships them and its ancestors' examples ("full" ships all).
+#     Each example belongs to exactly one target, matching its test marker.
 # =============================================================================
 
 [settings]
@@ -34,22 +37,51 @@ description = "Base Python environment with common utilities for data science"
 [targets.scientific]
 parent = "base"
 description = "Scientific computing with NumPy, SciPy, and Pandas"
+examples = [
+    "01_numpy_scipy_basics",
+    "02_pandas_data_analysis",
+    "17_scipy_signal_processing",
+    "21_polars_duckdb_xarray",
+    "33_lorenz_numba_dask",
+]
 
 [targets.visualization]
 parent = "base"
 description = "Data visualization with Matplotlib, Seaborn, Plotly, and Bokeh"
+examples = [
+    "03_matplotlib_seaborn_viz",
+    "04_plotly_interactive",
+    "05_bokeh_holoviews",
+    "16_altair_panel_viz",
+    "22_plotnine_tables_datashader",
+]
 
 [targets.dataio]
 parent = "base"
 description = "Data I/O for Parquet, HDF5, Excel, and databases"
+examples = [
+    "08_data_io_serialization",
+    "18_sqlalchemy_database",
+    "23_modern_data_formats",
+    "32_dataframe_engines",
+]
 
 [targets.ml]
 parent = "scientific"
 description = "Classical machine learning with scikit-learn, XGBoost, and LightGBM"
+examples = [
+    "09_machine_learning",
+    "24_ml_explain_and_uncertainty",
+]
 
 [targets.deeplearn]
 parent = "ml"
 description = "Deep learning with PyTorch and TensorFlow"
+examples = [
+    "10_deep_learning_pytorch",
+    "11_deep_learning_tensorflow",
+    "25_lightning_onnx",
+]
 # triton (torch's GPU kernel compiler) segfaults when TensorFlow is already
 # loaded, so any TensorFlow-first import (keras, deepface, umap-learn's
 # ParametricUMAP) followed by torchvision crashes the process. torch.compile
@@ -62,6 +94,11 @@ python = ["3.13"]
 [targets.vision]
 parent = "base"
 description = "Computer vision and image processing"
+examples = [
+    "12_image_processing",
+    "13_object_detection_yolo",
+    "26_vision_backbones_kornia",
+]
 # ultralytics requires GUI opencv-python, which double-installs cv2 over our
 # pinned opencv-python-headless (same paths, corrupted mix).
 exclude-dependencies = ["opencv-python"]
@@ -69,26 +106,49 @@ exclude-dependencies = ["opencv-python"]
 [targets.audio]
 parent = "base"
 description = "Audio processing and analysis"
+examples = [
+    "15_audio_analysis",
+    "27_audio_effects_loudness",
+]
 
 [targets.geospatial]
 parent = "scientific"
 description = "Geospatial analysis and mapping"
+examples = [
+    "06_geospatial",
+    "28_geospatial_raster_h3",
+]
 
 [targets.timeseries]
 parent = "scientific"
 description = "Time series analysis and forecasting"
+examples = [
+    "07_timeseries_analysis",
+    "29_forecasting_toolkit",
+]
 
 [targets.nlp]
 parent = "base"
 description = "Natural language processing"
+examples = [
+    "14_nlp_text_analysis",
+    "30_nlp_toolkit",
+]
 
 [targets.speech]
 parent = "base"
 description = "Speech recognition and text-to-speech synthesis"
+examples = [
+    "19_speech_processing",
+    "31_speech_metrics_vad",
+]
 
 [targets.face]
 parent = "base"
 description = "Face detection, recognition, analysis, and generation"
+examples = [
+    "20_face_analysis",
+]
 # tensorflow 2.21 ships no cp314 wheels; widen once tensorflow 2.22 and
 # tf-keras 2.22 are released.
 python = ["3.13"]

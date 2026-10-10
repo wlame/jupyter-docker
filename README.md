@@ -411,43 +411,45 @@ docker run --rm -it ds-scientific uv run --no-project ipython
 
 The `examples/` directory contains Python scripts and Jupyter notebooks. The
 `.py` files are the source of truth; notebooks are generated from them with
-jupytext (`just nb`) and CI verifies they stay in sync:
+jupytext (`just nb`) and CI verifies they stay in sync. Each image ships the
+examples of its own target and its parents (`ml` also has the `scientific`
+examples), and `full` ships all of them:
 
-| Example | Description |
-|---------|-------------|
-| `01_numpy_scipy_basics` | NumPy arrays, SciPy statistics |
-| `02_pandas_data_analysis` | DataFrame operations |
-| `03_matplotlib_seaborn_viz` | Static visualizations |
-| `04_plotly_interactive` | Interactive charts |
-| `05_bokeh_holoviews` | Bokeh and HoloViews |
-| `06_geospatial` | Maps with Cartopy, GeoPandas, Folium |
-| `07_timeseries_analysis` | Time series, ARIMA, forecasting |
-| `08_data_io_serialization` | JSON, XML, Parquet, HDF5 |
-| `09_machine_learning` | Classification, regression |
-| `10_deep_learning_pytorch` | PyTorch neural networks |
-| `11_deep_learning_tensorflow` | TensorFlow and Keras |
-| `12_image_processing` | PIL, OpenCV, scikit-image |
-| `13_object_detection_yolo` | YOLO26 object detection |
-| `14_nlp_text_analysis` | spaCy, NLTK, sentence-transformers |
-| `15_audio_analysis` | librosa, torchaudio features |
-| `16_altair_panel_viz` | Altair, hvPlot, Panel dashboards |
-| `17_scipy_signal_processing` | FFT, filters, spectrograms |
-| `18_sqlalchemy_database` | SQLAlchemy ORM, Parquet, HDF5 |
-| `19_speech_processing` | Whisper ASR, gTTS, torchaudio |
-| `20_face_analysis` | dlib, DeepFace, face-alignment |
-| `21_polars_duckdb_xarray` | polars, DuckDB, Arrow, xarray, pint |
-| `22_plotnine_tables_datashader` | plotnine, great-tables, itables, datashader, vl-convert |
-| `23_modern_data_formats` | Delta Lake, Excel, SPSS, zarr, netCDF, connectorx |
-| `24_ml_explain_and_uncertainty` | CatBoost, SHAP, MAPIE, UMAP, skrub, skops, skl2onnx |
-| `25_lightning_onnx` | Lightning, torchmetrics, Accelerate, einops, ONNX |
-| `26_vision_backbones_kornia` | timm, kornia, supervision, OpenCLIP |
-| `27_audio_effects_loudness` | pedalboard, pyloudnorm, noisereduce, parselmouth |
-| `28_geospatial_raster_h3` | rasterio, rioxarray, H3, mapclassify, OSMnx, lonboard |
-| `29_forecasting_toolkit` | statsforecast, mlforecast, skforecast, arch, tslearn |
-| `30_nlp_toolkit` | rapidfuzz, lingua, datasets, PEFT, KeyBERT, SentencePiece |
-| `31_speech_metrics_vad` | jiwer, silero-vad, parselmouth |
-| `32_dataframe_engines` | One query in pandas, Polars, DuckDB, and Ibis; ADBC |
-| `33_lorenz_numba_dask` | Lorenz attractor with SymPy, Numba, FFT, and Dask |
+| Example | Image | Description |
+|---------|-------|-------------|
+| `01_numpy_scipy_basics` | `scientific` | NumPy arrays, SciPy statistics |
+| `02_pandas_data_analysis` | `scientific` | DataFrame operations |
+| `03_matplotlib_seaborn_viz` | `visualization` | Static visualizations |
+| `04_plotly_interactive` | `visualization` | Interactive charts |
+| `05_bokeh_holoviews` | `visualization` | Bokeh and HoloViews |
+| `06_geospatial` | `geospatial` | Maps with Cartopy, GeoPandas, Folium |
+| `07_timeseries_analysis` | `timeseries` | Time series, ARIMA, forecasting |
+| `08_data_io_serialization` | `dataio` | JSON, XML, Parquet, HDF5 |
+| `09_machine_learning` | `ml` | Classification, regression |
+| `10_deep_learning_pytorch` | `deeplearn` | PyTorch neural networks |
+| `11_deep_learning_tensorflow` | `deeplearn` | TensorFlow and Keras |
+| `12_image_processing` | `vision` | PIL, OpenCV, scikit-image |
+| `13_object_detection_yolo` | `vision` | YOLO26 object detection |
+| `14_nlp_text_analysis` | `nlp` | spaCy, NLTK, sentence-transformers |
+| `15_audio_analysis` | `audio` | librosa, torchaudio features |
+| `16_altair_panel_viz` | `visualization` | Altair, hvPlot, Panel dashboards |
+| `17_scipy_signal_processing` | `scientific` | FFT, filters, spectrograms |
+| `18_sqlalchemy_database` | `dataio` | SQLAlchemy ORM, Parquet, HDF5 |
+| `19_speech_processing` | `speech` | Whisper ASR, gTTS, torchaudio |
+| `20_face_analysis` | `face` | dlib, DeepFace, face-alignment |
+| `21_polars_duckdb_xarray` | `scientific` | polars, DuckDB, Arrow, xarray, pint |
+| `22_plotnine_tables_datashader` | `visualization` | plotnine, great-tables, itables, datashader, vl-convert |
+| `23_modern_data_formats` | `dataio` | Delta Lake, Excel, SPSS, zarr, netCDF, connectorx |
+| `24_ml_explain_and_uncertainty` | `ml` | CatBoost, SHAP, MAPIE, UMAP, skrub, skops, skl2onnx |
+| `25_lightning_onnx` | `deeplearn` | Lightning, torchmetrics, Accelerate, einops, ONNX |
+| `26_vision_backbones_kornia` | `vision` | timm, kornia, supervision, OpenCLIP |
+| `27_audio_effects_loudness` | `audio` | pedalboard, pyloudnorm, noisereduce, parselmouth |
+| `28_geospatial_raster_h3` | `geospatial` | rasterio, rioxarray, H3, mapclassify, OSMnx, lonboard |
+| `29_forecasting_toolkit` | `timeseries` | statsforecast, mlforecast, skforecast, arch, tslearn |
+| `30_nlp_toolkit` | `nlp` | rapidfuzz, lingua, datasets, PEFT, KeyBERT, SentencePiece |
+| `31_speech_metrics_vad` | `speech` | jiwer, silero-vad, parselmouth |
+| `32_dataframe_engines` | `dataio` | One query in pandas, Polars, DuckDB, and Ibis; ADBC |
+| `33_lorenz_numba_dask` | `scientific` | Lorenz attractor with SymPy, Numba, FFT, and Dask |
 
 ## Choosing the Right Target
 

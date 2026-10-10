@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate per-target pyproject.toml and verify_imports.py from targets/matrix.toml.
+"""Generate per-target pyproject.toml, verify_imports.py, and examples.txt from targets/matrix.toml.
 
 The matrix is the single source of truth for which package (at which version)
 belongs to which Docker target. This script materializes it into the files the
@@ -44,6 +44,12 @@ GENERATED_HEADER_TOML = """\
 # Source of truth: targets/matrix.toml
 # Regenerate with:  python3 scripts/gen_targets.py
 # -----------------------------------------------------------------------------
+"""
+
+GENERATED_HEADER_TXT = """\
+# GENERATED FILE — do not edit by hand.
+# Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py).
+# Examples copied into this target's image: its own and its ancestors', one per line.
 """
 
 GENERATED_HEADER_PY = '''\
@@ -123,6 +129,8 @@ def load_matrix(root: Path) -> dict:
             errors.append(f"package {pkg}: extras must be a list of extra names, got {extras!r}")
     errors += validate_exclude_newer(matrix)
     errors += validate_python_versions(matrix)
+    examples_dir = root / 'examples'
+    errors += validate_examples(matrix, example_stems(examples_dir) if examples_dir.is_dir() else None)
     if errors:
         raise SystemExit("matrix.toml is invalid:\n  " + "\n  ".join(errors))
     return matrix
@@ -162,6 +170,35 @@ def validate_python_versions(matrix: dict) -> list[str]:
         outside = [v for v in own if v not in python_versions(parent, matrix)]
         if outside:
             errors.append(f"target {name}: python {outside} not built by its parent {parent}")
+    return errors
+
+
+def example_stems(examples_dir: Path) -> list[str]:
+    """Names (without .py) of the example scripts, which follow the NN_name.py pattern."""
+    return sorted(path.stem for path in examples_dir.glob('[0-9][0-9]_*.py'))
+
+
+def validate_examples(matrix: dict, available: list[str] | None) -> list[str]:
+    """Check target `examples` lists; return error messages.
+
+    Rules: each list holds example names; an example belongs to one target only;
+    and, when the examples directory is known (`available`), every listed example
+    exists and every example script is listed by some target.
+    """
+    errors = []
+    owners: dict[str, list[str]] = {}
+    for name, target in matrix['targets'].items():
+        examples = target.get('examples', [])
+        if not (isinstance(examples, list) and all(isinstance(e, str) and e for e in examples)):
+            errors.append(f"target {name}: examples must be a list of example names, got {examples!r}")
+            continue
+        for stem in examples:
+            owners.setdefault(stem, []).append(name)
+    errors += [f"example {stem}: listed by several targets ({', '.join(names)})"
+               for stem, names in owners.items() if len(names) > 1]
+    if available is not None:
+        errors += [f"example {stem}: examples/{stem}.py does not exist" for stem in owners if stem not in available]
+        errors += [f"example {stem}: not listed in any target's examples" for stem in available if stem not in owners]
     return errors
 
 
@@ -364,6 +401,18 @@ def render_pyproject(target: str, matrix: dict) -> str:
     return '\n'.join(lines) + '\n'
 
 
+def target_examples(target: str, matrix: dict) -> list[str]:
+    """Examples a target's image ships: its own and its ancestors' (every example for full)."""
+    targets = matrix['targets']
+    chain = target_order(targets) if target == 'full' else lineage(target, targets)
+    return sorted(stem for t in chain for stem in targets[t].get('examples', []))
+
+
+def render_examples(target: str, matrix: dict) -> str:
+    """Render targets/<target>/examples.txt, the list the Dockerfile copies examples from."""
+    return GENERATED_HEADER_TXT + ''.join(f'{stem}\n' for stem in target_examples(target, matrix))
+
+
 def render_verify(target: str, matrix: dict) -> str:
     """Render the verify_imports.py content for one target."""
     targets = matrix['targets']
@@ -400,6 +449,7 @@ def generate(root: Path, check: bool) -> int:
         for filename, content in (
             ('pyproject.toml', render_pyproject(target, matrix)),
             ('verify_imports.py', render_verify(target, matrix)),
+            ('examples.txt', render_examples(target, matrix)),
         ):
             path = root / 'targets' / target / filename
             current = path.read_text() if path.exists() else None

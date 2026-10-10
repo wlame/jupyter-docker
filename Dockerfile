@@ -107,10 +107,15 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Copy examples, tests, and the model-baking script (used by specialized stages)
-COPY --chown=jupyter:jupyter examples/ /home/jupyter/examples/
+# Copy tests and the build-time helpers every stage uses: model baking and example
+# selection (each stage ships only its own and its ancestors' examples).
 COPY --chown=jupyter:jupyter tests/ /home/jupyter/tests/
-COPY --chown=jupyter:jupyter scripts/bake_models.sh /home/jupyter/scripts/bake_models.sh
+COPY --chown=jupyter:jupyter scripts/bake_models.sh scripts/select_examples.sh /home/jupyter/scripts/
+
+# Ship this target's examples: its own and its ancestors' (targets/base/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/base/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
 
 # Configure Jupyter.
 # No token/password lines: jupyter-server generates a random token per start
@@ -149,6 +154,11 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
+# Ship this target's examples: its own and its ancestors' (targets/scientific/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/scientific/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+
 
 # =============================================================================
 # VISUALIZATION: Charts and dashboards (inherits from base)
@@ -172,6 +182,11 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
+# Ship this target's examples: its own and its ancestors' (targets/visualization/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/visualization/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+
 
 # =============================================================================
 # DATAIO: Data formats and databases (inherits from base)
@@ -194,6 +209,11 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
+# Ship this target's examples: its own and its ancestors' (targets/dataio/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/dataio/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+
 
 # =============================================================================
 # ML: Classical machine learning (inherits from scientific)
@@ -208,6 +228,11 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
+# Ship this target's examples: its own and its ancestors' (targets/ml/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/ml/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+
 
 # =============================================================================
 # DEEPLEARN: Neural networks (inherits from ml)
@@ -221,6 +246,11 @@ COPY --chown=jupyter:jupyter targets/deeplearn/verify_imports.py /home/jupyter/s
 USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
+
+# Ship this target's examples: its own and its ancestors' (targets/deeplearn/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/deeplearn/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
 
 
 # =============================================================================
@@ -253,6 +283,11 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 # Pre-bake model weights so example tests run offline (see scripts/bake_models.sh)
 RUN bash /home/jupyter/scripts/bake_models.sh vision
 
+# Ship this target's examples: its own and its ancestors' (targets/vision/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/vision/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+
 
 # =============================================================================
 # AUDIO: Audio processing (inherits from base, needs torch)
@@ -279,6 +314,11 @@ COPY --chown=jupyter:jupyter targets/audio/verify_imports.py /home/jupyter/scrip
 USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
+
+# Ship this target's examples: its own and its ancestors' (targets/audio/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/audio/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
 
 
 # =============================================================================
@@ -308,6 +348,11 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
+# Ship this target's examples: its own and its ancestors' (targets/geospatial/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/geospatial/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+
 
 # =============================================================================
 # TIMESERIES: Time series analysis (inherits from scientific)
@@ -321,6 +366,11 @@ COPY --chown=jupyter:jupyter targets/timeseries/verify_imports.py /home/jupyter/
 USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
+
+# Ship this target's examples: its own and its ancestors' (targets/timeseries/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/timeseries/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
 
 
 # =============================================================================
@@ -347,6 +397,11 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 
 # Pre-bake model weights so example tests run offline (see scripts/bake_models.sh)
 RUN bash /home/jupyter/scripts/bake_models.sh nlp
+
+# Ship this target's examples: its own and its ancestors' (targets/nlp/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/nlp/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
 
 
 # =============================================================================
@@ -376,6 +431,11 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 
 # Pre-bake model weights so example tests run offline (see scripts/bake_models.sh)
 RUN bash /home/jupyter/scripts/bake_models.sh speech
+
+# Ship this target's examples: its own and its ancestors' (targets/speech/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/speech/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
 
 
 # =============================================================================
@@ -443,6 +503,11 @@ USER 1000:1000
 # attribute models are intentionally NOT baked (~1.5 GB, reliably hosted, and
 # the example already skips them offline). See scripts/bake_models.sh.
 RUN bash /home/jupyter/scripts/bake_models.sh face
+
+# Ship this target's examples: its own and its ancestors' (targets/face/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/face/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
 
 
 # =============================================================================
@@ -543,3 +608,8 @@ COPY --from=full-builder --chown=jupyter:jupyter /home/jupyter/.venv /home/jupyt
 USER 1000:1000
 # Pre-bake every target's model weights so example tests run offline
 RUN bash /home/jupyter/scripts/bake_models.sh full
+
+# Ship this target's examples: its own and its ancestors' (targets/full/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/full/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt

@@ -1,0 +1,7 @@
+# GENERATED FILE — do not edit by hand.
+# Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py).
+# Examples copied into this target's image: its own and its ancestors', one per line.
+08_data_io_serialization
+18_sqlalchemy_database
+23_modern_data_formats
+32_dataframe_engines

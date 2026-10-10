@@ -1,0 +1,13 @@
+# GENERATED FILE — do not edit by hand.
+# Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py).
+# Examples copied into this target's image: its own and its ancestors', one per line.
+01_numpy_scipy_basics
+02_pandas_data_analysis
+09_machine_learning
+10_deep_learning_pytorch
+11_deep_learning_tensorflow
+17_scipy_signal_processing
+21_polars_duckdb_xarray
+24_ml_explain_and_uncertainty
+25_lightning_onnx
+33_lorenz_numba_dask

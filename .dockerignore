@@ -137,6 +137,8 @@ coverage.xml
 # -----------------------------------------------------------------------------
 notebooks/
 data/
+# Example outputs written by local runs (images copy only the example sources)
+examples/output/
 
 # -----------------------------------------------------------------------------
 # Secrets and Environment

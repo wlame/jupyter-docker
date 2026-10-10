@@ -1,0 +1,36 @@
+# GENERATED FILE — do not edit by hand.
+# Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py).
+# Examples copied into this target's image: its own and its ancestors', one per line.
+01_numpy_scipy_basics
+02_pandas_data_analysis
+03_matplotlib_seaborn_viz
+04_plotly_interactive
+05_bokeh_holoviews
+06_geospatial
+07_timeseries_analysis
+08_data_io_serialization
+09_machine_learning
+10_deep_learning_pytorch
+11_deep_learning_tensorflow
+12_image_processing
+13_object_detection_yolo
+14_nlp_text_analysis
+15_audio_analysis
+16_altair_panel_viz
+17_scipy_signal_processing
+18_sqlalchemy_database
+19_speech_processing
+20_face_analysis
+21_polars_duckdb_xarray
+22_plotnine_tables_datashader
+23_modern_data_formats
+24_ml_explain_and_uncertainty
+25_lightning_onnx
+26_vision_backbones_kornia
+27_audio_effects_loudness
+28_geospatial_raster_h3
+29_forecasting_toolkit
+30_nlp_toolkit
+31_speech_metrics_vad
+32_dataframe_engines
+33_lorenz_numba_dask

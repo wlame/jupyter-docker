@@ -74,7 +74,7 @@ nb-check:
 lint:
     uvx ruff@{{ruff_version}} check scripts/ tests/
     @if command -v shellcheck >/dev/null; then \
-        shellcheck build-all.sh scripts/bake_models.sh; \
+        shellcheck build-all.sh scripts/bake_models.sh scripts/select_examples.sh; \
     else \
         echo "shellcheck not installed — skipped (CI enforces it)"; \
     fi
