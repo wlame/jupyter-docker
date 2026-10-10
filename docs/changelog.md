@@ -22,6 +22,19 @@ To review what changed, browse the commit history on GitHub:
 
 ## Notable changes
 
+### October 2026 — four new images and per-image examples
+
+- New images: `optimization` (OR-Tools, CVXPY, Pyomo, PuLP), `jax` (JAX, Optax,
+  Flax NNX, Equinox, NumPyro), `probabilistic` (PyMC, nutpie, ArviZ, Bambi, PreliZ;
+  built on `jax`), and `genai` (TRL, FAISS, bm25s, diffusers, the `openai` and
+  `anthropic` clients, and a baked SmolLM2-135M; built on `nlp`), each with an
+  example (34–37). `full` includes all of them.
+- Each image now ships only the examples its libraries can run: its own and its
+  parents' (`full` still ships all). The matrix records which target owns each
+  example.
+- `full` now holds protobuf 6.33 (OR-Tools caps it) and numba 0.67 (PyTensor caps
+  it), and leaves out highspy, which cannot share a process with OR-Tools.
+
 ### October 2026 — data engines, Dask, and YOLO26
 
 - `dataio` adds Ibis (with its DuckDB backend) and ADBC drivers for SQLite and
