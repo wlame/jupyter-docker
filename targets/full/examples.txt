@@ -37,3 +37,4 @@
 34_optimization
 35_jax_jit_autodiff
 36_bayesian_modeling
+37_retrieval_and_generation

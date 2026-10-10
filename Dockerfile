@@ -18,6 +18,7 @@
 #   docker build --target jax -t ds-jax .
 #   docker build --target probabilistic -t ds-probabilistic .
 #   docker build --target nlp -t ds-nlp .
+#   docker build --target genai -t ds-genai .
 #   docker build --target speech -t ds-speech .
 #   docker build --target face -t ds-face .
 #   docker build --target full -t ds-full .
@@ -469,6 +470,29 @@ RUN bash /home/jupyter/scripts/bake_models.sh nlp
 # Ship this target's examples: its own and its ancestors' (targets/nlp/examples.txt).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
     --mount=type=bind,source=targets/nlp/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+
+
+# =============================================================================
+# GENAI: Retrieval, fine-tuning, diffusion, LLM clients (inherits from nlp)
+# =============================================================================
+FROM nlp AS genai
+LABEL org.opencontainers.image.description="ds-genai: Generative AI: retrieval, fine-tuning, diffusion, and LLM API clients"
+
+COPY --chown=jupyter:jupyter targets/genai/pyproject.toml targets/genai/uv.lock /home/jupyter/
+COPY --chown=jupyter:jupyter targets/genai/verify_imports.py /home/jupyter/scripts/verify_genai.py
+
+USER 1000:1000
+RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
+    uv sync --locked --no-install-project
+
+# Pre-bake the small language model for the RAG example (the nlp stage already
+# baked MiniLM and NLTK data; see scripts/bake_models.sh)
+RUN bash /home/jupyter/scripts/bake_models.sh genai
+
+# Ship this target's examples: its own and its ancestors' (targets/genai/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/genai/examples.txt,target=/tmp/examples.txt \
     bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
 
 

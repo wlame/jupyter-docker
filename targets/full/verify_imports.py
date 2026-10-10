@@ -205,6 +205,13 @@ IMPORTS = [
     ("tiktoken", "tiktoken"),
     ("tokenizers", "tokenizers"),
     ("transformers", "transformers"),
+    # --- genai ---
+    ("anthropic", "anthropic"),
+    ("bm25s", "bm25s"),
+    ("diffusers", "diffusers"),
+    ("faiss", "faiss-cpu"),
+    ("openai", "openai"),
+    ("trl", "trl"),
     # --- speech ---
     ("TTS", "coqui-tts"),
     ("faster_whisper", "faster-whisper"),
@@ -218,7 +225,6 @@ IMPORTS = [
     ("speech_recognition", "speechrecognition"),
     # --- face ---
     ("deepface", "deepface"),
-    ("diffusers", "diffusers"),
     ("dlib", "dlib"),
     ("face_alignment", "face-alignment"),
     ("insightface", "insightface"),

@@ -10,7 +10,7 @@
 # the library-managed caches (NLTK, HuggingFace, Whisper, torch hub) rely on
 # each library's own integrity checks.
 #
-# Usage: bake_models.sh <target>     # vision | nlp | speech | face | full
+# Usage: bake_models.sh <target>     # vision | nlp | genai | speech | face | full
 # =============================================================================
 set -euo pipefail
 
@@ -41,6 +41,16 @@ bake_nlp() {
     py -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
 }
 
+# A small instruction-tuned language model for the RAG example (Apache-2.0,
+# about 270 MB). Pinned to a revision; example 37 loads the same one.
+SMOLLM_REPO="HuggingFaceTB/SmolLM2-135M-Instruct"
+SMOLLM_REVISION="12fd25f77366fa6b3b4b768ec3050bf629380bac"
+
+bake_genai() {
+    echo "→ ${SMOLLM_REPO} (weights, config, tokenizer)"
+    py -c "from huggingface_hub import snapshot_download; snapshot_download('${SMOLLM_REPO}', revision='${SMOLLM_REVISION}', allow_patterns=['*.json', 'model.safetensors', 'merges.txt'], ignore_patterns=['onnx/*'])"
+}
+
 bake_speech() {
     echo "→ Whisper tiny"
     py -c "import whisper; whisper.load_model('tiny')"
@@ -51,13 +61,14 @@ bake_face() {
     py -c "import face_alignment; face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, device='cpu')"
 }
 
-target="${1:?usage: bake_models.sh <vision|nlp|speech|face|full>}"
+target="${1:?usage: bake_models.sh <vision|nlp|genai|speech|face|full>}"
 case "${target}" in
     vision) bake_vision ;;
     nlp)    bake_nlp ;;
+    genai)  bake_genai ;;
     speech) bake_speech ;;
     face)   bake_face ;;
-    full)   bake_vision; bake_nlp; bake_speech; bake_face ;;
+    full)   bake_vision; bake_nlp; bake_genai; bake_speech; bake_face ;;
     *)      echo "no models to bake for target: ${target}"; exit 0 ;;
 esac
 echo "✓ model baking complete for ${target}"

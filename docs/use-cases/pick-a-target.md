@@ -37,6 +37,7 @@ Map the work you're doing to a target, then pull it:
 | JAX, autodiff, differentiable programming | `jax` | `docker pull ghcr.io/wlame/jupyter-docker:jax` |
 | Bayesian statistics (PyMC) | `probabilistic` | `docker pull ghcr.io/wlame/jupyter-docker:probabilistic` |
 | Text / NLP work | `nlp` | `docker pull ghcr.io/wlame/jupyter-docker:nlp` |
+| RAG, fine-tuning LLMs, LLM API clients | `genai` | `docker pull ghcr.io/wlame/jupyter-docker:genai` |
 | Speech recognition / synthesis | `speech` | `docker pull ghcr.io/wlame/jupyter-docker:speech` |
 | Face detection / recognition | `face` | `docker pull ghcr.io/wlame/jupyter-docker:face` |
 | Need everything | `full` | `docker pull ghcr.io/wlame/jupyter-docker:full` |
@@ -72,6 +73,7 @@ base
 ├── vision
 ├── audio
 ├── nlp
+│   └── genai
 ├── speech
 └── face
 
@@ -105,6 +107,7 @@ Deeper and broader targets are larger. Approximate **compressed download** sizes
 | `jax` | not yet measured | scientific |
 | `probabilistic` | not yet measured | jax |
 | `nlp` | ~3.4 GB | base |
+| `genai` | not yet measured | nlp |
 | `speech` | ~3.7 GB | base |
 | `face` | ~4.1 GB | base |
 | `full` | ~5.3 GB | standalone |

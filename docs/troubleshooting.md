@@ -170,6 +170,21 @@ Emulated amd64 builds are slower but match what CI publishes.
 
 ---
 
+### FAISS and PyTorch crash together in a local macOS venv
+
+**Symptom**: in a local `uv sync` of `genai` (or `full`) on macOS, a script that
+uses FAISS and then PyTorch aborts with `OMP: Error #15: Initializing
+libomp.dylib, but found libomp.dylib already initialized`, or segfaults.
+
+**Cause**: on macOS, the `faiss-cpu` and `torch` wheels each bundle their own LLVM
+OpenMP runtime, and two copies cannot run in one process. The Linux wheels the
+images use do not have this conflict, so example 37 runs fine in the image.
+
+**Fix**: run that work in the image. `KMP_DUPLICATE_LIB_OK=TRUE` only silences the
+check, and the process can still crash.
+
+---
+
 ### Build fails on `--mount=type=cache` (BuildKit not enabled)
 
 **Symptom**: `docker build` errors on the Dockerfile's cache-mount syntax, or the

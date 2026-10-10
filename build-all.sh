@@ -35,6 +35,7 @@ ALL_TARGETS=(
     "jax"
     "probabilistic"
     "nlp"
+    "genai"
     "speech"
     "face"
     "full"

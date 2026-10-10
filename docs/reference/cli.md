@@ -100,6 +100,7 @@ target is given, all targets are built and tested** in dependency order.
     jax
     probabilistic
     nlp
+    genai
     speech
     face
     full
@@ -197,8 +198,9 @@ The single positional argument selects which weights to download:
 | `vision` | YOLO26n weights (`yolo26n.pt`) into `~/.cache/ultralytics/`, verified against a pinned SHA-256 |
 | `nlp` | NLTK resources (punkt, stopwords, wordnet, taggers, …) into `~/nltk_data`, plus the `all-MiniLM-L6-v2` sentence-transformers model |
 | `speech` | Whisper `tiny` model |
+| `genai` | SmolLM2-135M-Instruct at a pinned revision (the image also inherits the `nlp` models) |
 | `face` | face-alignment detector + landmark nets (s3fd, 2DFAN) |
-| `full` | Everything above — runs the `vision`, `nlp`, `speech`, and `face` bakes in sequence |
+| `full` | Everything above — runs the `vision`, `nlp`, `genai`, `speech`, and `face` bakes in sequence |
 
 Any other target value is accepted and simply prints `no models to bake for target:
 <target>` and exits `0`.

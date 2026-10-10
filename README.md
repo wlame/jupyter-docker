@@ -70,6 +70,7 @@ Access Jupyter Lab at: **http://localhost:8888**
 | `jax` | not yet measured | JAX, Optax, Flax, Equinox, NumPyro | scientific |
 | `probabilistic` | not yet measured | PyMC, nutpie, ArviZ, Bambi | jax |
 | `nlp` | ~4GB | spaCy, Transformers, NLTK | base |
+| `genai` | not yet measured | TRL, FAISS, bm25s, diffusers, LLM clients | nlp |
 | `speech` | ~4GB | Whisper, gTTS, SpeechBrain | base |
 | `face` | ~7GB | DeepFace, dlib, face-alignment | base |
 | `full` | ~14GB | Everything combined | standalone |
@@ -91,6 +92,7 @@ base
 ├── vision
 ├── audio
 ├── nlp
+│   └── genai
 ├── speech
 └── face
 
@@ -347,6 +349,17 @@ Text processing and language models.
 | tiktoken, SentencePiece | OpenAI tokenizers, subword tokenizer training |
 | BERTopic, KeyBERT | Topic modelling, keyword extraction |
 
+### GenAI (Retrieval and Fine-Tuning)
+
+Retrieval-augmented generation, fine-tuning, and LLM clients on top of NLP.
+
+| Library | Description |
+|---------|-------------|
+| TRL | Supervised fine-tuning, DPO, GRPO |
+| FAISS, bm25s | Vector search, keyword search |
+| diffusers | Diffusion models |
+| openai, anthropic | Clients for hosted APIs and local OpenAI-compatible servers |
+
 ### Speech (Speech Recognition & TTS)
 
 Speech-to-text and text-to-speech.
@@ -493,6 +506,7 @@ examples), and `full` ships all of them:
 | `34_optimization` | `optimization` | Assignment, OR-Tools routing, CVXPY portfolios, Pyomo MILP |
 | `35_jax_jit_autodiff` | `jax` | jit Mandelbrot, grad, Optax, Flax NNX and Equinox |
 | `36_bayesian_modeling` | `probabilistic` | PreliZ prior, three NUTS samplers, eight schools, Bambi |
+| `37_retrieval_and_generation` | `genai` | BM25 vs embeddings vs hybrid search, RAG with SmolLM2, TRL |
 
 ## Choosing the Right Target
 
@@ -510,6 +524,7 @@ examples), and `full` ships all of them:
 | JAX, autodiff, differentiable programming | `jax` |
 | Bayesian statistics (PyMC) | `probabilistic` |
 | Text/NLP work | `nlp` |
+| RAG, fine-tuning LLMs, LLM API clients | `genai` |
 | Speech recognition/synthesis | `speech` |
 | Face detection/recognition | `face` |
 | Need everything | `full` |

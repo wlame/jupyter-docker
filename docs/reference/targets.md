@@ -60,6 +60,7 @@ docker pull ghcr.io/wlame/jupyter-docker:scientific-py3.14-a1b2c3d
 | `jax` | `scientific` | 3.14, 3.13 | not yet measured | JIT, autodiff, and neural networks with JAX |
 | `probabilistic` | `jax` | 3.14, 3.13 | not yet measured | Bayesian statistics and probabilistic programming |
 | `nlp` | `base` | 3.14, 3.13 | ~3390 MB | Natural language processing |
+| `genai` | `nlp` | 3.14, 3.13 | not yet measured | Retrieval, fine-tuning, diffusion, LLM clients |
 | `speech` | `base` | 3.14, 3.13 | ~3680 MB | Speech recognition and text-to-speech |
 | `face` | `base` | 3.13 | ~4130 MB | Face detection, recognition, and analysis |
 | `full` | — (root, union) | 3.13 | ~5260 MB | Everything combined |
@@ -280,6 +281,23 @@ and libgfortran.
 !!! note "Pre-baked weights"
     NLTK corpora and the MiniLM sentence-embedding model are baked in so the NLP
     example runs offline.
+
+## genai
+
+**Inherits from:** `nlp`
+
+Generative AI: retrieval, fine-tuning, diffusion, and LLM API clients.
+
+**Adds:** TRL (supervised fine-tuning, DPO, GRPO on top of the inherited
+transformers, PEFT, and datasets), FAISS (vector search, CPU build), bm25s
+(keyword search), diffusers, and the `openai` and `anthropic` clients. The
+clients talk to hosted APIs or to any local OpenAI-compatible server (vLLM,
+Ollama, LM Studio) through `base_url`; API keys come from the environment.
+
+!!! note "Pre-baked weights"
+    SmolLM2-135M-Instruct (Apache-2.0, about 270 MB, pinned revision) is baked in
+    for the retrieval-augmented generation example, next to the MiniLM and NLTK
+    data inherited from `nlp`.
 
 ## speech
 

@@ -62,6 +62,7 @@ flowchart TD
     base --> vision[vision]
     base --> audio[audio]
     base --> nlp[nlp]
+    nlp --> genai[genai]
     base --> speech[speech]
     base --> face[face]
     base --> full[full]
@@ -82,6 +83,8 @@ The chains that matter:
   the NumPy/SciPy/Pandas core.
 - `scientific` → `jax` → `probabilistic` — JAX first, then PyMC, which can sample
   through JAX (NumPyro).
+- `nlp` → `genai` — retrieval, fine-tuning, and LLM clients on top of the
+  transformers stack.
 - `base` → `visualization`, `dataio`, `vision`, `audio`, `nlp`, `speech`, `face` —
   siblings that each inherit only the common utilities.
 - `full` is `FROM base` but installs the **union** of every target's packages and

@@ -491,6 +491,23 @@ def test_example_30_nlp_toolkit():
 
 
 # =============================================================================
+# GENAI target — bm25s, FAISS, SmolLM2 (baked), TRL, OpenAI-compatible clients
+# =============================================================================
+
+@pytest.mark.genai
+def test_example_37_retrieval_and_generation():
+    """BM25 vs MiniLM+FAISS vs hybrid retrieval, RAG answer with SmolLM2, TRL LoRA steps."""
+    run_example(
+        '37_retrieval_and_generation.py',
+        expected_outputs=[
+            'genai_answer.txt',
+            'genai_results.json',
+        ],
+        timeout=600,
+    )
+
+
+# =============================================================================
 # SPEECH target — whisper, gTTS, torchaudio, SpeechRecognition, jiwer, silero-vad
 # =============================================================================
 
