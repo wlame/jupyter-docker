@@ -323,3 +323,41 @@ def test_verify_script_imports_torch_family_before_everything_else(target):
     flags = [m in VERIFY_FIRST_MODULES for m in modules]
 
     assert flags == sorted(flags, reverse=True), f"{target}: a non-torch module loads before the torch family"
+
+
+def test_package_exclude_newer_becomes_a_uv_exception(python_matrix_root: Path):
+    matrix = python_matrix_root / 'targets' / 'matrix.toml'
+    matrix.write_text(matrix.read_text() + """
+[packages."fresh-fix"]
+version = "1.0"
+module = "fresh_fix"
+introduced-by = ["narrow"]
+exclude-newer = "2026-02-01T00:00:00Z"
+""")
+
+    result = run_gen(root=python_matrix_root)
+    narrow = tomllib.loads((python_matrix_root / 'targets' / 'narrow' / 'pyproject.toml').read_text())
+    base = tomllib.loads((python_matrix_root / 'targets' / 'base' / 'pyproject.toml').read_text())
+
+    assert result.returncode == 0, result.stderr
+    assert narrow['tool']['uv']['exclude-newer-package'] == {'fresh-fix': '2026-02-01T00:00:00Z'}
+    assert 'exclude-newer-package' not in base['tool']['uv']
+
+
+@pytest.mark.parametrize(
+    'old,new',
+    [
+        ('exclude-newer = "2026-01-01T00:00:00Z"', 'exclude-newer = "2026-01-01"'),
+        ('[packages]\n', '[packages."fresh-fix"]\nversion = "1.0"\nmodule = "fresh_fix"\nintroduced-by = ["base"]\nexclude-newer = "2026-02-01"\n'),
+    ],
+    ids=['settings-bare-date', 'package-bare-date'],
+)
+def test_exclude_newer_must_be_a_utc_timestamp(python_matrix_root: Path, old, new):
+    matrix = python_matrix_root / 'targets' / 'matrix.toml'
+    assert old in matrix.read_text()
+    matrix.write_text(matrix.read_text().replace(old, new))
+
+    result = run_gen('--python-matrix', root=python_matrix_root)
+
+    assert result.returncode != 0
+    assert 'not a UTC timestamp' in result.stderr

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import tomllib
 from pathlib import Path
@@ -24,6 +25,10 @@ from pathlib import Path
 # uv must find wheels (or a source build) for every listed Python on this platform,
 # the one the published images run on.
 IMAGE_PLATFORM_MARKER = "sys_platform == 'linux' and platform_machine == 'x86_64'"
+
+# exclude-newer values must be full UTC timestamps: uv reads a bare date in the
+# machine's local timezone, which makes lockfiles differ between machines.
+UTC_TIMESTAMP = re.compile(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z')
 
 # Platforms each lockfile resolves for: Linux (the images) and Apple-silicon macOS
 # (local `uv sync` for development). Resolving for every platform lets caps that
@@ -113,10 +118,20 @@ def load_matrix(root: Path) -> dict:
         for t in spec.get('overrides', {}):
             if t not in targets:
                 errors.append(f"package {pkg}: unknown target {t!r} in overrides")
+    errors += validate_exclude_newer(matrix)
     errors += validate_python_versions(matrix)
     if errors:
         raise SystemExit("matrix.toml is invalid:\n  " + "\n  ".join(errors))
     return matrix
+
+
+def validate_exclude_newer(matrix: dict) -> list[str]:
+    """Check that the global and per-package exclude-newer values are UTC timestamps."""
+    values = [('[settings] exclude-newer', matrix['settings'].get('exclude-newer'))]
+    values += [(f'package {name}: exclude-newer', spec['exclude-newer'])
+               for name, spec in matrix['packages'].items() if 'exclude-newer' in spec]
+    return [f"{where}: {value!r} is not a UTC timestamp like 2026-10-01T00:00:00Z"
+            for where, value in values if not (isinstance(value, str) and UTC_TIMESTAMP.fullmatch(value))]
 
 
 def validate_python_versions(matrix: dict) -> list[str]:
@@ -222,6 +237,7 @@ def materialize(target: str, matrix: dict) -> dict[str, dict]:
             'module': spec['module'],
             'group': group or introducers[0],
             'source-url': spec.get('source-url'),
+            'exclude-newer': spec.get('exclude-newer'),
             'verify-first': spec.get('verify-first', False),
         }
     return result
@@ -259,6 +275,16 @@ def grouped(mat: dict[str, dict], chain: list[str]) -> list[tuple[str, list[str]
     ]
 
 
+def exclude_newer_exceptions(mat: dict[str, dict]) -> list[str]:
+    """pyproject lines letting specific packages past the global exclude-newer cutoff."""
+    exceptions = {pkg: spec['exclude-newer'] for pkg, spec in mat.items() if spec.get('exclude-newer')}
+    if not exceptions:
+        return []
+    table = ', '.join(f'{pkg} = "{stamp}"' for pkg, stamp in sorted(exceptions.items()))
+    return ['# Per-package exceptions (see their exclude-newer comments in targets/matrix.toml)',
+            f'exclude-newer-package = {{ {table} }}']
+
+
 def render_pyproject(target: str, matrix: dict) -> str:
     """Render the pyproject.toml content for one target."""
     targets = matrix['targets']
@@ -288,6 +314,7 @@ def render_pyproject(target: str, matrix: dict) -> str:
         '[tool.uv]',
         '# Supply-chain guard: never resolve packages published after this date',
         f'exclude-newer = "{settings["exclude-newer"]}"',
+        *exclude_newer_exceptions(mat),
         '# Resolve only for the platforms this project runs on',
         'environments = [',
         *(f'    "{marker}",' for marker in LOCK_ENVIRONMENTS),
