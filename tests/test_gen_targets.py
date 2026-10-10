@@ -40,7 +40,7 @@ def dependency_names(target: str, root: Path = REPO_ROOT) -> set[str]:
     """Package names declared in a target's generated pyproject.toml."""
     with open(root / 'targets' / target / 'pyproject.toml', 'rb') as f:
         data = tomllib.load(f)
-    return {re.split(r'==', dep)[0] for dep in data['project']['dependencies']}
+    return {re.split(r'\[|==', dep)[0] for dep in data['project']['dependencies']}
 
 
 def verified_packages(target: str, root: Path = REPO_ROOT) -> set[str]:
@@ -342,6 +342,41 @@ exclude-newer = "2026-02-01T00:00:00Z"
     assert result.returncode == 0, result.stderr
     assert narrow['tool']['uv']['exclude-newer-package'] == {'fresh-fix': '2026-02-01T00:00:00Z'}
     assert 'exclude-newer-package' not in base['tool']['uv']
+
+
+def test_package_extras_render_in_the_requirement(python_matrix_root: Path):
+    matrix = python_matrix_root / 'targets' / 'matrix.toml'
+    matrix.write_text(matrix.read_text() + """
+[packages."frame-lib"]
+version = "2.0"
+module = "frame_lib"
+introduced-by = ["base"]
+extras = ["sql", "arrow"]
+""")
+
+    result = run_gen(root=python_matrix_root)
+    base = tomllib.loads((python_matrix_root / 'targets' / 'base' / 'pyproject.toml').read_text())
+
+    assert result.returncode == 0, result.stderr
+    assert 'frame-lib[sql,arrow]==2.0' in base['project']['dependencies']
+    assert 'frame-lib' in verified_packages('base', root=python_matrix_root)
+
+
+@pytest.mark.parametrize('extras', ['"sql"', '[""]', '[1]'], ids=['string', 'empty-name', 'number'])
+def test_package_extras_must_be_a_list_of_names(python_matrix_root: Path, extras):
+    matrix = python_matrix_root / 'targets' / 'matrix.toml'
+    matrix.write_text(matrix.read_text() + f"""
+[packages."frame-lib"]
+version = "2.0"
+module = "frame_lib"
+introduced-by = ["base"]
+extras = {extras}
+""")
+
+    result = run_gen('--python-matrix', root=python_matrix_root)
+
+    assert result.returncode != 0
+    assert 'extras must be a list of extra names' in result.stderr
 
 
 @pytest.mark.parametrize(

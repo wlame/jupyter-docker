@@ -118,6 +118,9 @@ def load_matrix(root: Path) -> dict:
         for t in spec.get('overrides', {}):
             if t not in targets:
                 errors.append(f"package {pkg}: unknown target {t!r} in overrides")
+        extras = spec.get('extras', [])
+        if not (isinstance(extras, list) and all(isinstance(e, str) and e for e in extras)):
+            errors.append(f"package {pkg}: extras must be a list of extra names, got {extras!r}")
     errors += validate_exclude_newer(matrix)
     errors += validate_python_versions(matrix)
     if errors:
@@ -234,6 +237,7 @@ def materialize(target: str, matrix: dict) -> dict[str, dict]:
         version = spec.get('overrides', {}).get(target, spec.get('version'))
         result[pkg] = {
             'version': version,
+            'extras': spec.get('extras', []),
             'module': spec['module'],
             'group': group or introducers[0],
             'source-url': spec.get('source-url'),
@@ -285,6 +289,13 @@ def exclude_newer_exceptions(mat: dict[str, dict]) -> list[str]:
             f'exclude-newer-package = {{ {table} }}']
 
 
+def requirement(pkg: str, spec: dict) -> str:
+    """PEP 508 requirement for a materialized package: name, optional [extras], optional ==pin."""
+    extras = f"[{','.join(spec['extras'])}]" if spec['extras'] else ''
+    pin = f"=={spec['version']}" if spec['version'] else ''
+    return f'{pkg}{extras}{pin}'
+
+
 def render_pyproject(target: str, matrix: dict) -> str:
     """Render the pyproject.toml content for one target."""
     targets = matrix['targets']
@@ -305,9 +316,7 @@ def render_pyproject(target: str, matrix: dict) -> str:
     ]
     for group, pkgs in grouped(mat, chain):
         lines.append(f'    # --- {group} ---')
-        for pkg in pkgs:
-            version = mat[pkg]['version']
-            lines.append(f'    "{pkg}=={version}",' if version else f'    "{pkg}",')
+        lines += [f'    "{requirement(pkg, mat[pkg])}",' for pkg in pkgs]
     lines += [']', '']
 
     lines += [
