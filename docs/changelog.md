@@ -22,6 +22,21 @@ To review what changed, browse the commit history on GitHub:
 
 ## Notable changes
 
+### October 2026 — data engines, Dask, and YOLO26
+
+- `dataio` adds Ibis (with its DuckDB backend) and ADBC drivers for SQLite and
+  PostgreSQL. Example 32 answers one question in pandas, Polars, DuckDB, and Ibis
+  over the same Parquet file, checks that the answers agree, and times them.
+- `scientific` (and so `ml`, `deeplearn`, `geospatial`, `timeseries`) adds Numba
+  and Dask with distributed. The Dask dashboard opens through JupyterLab at
+  `/proxy/8787/status` (jupyter-server-proxy). Example 33 explores the Lorenz
+  attractor with SymPy, Numba, an FFT, and a Dask ensemble.
+- `ml` adds ONNX, onnxruntime, and skl2onnx (previously ONNX came only with
+  `deeplearn`); `visualization` adds itables; `nlp` adds SentencePiece; every image
+  adds rich and tenacity.
+- The `vision` image bakes YOLO26n weights instead of YOLOv8n, and example 13 uses them.
+- The matrix accepts `extras` on a package, rendered as `name[extra]==version`.
+
 ### October 2026 — images per Python version
 
 - **Breaking for moving-tag users:** the plain `:<target>` tag now points to
