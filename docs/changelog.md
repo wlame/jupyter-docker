@@ -32,6 +32,9 @@ To review what changed, browse the commit history on GitHub:
   `-<short-sha>`). See [Deployment & publishing](operations/deployment.md).
 - All dependencies were refreshed to the 2026-10-01 cutoff; scikit-learn is no longer
   held back in `timeseries` and `full`.
+- pedalboard is pinned to 0.9.26, ahead of the global cutoff through a per-package
+  `exclude-newer` exception: 0.9.25 crashed with an illegal instruction on some
+  x86_64 CPUs (images built before this fix may be affected).
 - The TensorFlow images (`deeplearn`, `face`, `full`) no longer install triton: it
   segfaults when TensorFlow is already loaded, which made `import umap` (and any
   TensorFlow-first import followed by torchvision) crash. torch.compile was not

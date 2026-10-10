@@ -739,9 +739,14 @@ module = "noisereduce"
 introduced-by = ["audio"]
 
 [packages."pedalboard"]
-version = "0.9.25"
+# pedalboard <= 0.9.25 Linux x86_64 wheels crash with an illegal instruction on
+# CPUs without the build machine's instructions; 0.9.26 targets the AVX baseline.
+# It is newer than [settings] exclude-newer, so it gets its own cutoff; drop this
+# line once the global cutoff passes 2026-10-08.
+version = "0.9.26"
 module = "pedalboard"
 introduced-by = ["audio"]
+exclude-newer = "2026-10-08T00:00:00Z"
 
 [packages."praat-parselmouth"]
 version = "0.4.7"

@@ -54,7 +54,7 @@ dependencies = [
     "noisereduce==3.0.3",
     "numba==0.68.0",
     "numpy==2.5.3",
-    "pedalboard==0.9.25",
+    "pedalboard==0.9.26",
     "praat-parselmouth==0.4.7",
     "pydub==0.25.1",
     "pyloudnorm==0.2.0",
@@ -64,6 +64,8 @@ dependencies = [
 [tool.uv]
 # Supply-chain guard: never resolve packages published after this date
 exclude-newer = "2026-10-01T00:00:00Z"
+# Per-package exceptions (see their exclude-newer comments in targets/matrix.toml)
+exclude-newer-package = { pedalboard = "2026-10-08T00:00:00Z" }
 # Resolve only for the platforms this project runs on
 environments = [
     "sys_platform == 'linux'",

@@ -30,8 +30,10 @@ any drift between them, the lockfiles, and the matrix.
 - `[settings] exclude-newer` blocks packages published after its date. A pin
   newer than that date fails to lock until you bump it, and a bump re-resolves
   all 14 lockfiles.
-- Keep `exclude-newer` a full UTC timestamp (`…T00:00:00Z`). uv reads a bare
-  date in the local timezone, so lockfiles would differ between machines and CI.
+- Keep `exclude-newer` a full UTC timestamp (`…T00:00:00Z`); the generator
+  rejects bare dates, which uv reads in the local timezone. A package may carry
+  its own later `exclude-newer` for an urgent fix, with a comment saying when to
+  drop it (currently pedalboard).
 - Images run `uv sync --locked` and never resolve at build time.
 - Every pyproject carries `required-environments` for each of its Python versions
   on linux x86_64, so a pin without a wheel for one of them fails `just lock`

@@ -85,6 +85,7 @@ One entry per dependency. The section name is the exact package name uv installs
 | `introduced-by` | List of targets that add the package. Every **descendant** of a listed target inherits it. `full` always gets every package regardless. | `["ml", "timeseries"]` |
 | `overrides` | Sub-table `[packages."<name>".overrides]` pinning a different version for specific targets. Remove an override once the constraint that forced it is gone. | `[packages."pandas".overrides]` |
 | `source-url` | Direct wheel URL rendered into `[tool.uv.sources]` instead of a version pin. Used for the spaCy model `en-core-web-sm`. | `"https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl"` |
+| `exclude-newer` | Optional per-package exception to `[settings] exclude-newer`: a later UTC timestamp for this package only, rendered as uv's `exclude-newer-package`. Use it sparingly — for a fix too new for the global cutoff — with a comment saying why and when to drop it. | `"2026-10-08T00:00:00Z"` |
 | `verify-first` | `true` for the torch family. Puts the package ahead of every other package in the verify scripts, so torch loads before anything that might load TensorFlow. | `true` |
 
 !!! warning "TensorFlow and triton in one process"
@@ -184,6 +185,7 @@ because a downstream library caps a dependency.
 | `diffusers` 0.39 in full | `diffusers` ≥ 0.40 needs `huggingface-hub` ≥ 1.23; `transformers` 4.57.6 needs `huggingface-hub` < 1.0. | `diffusers` override → `0.39.0` on `full`; `face` ships `0.40.0`. |
 | spaCy 3.8.14 in full | spaCy ≥ 3.8.15 needs `click` ≥ 8.2.1; `gtts` 2.5.4 needs `click` < 8.2. | `spacy` override → `3.8.14` on `full`; `nlp` ships `3.8.16`. |
 | `bokeh < 3.10` | `panel` 1.9.4 cap. | `bokeh` pinned to `3.9.2`. |
+| pedalboard newer than the cutoff | pedalboard ≤ 0.9.25 Linux x86_64 wheels crash with an illegal instruction on CPUs lacking the build machine's instructions; 0.9.26 (2026-10-07) fixes it. | `pedalboard` 0.9.26 with its own `exclude-newer = "2026-10-08T00:00:00Z"`; drop the exception once the global cutoff passes that date. |
 | `pandas < 3` in timeseries/full | `statsforecast`, `mlforecast`, and `skforecast` cap it. | `pandas` override → `2.3.3` on `timeseries` and `full`; every other target ships `3.0.6`. |
 | Cloud filesystems held in full | `datasets` 5.0.1 (nlp) caps `fsspec` at 2026.6.0; `s3fs` pins `fsspec` exactly. | `s3fs` → `2026.6.0` and `gcsfs` → `2026.7.0` on `full`; `dataio` ships the newest. |
 | `h5py < 3.15` in full | `tensorflow` 2.21 cap; only `full` merges both stacks. | `h5py` override → `3.14.0` on `full`; `dataio` ships `3.16.0`. |
