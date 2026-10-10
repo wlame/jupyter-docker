@@ -32,6 +32,8 @@ ALL_TARGETS=(
     "geospatial"
     "timeseries"
     "optimization"
+    "jax"
+    "probabilistic"
     "nlp"
     "speech"
     "face"

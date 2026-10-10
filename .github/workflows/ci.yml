@@ -393,7 +393,55 @@ jobs:
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
+  jax:
+    name: jax (py${{ matrix.python }})
+    needs: [plan, scientific]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).jax }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: jax
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).jax[0] }}
+          cache-scopes: base scientific
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
+
   # ─── Tier 4 — heavyweight images ─────────────────────────────────────────────
+  probabilistic:
+    name: probabilistic (py${{ matrix.python }})
+    needs: [plan, jax]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).probabilistic }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: probabilistic
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).probabilistic[0] }}
+          cache-scopes: base scientific jax
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
+
   deeplearn:
     name: deeplearn (py${{ matrix.python }})
     needs: [plan, ml]

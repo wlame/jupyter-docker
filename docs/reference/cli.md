@@ -97,6 +97,8 @@ target is given, all targets are built and tested** in dependency order.
     geospatial
     timeseries
     optimization
+    jax
+    probabilistic
     nlp
     speech
     face

@@ -140,6 +140,20 @@ examples = [
 # binary from the coinor-cbc system package instead. full inherits this exclusion.
 exclude-dependencies = ["highspy"]
 
+[targets.jax]
+parent = "scientific"
+description = "JAX: JIT compilation, automatic differentiation, and accelerated numerics"
+examples = [
+    "35_jax_jit_autodiff",
+]
+
+[targets.probabilistic]
+parent = "jax"
+description = "Bayesian statistics and probabilistic programming"
+examples = [
+    "36_bayesian_modeling",
+]
+
 [targets.nlp]
 parent = "base"
 description = "Natural language processing"
@@ -442,6 +456,11 @@ introduced-by = ["scientific"]
 version = "0.68.0"
 module = "numba"
 introduced-by = ["scientific", "audio", "speech"]
+# pytensor 3.3 (PyMC's backend, probabilistic) caps numba <= 0.67.0, and full
+# ships PyMC too. Lift this hold once a pytensor release allows numba 0.68.
+[packages."numba".overrides]
+probabilistic = "0.67.0"
+full = "0.67.0"
 
 # ── introduced in: visualization ─────────────────────────────────────────────
 
@@ -1039,6 +1058,66 @@ introduced-by = ["optimization"]
 version = "4.0.0"
 module = "pulp"
 introduced-by = ["optimization"]
+
+# ── introduced in: jax ───────────────────────────────────────────────────────
+
+# The PyPI jaxlib is the CPU build. For NVIDIA GPUs, `pip install "jax[cuda13]"`
+# inside the image adds the CUDA plugin wheels (several GB, so not baked in).
+# jax pins jaxlib exactly, so jaxlib needs no entry of its own.
+[packages."jax"]
+version = "0.11.2"
+module = "jax"
+introduced-by = ["jax"]
+
+[packages."optax"]
+version = "0.2.8"
+module = "optax"
+introduced-by = ["jax"]
+
+[packages."flax"]
+version = "0.12.10"
+module = "flax.nnx"
+introduced-by = ["jax"]
+
+[packages."equinox"]
+version = "0.13.8"
+module = "equinox"
+introduced-by = ["jax"]
+
+# NumPyro also gives PyMC (probabilistic) its JAX-based NUTS sampler.
+[packages."numpyro"]
+version = "0.22.0"
+module = "numpyro"
+introduced-by = ["jax"]
+
+# ── introduced in: probabilistic ─────────────────────────────────────────────
+
+# PyTensor 3 (PyMC's backend) compiles models with Numba by default, so PyMC
+# needs no C compiler in the runtime image.
+[packages."pymc"]
+version = "6.3.2"
+module = "pymc"
+introduced-by = ["probabilistic"]
+
+[packages."arviz"]
+version = "1.3.0"
+module = "arviz"
+introduced-by = ["probabilistic"]
+
+[packages."nutpie"]
+version = "0.16.11"
+module = "nutpie"
+introduced-by = ["probabilistic"]
+
+[packages."bambi"]
+version = "0.21.0"
+module = "bambi"
+introduced-by = ["probabilistic"]
+
+[packages."preliz"]
+version = "0.28.0"
+module = "preliz"
+introduced-by = ["probabilistic"]
 
 # ── introduced in: nlp ───────────────────────────────────────────────────────
 

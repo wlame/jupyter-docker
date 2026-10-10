@@ -1,6 +1,6 @@
 # AGENTS.md
 
-One multi-stage `Dockerfile` builds 15 JupyterLab images ("targets") for data
+One multi-stage `Dockerfile` builds 17 JupyterLab images ("targets") for data
 science on Ubuntu 24.04 with Python 3.14 and 3.13 (deadsnakes) and uv, published as
 `ghcr.io/wlame/jupyter-docker:<target>`. `just` is the dev entrypoint; run it
 bare to list recipes.
@@ -14,7 +14,7 @@ bare to list recipes.
 
 ```bash
 just gen    # regenerate pyprojects + verify scripts
-just lock   # re-resolve all 15 lockfiles
+just lock   # re-resolve all 17 lockfiles
 just ci     # every fast gate CI enforces
 ```
 
@@ -29,7 +29,7 @@ any drift between them, the lockfiles, and the matrix.
   before raising the pin.
 - `[settings] exclude-newer` blocks packages published after its date. A pin
   newer than that date fails to lock until you bump it, and a bump re-resolves
-  all 15 lockfiles.
+  all 17 lockfiles.
 - Keep `exclude-newer` a full UTC timestamp (`…T00:00:00Z`); the generator
   rejects bare dates, which uv reads in the local timezone. A package may carry
   its own later `exclude-newer` for an urgent fix, with a comment saying when to
@@ -47,8 +47,8 @@ any drift between them, the lockfiles, and the matrix.
 
 - The tree is `[targets.*] parent` in the matrix, mirrored by each stage's
   `FROM`: `base` → everything; `scientific` → `ml` → `deeplearn`;
-  `scientific` → `geospatial` / `timeseries` / `optimization`; the rest sit
-  directly on `base`.
+  `scientific` → `geospatial` / `timeseries` / `optimization`;
+  `scientific` → `jax` → `probabilistic`; the rest sit directly on `base`.
   `full` is `FROM base` and installs the union of every package and every
   system library.
 - Python versions are data: `[settings] python` (newest first; the first is the

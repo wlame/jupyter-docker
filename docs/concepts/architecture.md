@@ -69,6 +69,8 @@ flowchart TD
     scientific --> geospatial[geospatial]
     scientific --> timeseries[timeseries]
     scientific --> optimization[optimization]
+    scientific --> jax[jax]
+    jax --> probabilistic[probabilistic]
     ml --> deeplearn[deeplearn]
 ```
 
@@ -78,6 +80,8 @@ The chains that matter:
   then the deep learning frameworks.
 - `scientific` → `geospatial`, `timeseries`, and `optimization` — each builds on
   the NumPy/SciPy/Pandas core.
+- `scientific` → `jax` → `probabilistic` — JAX first, then PyMC, which can sample
+  through JAX (NumPyro).
 - `base` → `visualization`, `dataio`, `vision`, `audio`, `nlp`, `speech`, `face` —
   siblings that each inherit only the common utilities.
 - `full` is `FROM base` but installs the **union** of every target's packages and

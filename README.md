@@ -67,6 +67,8 @@ Access Jupyter Lab at: **http://localhost:8888**
 | `geospatial` | ~2GB | Cartopy, GeoPandas, Folium | scientific |
 | `timeseries` | ~2GB | tsfresh, sktime, Prophet | scientific |
 | `optimization` | not yet measured | OR-Tools, CVXPY, Pyomo, PuLP | scientific |
+| `jax` | not yet measured | JAX, Optax, Flax, Equinox, NumPyro | scientific |
+| `probabilistic` | not yet measured | PyMC, nutpie, ArviZ, Bambi | jax |
 | `nlp` | ~4GB | spaCy, Transformers, NLTK | base |
 | `speech` | ~4GB | Whisper, gTTS, SpeechBrain | base |
 | `face` | ~7GB | DeepFace, dlib, face-alignment | base |
@@ -81,7 +83,9 @@ base
 │   │   └── deeplearn
 │   ├── geospatial
 │   ├── timeseries
-│   └── optimization
+│   ├── optimization
+│   └── jax
+│       └── probabilistic
 ├── visualization
 ├── dataio
 ├── vision
@@ -302,6 +306,30 @@ Linear, integer, and convex optimization, routing, and scheduling.
 | CVXPY | Convex optimization (Clarabel, OSQP, SCS) |
 | Pyomo, PuLP | Algebraic modeling, solved with the bundled CBC command |
 
+### JAX (Accelerated Numerics)
+
+JIT compilation, automatic differentiation, and neural networks on JAX (CPU
+jaxlib; `pip install "jax[cuda13]"` for NVIDIA GPUs).
+
+| Library | Description |
+|---------|-------------|
+| JAX | NumPy-like arrays with jit, grad, and vmap |
+| Optax | Gradient-based optimizers |
+| Flax NNX, Equinox | Neural network libraries |
+| NumPyro | Probabilistic programming on JAX |
+
+### Probabilistic (Bayesian Statistics)
+
+Bayesian modeling on top of the JAX image.
+
+| Library | Description |
+|---------|-------------|
+| PyMC | Probabilistic programming (PyTensor, compiled with Numba) |
+| nutpie | Fast NUTS sampler written in Rust |
+| ArviZ | Diagnostics, summaries, and plots |
+| Bambi | Regression models from formulas |
+| PreliZ | Prior elicitation |
+
 ### NLP (Natural Language Processing)
 
 Text processing and language models.
@@ -463,6 +491,8 @@ examples), and `full` ships all of them:
 | `32_dataframe_engines` | `dataio` | One query in pandas, Polars, DuckDB, and Ibis; ADBC |
 | `33_lorenz_numba_dask` | `scientific` | Lorenz attractor with SymPy, Numba, FFT, and Dask |
 | `34_optimization` | `optimization` | Assignment, OR-Tools routing, CVXPY portfolios, Pyomo MILP |
+| `35_jax_jit_autodiff` | `jax` | jit Mandelbrot, grad, Optax, Flax NNX and Equinox |
+| `36_bayesian_modeling` | `probabilistic` | PreliZ prior, three NUTS samplers, eight schools, Bambi |
 
 ## Choosing the Right Target
 
@@ -477,6 +507,8 @@ examples), and `full` ships all of them:
 | Geographic data/maps | `geospatial` |
 | Time series forecasting | `timeseries` |
 | Optimization (LP/MIP, routing, scheduling) | `optimization` |
+| JAX, autodiff, differentiable programming | `jax` |
+| Bayesian statistics (PyMC) | `probabilistic` |
 | Text/NLP work | `nlp` |
 | Speech recognition/synthesis | `speech` |
 | Face detection/recognition | `face` |

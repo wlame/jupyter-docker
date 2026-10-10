@@ -15,6 +15,8 @@
 #   docker build --target geospatial -t ds-geospatial .
 #   docker build --target timeseries -t ds-timeseries .
 #   docker build --target optimization -t ds-optimization .
+#   docker build --target jax -t ds-jax .
+#   docker build --target probabilistic -t ds-probabilistic .
 #   docker build --target nlp -t ds-nlp .
 #   docker build --target speech -t ds-speech .
 #   docker build --target face -t ds-face .
@@ -398,6 +400,44 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 # Ship this target's examples: its own and its ancestors' (targets/optimization/examples.txt).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
     --mount=type=bind,source=targets/optimization/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+
+
+# =============================================================================
+# JAX: JIT, autodiff, Flax, Optax, NumPyro (inherits from scientific; CPU jaxlib)
+# =============================================================================
+FROM scientific AS jax
+LABEL org.opencontainers.image.description="ds-jax: JAX: JIT compilation, automatic differentiation, and accelerated numerics"
+
+COPY --chown=jupyter:jupyter targets/jax/pyproject.toml targets/jax/uv.lock /home/jupyter/
+COPY --chown=jupyter:jupyter targets/jax/verify_imports.py /home/jupyter/scripts/verify_jax.py
+
+USER 1000:1000
+RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
+    uv sync --locked --no-install-project
+
+# Ship this target's examples: its own and its ancestors' (targets/jax/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/jax/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+
+
+# =============================================================================
+# PROBABILISTIC: PyMC, nutpie, ArviZ, Bambi, PreliZ (inherits from jax)
+# =============================================================================
+FROM jax AS probabilistic
+LABEL org.opencontainers.image.description="ds-probabilistic: Bayesian statistics and probabilistic programming"
+
+COPY --chown=jupyter:jupyter targets/probabilistic/pyproject.toml targets/probabilistic/uv.lock /home/jupyter/
+COPY --chown=jupyter:jupyter targets/probabilistic/verify_imports.py /home/jupyter/scripts/verify_probabilistic.py
+
+USER 1000:1000
+RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
+    uv sync --locked --no-install-project
+
+# Ship this target's examples: its own and its ancestors' (targets/probabilistic/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/probabilistic/examples.txt,target=/tmp/examples.txt \
     bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
 
 

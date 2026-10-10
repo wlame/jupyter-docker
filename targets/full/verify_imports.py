@@ -177,6 +177,18 @@ IMPORTS = [
     ("ortools.constraint_solver.pywrapcp", "ortools"),
     ("pulp", "pulp"),
     ("pyomo.environ", "pyomo"),
+    # --- jax ---
+    ("equinox", "equinox"),
+    ("flax.nnx", "flax"),
+    ("jax", "jax"),
+    ("numpyro", "numpyro"),
+    ("optax", "optax"),
+    # --- probabilistic ---
+    ("arviz", "arviz"),
+    ("bambi", "bambi"),
+    ("nutpie", "nutpie"),
+    ("preliz", "preliz"),
+    ("pymc", "pymc"),
     # --- nlp ---
     ("bertopic", "bertopic"),
     ("datasets", "datasets"),

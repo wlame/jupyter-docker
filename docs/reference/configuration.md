@@ -188,6 +188,7 @@ because a downstream library caps a dependency.
 | spaCy 3.8.14 in full | spaCy ≥ 3.8.15 needs `click` ≥ 8.2.1; `gtts` 2.5.4 needs `click` < 8.2. | `spacy` override → `3.8.14` on `full`; `nlp` ships `3.8.16`. |
 | `bokeh < 3.10` | `panel` 1.9.4 cap. | `bokeh` pinned to `3.9.2`. |
 | pedalboard newer than the cutoff | pedalboard ≤ 0.9.25 Linux x86_64 wheels crash with an illegal instruction on CPUs lacking the build machine's instructions; 0.9.26 (2026-10-07) fixes it. | `pedalboard` 0.9.26 with its own `exclude-newer = "2026-10-08T00:00:00Z"`; drop the exception once the global cutoff passes that date. |
+| `numba <= 0.67` in probabilistic/full | `pytensor` 3.3 (PyMC's backend) caps it. | `numba` override → `0.67.0` on `probabilistic` and `full`; every other target ships `0.68.0`. |
 | `pandas < 3` in timeseries/full | `statsforecast`, `mlforecast`, and `skforecast` cap it. | `pandas` override → `2.3.3` on `timeseries` and `full`; every other target ships `3.0.6`. |
 | Cloud filesystems held in full | `datasets` 5.0.1 (nlp) caps `fsspec` at 2026.6.0; `s3fs` pins `fsspec` exactly. | `s3fs` → `2026.6.0` and `gcsfs` → `2026.7.0` on `full`; `dataio` ships the newest. |
 | `h5py < 3.15` in full | `tensorflow` 2.21 cap; only `full` merges both stacks. | `h5py` override → `3.14.0` on `full`; `dataio` ships `3.16.0`. |

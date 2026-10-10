@@ -35,3 +35,5 @@
 32_dataframe_engines
 33_lorenz_numba_dask
 34_optimization
+35_jax_jit_autodiff
+36_bayesian_modeling

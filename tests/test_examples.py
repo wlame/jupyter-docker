@@ -423,6 +423,42 @@ def test_example_34_optimization():
 
 
 # =============================================================================
+# JAX target — JAX, Optax, Flax NNX, Equinox, NumPyro
+# =============================================================================
+
+@pytest.mark.jax
+def test_example_35_jax_jit_autodiff():
+    """Mandelbrot (NumPy vs jit), grad vs exact derivative, Optax fit, Flax and Equinox MLPs."""
+    run_example(
+        '35_jax_jit_autodiff.py',
+        expected_outputs=[
+            'jax_mandelbrot.png',
+            'jax_training.png',
+            'jax_summary.json',
+        ],
+        timeout=300,
+    )
+
+
+# =============================================================================
+# PROBABILISTIC target — PyMC, nutpie, NumPyro sampler, ArviZ, Bambi, PreliZ
+# =============================================================================
+
+@pytest.mark.probabilistic
+def test_example_36_bayesian_modeling():
+    """PreliZ prior, coin posterior with three samplers vs exact, eight schools, Bambi."""
+    run_example(
+        '36_bayesian_modeling.py',
+        expected_outputs=[
+            'bayes_coin.png',
+            'bayes_eight_schools.png',
+            'bayes_summary.json',
+        ],
+        timeout=600,
+    )
+
+
+# =============================================================================
 # NLP target — spaCy, NLTK, transformers, sentence-transformers, datasets, PEFT
 # =============================================================================
 

@@ -57,6 +57,8 @@ docker pull ghcr.io/wlame/jupyter-docker:scientific-py3.14-a1b2c3d
 | `geospatial` | `scientific` | 3.14, 3.13 | ~750 MB | Geospatial analysis and mapping |
 | `timeseries` | `scientific` | 3.14, 3.13 | ~810 MB | Time series analysis and forecasting |
 | `optimization` | `scientific` | 3.14, 3.13 | not yet measured | Linear, integer, convex, routing, scheduling |
+| `jax` | `scientific` | 3.14, 3.13 | not yet measured | JIT, autodiff, and neural networks with JAX |
+| `probabilistic` | `jax` | 3.14, 3.13 | not yet measured | Bayesian statistics and probabilistic programming |
 | `nlp` | `base` | 3.14, 3.13 | ~3390 MB | Natural language processing |
 | `speech` | `base` | 3.14, 3.13 | ~3680 MB | Speech recognition and text-to-speech |
 | `face` | `base` | 3.13 | ~4130 MB | Face detection, recognition, and analysis |
@@ -234,6 +236,33 @@ and PuLP. System package: coinor-cbc, the `cbc` command that PuLP and Pyomo call
     whichever loads first breaks the other's import. The image leaves highspy out
     (OR-Tools already embeds HiGHS, and CVXPY solves integer problems through
     SciPy's HiGHS), so PuLP and Pyomo use CBC. Don't `pip install highspy` here.
+
+## jax
+
+**Inherits from:** `scientific`
+
+JAX: JIT compilation, automatic differentiation, and accelerated numerics.
+
+**Adds:** JAX (CPU jaxlib), Optax (optimizers), Flax NNX and Equinox (neural
+networks), and NumPyro (probabilistic programming on JAX). For an NVIDIA GPU, run
+`pip install "jax[cuda13]"` inside the container; the CUDA plugin wheels are
+several GB, so the image does not ship them.
+
+## probabilistic
+
+**Inherits from:** `jax`
+
+Bayesian statistics and probabilistic programming.
+
+**Adds:** PyMC (with PyTensor), nutpie (a fast Rust NUTS sampler), ArviZ
+(diagnostics and plots), Bambi (regression models from formulas), and PreliZ (prior
+elicitation), on top of the inherited JAX stack, so PyMC can also sample with
+NumPyro (`pm.sample(nuts_sampler="numpyro")`). PyTensor compiles models with Numba,
+so no C compiler is needed.
+
+!!! note "numba 0.67"
+    PyTensor 3.3 caps numba at 0.67.0, so this target (and `full`) holds numba
+    0.67.0 while the other targets run 0.68.
 
 ## nlp
 

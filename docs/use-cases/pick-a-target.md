@@ -34,6 +34,8 @@ Map the work you're doing to a target, then pull it:
 | Geographic data / maps / GIS | `geospatial` | `docker pull ghcr.io/wlame/jupyter-docker:geospatial` |
 | Time series forecasting | `timeseries` | `docker pull ghcr.io/wlame/jupyter-docker:timeseries` |
 | Optimization (LP/MIP, routing, scheduling) | `optimization` | `docker pull ghcr.io/wlame/jupyter-docker:optimization` |
+| JAX, autodiff, differentiable programming | `jax` | `docker pull ghcr.io/wlame/jupyter-docker:jax` |
+| Bayesian statistics (PyMC) | `probabilistic` | `docker pull ghcr.io/wlame/jupyter-docker:probabilistic` |
 | Text / NLP work | `nlp` | `docker pull ghcr.io/wlame/jupyter-docker:nlp` |
 | Speech recognition / synthesis | `speech` | `docker pull ghcr.io/wlame/jupyter-docker:speech` |
 | Face detection / recognition | `face` | `docker pull ghcr.io/wlame/jupyter-docker:face` |
@@ -62,7 +64,9 @@ base
 │   │   └── deeplearn
 │   ├── geospatial
 │   ├── timeseries
-│   └── optimization
+│   ├── optimization
+│   └── jax
+│       └── probabilistic
 ├── visualization
 ├── dataio
 ├── vision
@@ -98,6 +102,8 @@ Deeper and broader targets are larger. Approximate **compressed download** sizes
 | `geospatial` | ~750 MB | scientific |
 | `timeseries` | ~810 MB | scientific |
 | `optimization` | not yet measured | scientific |
+| `jax` | not yet measured | scientific |
+| `probabilistic` | not yet measured | jax |
 | `nlp` | ~3.4 GB | base |
 | `speech` | ~3.7 GB | base |
 | `face` | ~4.1 GB | base |
