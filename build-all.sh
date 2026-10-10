@@ -188,7 +188,15 @@ test_target() {
     # them too. Use pytest -m "<target> and not slow" manually to skip them.
     local pytest_marks
     if [ "${target}" = "full" ]; then
-        pytest_marks="scientific or visualization or dataio or ml or deeplearn or vision or audio or geospatial or timeseries or nlp or speech or face"
+        # Every target's mark except base (no examples) and full itself.
+        pytest_marks=""
+        local t
+        for t in "${ALL_TARGETS[@]}"; do
+            case "${t}" in
+                base | full) ;;
+                *) pytest_marks="${pytest_marks:+${pytest_marks} or }${t}" ;;
+            esac
+        done
     else
         pytest_marks="${target}"
     fi
