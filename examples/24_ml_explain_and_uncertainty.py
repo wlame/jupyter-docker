@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Explaining, Bounding, and Shipping Models: CatBoost, SHAP, MAPIE, UMAP, skrub, skops
-=====================================================================================
+Explaining, Bounding, and Shipping Models: CatBoost, SHAP, MAPIE, UMAP, skrub, skops, ONNX
+===========================================================================================
 Fits a CatBoost model on mixed categorical/numeric data, explains it with SHAP,
 wraps a regressor in conformal prediction intervals with MAPIE, embeds the
-digits dataset with UMAP, builds features from a messy table with skrub, and
-saves a model with skops (a safer format than pickle).
+digits dataset with UMAP, builds features from a messy table with skrub,
+saves a model with skops (a safer format than pickle), and exports a pipeline
+to ONNX with skl2onnx so onnxruntime can serve it without scikit-learn.
 
 CatBoost: https://catboost.ai/docs/
 SHAP:     https://shap.readthedocs.io/
@@ -13,12 +14,14 @@ MAPIE:    https://mapie.readthedocs.io/
 UMAP:     https://umap-learn.readthedocs.io/
 skrub:    https://skrub-data.org/
 skops:    https://skops.readthedocs.io/
+skl2onnx: https://onnx.ai/sklearn-onnx/
 """
 
 import os
 
 import matplotlib
 import numpy as np
+import onnxruntime as ort
 import pandas as pd
 import shap
 import skops.io as sio
@@ -27,8 +30,11 @@ from catboost import CatBoostClassifier
 from mapie.regression import SplitConformalRegressor
 from sklearn.datasets import load_digits, make_regression
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import Ridge
+from skl2onnx import to_onnx
+from sklearn.linear_model import LogisticRegression, Ridge
 from sklearn.model_selection import train_test_split
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 from skrub import TableVectorizer
 
 matplotlib.use('Agg')
@@ -151,5 +157,34 @@ untrusted = sio.get_untrusted_types(file=model_path)
 restored = sio.load(model_path, trusted=untrusted)
 print(f"Untrusted types to review: {untrusted or 'none'}")
 print(f"Predictions identical after reload: {np.allclose(restored.predict(X_eval), ridge.predict(X_eval))}")
+
+# =============================================================================
+# skl2onnx + onnxruntime — serve a pipeline without scikit-learn
+# =============================================================================
+print("\n" + "=" * 60)
+print("skl2onnx: Export a Pipeline to ONNX")
+print("=" * 60)
+
+digit_images = digits.data.astype(np.float32)
+X_train_digits, X_test_digits, y_train_digits, y_test_digits = train_test_split(
+    digit_images, digits.target, test_size=0.25, random_state=0
+)
+digits_pipeline = make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000))
+digits_pipeline.fit(X_train_digits, y_train_digits)
+
+# zipmap=False returns probabilities as a plain array instead of a list of dicts.
+onnx_model = to_onnx(digits_pipeline, X_train_digits[:1], options={'zipmap': False})
+onnx_path = os.path.join(OUTPUT_DIR, 'digits_pipeline.onnx')
+with open(onnx_path, 'wb') as f:
+    f.write(onnx_model.SerializeToString())
+
+session = ort.InferenceSession(onnx_path, providers=['CPUExecutionProvider'])
+onnx_labels, onnx_probabilities = session.run(None, {session.get_inputs()[0].name: X_test_digits})
+agreement = (onnx_labels == digits_pipeline.predict(X_test_digits)).mean()
+gap = np.abs(onnx_probabilities - digits_pipeline.predict_proba(X_test_digits)).max()
+opset = next(entry.version for entry in onnx_model.opset_import if entry.domain == '')
+print(f"ONNX opset {opset}, IR version {onnx_model.ir_version}, {os.path.getsize(onnx_path) / 1024:.0f} KB")
+print(f"onnxruntime labels match scikit-learn on {agreement:.1%} of test digits (max probability gap {gap:.1e})")
+print("Saved: digits_pipeline.onnx")
 
 print("\nDone.")

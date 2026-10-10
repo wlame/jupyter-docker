@@ -18,7 +18,7 @@ import pytest
 from conftest import run_example
 
 # =============================================================================
-# SCIENTIFIC target — numpy, scipy, pandas, polars, duckdb, xarray
+# SCIENTIFIC target — numpy, scipy, pandas, polars, duckdb, xarray, numba, dask
 # =============================================================================
 
 @pytest.mark.scientific
@@ -61,8 +61,22 @@ def test_example_21_polars_duckdb_xarray():
     )
 
 
+@pytest.mark.scientific
+def test_example_33_lorenz_numba_dask():
+    """SymPy fixed points, Numba RK4, FFT, Dask ensemble on an in-process cluster."""
+    run_example(
+        '33_lorenz_numba_dask.py',
+        expected_outputs=[
+            'lorenz_attractor.png',
+            'lorenz_spectrum.png',
+            'lorenz_divergence.png',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
-# VISUALIZATION target — matplotlib, seaborn, plotly, bokeh, altair, panel, plotnine, datashader
+# VISUALIZATION target — matplotlib, seaborn, plotly, bokeh, altair, panel, plotnine, datashader, itables
 # =============================================================================
 
 @pytest.mark.visualization
@@ -126,12 +140,13 @@ def test_example_16_altair_panel_viz():
 
 @pytest.mark.visualization
 def test_example_22_plotnine_tables_datashader():
-    """plotnine, great-tables, datashader, vl-convert."""
+    """plotnine, great-tables, itables, datashader, vl-convert."""
     run_example(
         '22_plotnine_tables_datashader.py',
         expected_outputs=[
             'plotnine_efficiency.png',
             'great_tables_summary.html',
+            'itables_cars.html',
             'datashader_points.png',
             'altair_vlconvert.png',
         ],
@@ -139,7 +154,7 @@ def test_example_22_plotnine_tables_datashader():
 
 
 # =============================================================================
-# DATAIO target — pyarrow, parquet, HDF5, SQLAlchemy, Delta Lake, zarr, netCDF
+# DATAIO target — pyarrow, parquet, HDF5, SQLAlchemy, Delta Lake, zarr, netCDF, Ibis, ADBC
 # =============================================================================
 
 @pytest.mark.dataio
@@ -174,8 +189,23 @@ def test_example_23_modern_data_formats():
     )
 
 
+@pytest.mark.dataio
+def test_example_32_dataframe_engines():
+    """One query in pandas, Polars, DuckDB, and Ibis over one Parquet file, plus ADBC."""
+    run_example(
+        '32_dataframe_engines.py',
+        expected_outputs=[
+            'orders.parquet',
+            'engines_answer.csv',
+            'engines_timings.json',
+            'engines.sqlite',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
-# ML target — scikit-learn, XGBoost, LightGBM, CatBoost, SHAP, MAPIE, UMAP
+# ML target — scikit-learn, XGBoost, LightGBM, CatBoost, SHAP, MAPIE, UMAP, ONNX
 # =============================================================================
 
 @pytest.mark.ml
@@ -193,13 +223,14 @@ def test_example_09_machine_learning():
 
 @pytest.mark.ml
 def test_example_24_ml_explain_and_uncertainty():
-    """CatBoost, SHAP, MAPIE, UMAP, skrub, skops."""
+    """CatBoost, SHAP, MAPIE, UMAP, skrub, skops, skl2onnx + onnxruntime."""
     run_example(
         '24_ml_explain_and_uncertainty.py',
         expected_outputs=[
             'shap_beeswarm.png',
             'umap_digits.png',
             'ridge.skops',
+            'digits_pipeline.onnx',
         ],
         timeout=300,
     )
@@ -395,7 +426,7 @@ def test_example_14_nlp_text_analysis():
 
 @pytest.mark.nlp
 def test_example_30_nlp_toolkit():
-    """rapidfuzz, lingua, datasets, PEFT LoRA, KeyBERT on the baked MiniLM."""
+    """rapidfuzz, lingua, datasets, PEFT LoRA, KeyBERT on the baked MiniLM, SentencePiece."""
     run_example(
         '30_nlp_toolkit.py',
         expected_outputs=[

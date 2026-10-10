@@ -3,13 +3,17 @@
 Grammar of Graphics, Tables, and Big-Data Rendering
 ===================================================
 Demonstrates plotnine (ggplot2 grammar), great-tables (publication tables),
-datashader (rasterizing millions of points), and vl-convert (static export of
-Altair charts without a browser). ipympl and jupyter-bokeh are JupyterLab
-widget renderers: use `%matplotlib widget` for interactive matplotlib, and
-`jupyter_bokeh.BokehModel` to embed Bokeh/Panel objects as live widgets.
+itables (sortable, searchable tables), datashader (rasterizing millions of
+points), and vl-convert (static export of Altair charts without a browser).
+ipympl and jupyter-bokeh are JupyterLab widget renderers: use
+`%matplotlib widget` for interactive matplotlib, and `jupyter_bokeh.BokehModel`
+to embed Bokeh/Panel objects as live widgets. In a notebook,
+`itables.init_notebook_mode(all_interactive=True)` makes every DataFrame
+display as an interactive table.
 
 plotnine:      https://plotnine.org/
 great-tables:  https://posit-dev.github.io/great-tables/
+itables:       https://mwouts.github.io/itables/
 datashader:    https://datashader.org/
 vl-convert:    https://github.com/vega/vl-convert
 """
@@ -19,6 +23,7 @@ import os
 import altair as alt
 import datashader as ds
 import datashader.transfer_functions as tf
+import itables
 import numpy as np
 import pandas as pd
 import vl_convert as vlc
@@ -79,6 +84,26 @@ with open(os.path.join(OUTPUT_DIR, 'great_tables_summary.html'), 'w') as f:
     f.write(table.as_raw_html())
 print(summary.to_string(index=False))
 print("Saved: great_tables_summary.html")
+
+# =============================================================================
+# itables — an interactive table in a standalone HTML page
+# =============================================================================
+print("\n" + "=" * 60)
+print("itables: Sortable, Searchable Table")
+print("=" * 60)
+
+# connected=True loads the table script from a CDN, so the page works outside
+# Jupyter; inside JupyterLab itables serves its bundled copy offline.
+page = itables.to_html_datatable(
+    cars.round(2),
+    caption='All cars (click a header to sort, type to filter)',
+    connected=True,
+    lengthMenu=[10, 25, 100],
+)
+with open(os.path.join(OUTPUT_DIR, 'itables_cars.html'), 'w') as f:
+    f.write(f'<!doctype html><html><head><meta charset="utf-8"></head><body>{page}</body></html>')
+print(f"{len(cars)} rows written as an interactive table")
+print("Saved: itables_cars.html")
 
 # =============================================================================
 # datashader — two million points rendered to a raster

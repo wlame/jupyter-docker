@@ -436,16 +436,18 @@ jupytext (`just nb`) and CI verifies they stay in sync:
 | `19_speech_processing` | Whisper ASR, gTTS, torchaudio |
 | `20_face_analysis` | dlib, DeepFace, face-alignment |
 | `21_polars_duckdb_xarray` | polars, DuckDB, Arrow, xarray, pint |
-| `22_plotnine_tables_datashader` | plotnine, great-tables, datashader, vl-convert |
+| `22_plotnine_tables_datashader` | plotnine, great-tables, itables, datashader, vl-convert |
 | `23_modern_data_formats` | Delta Lake, Excel, SPSS, zarr, netCDF, connectorx |
-| `24_ml_explain_and_uncertainty` | CatBoost, SHAP, MAPIE, UMAP, skrub, skops |
+| `24_ml_explain_and_uncertainty` | CatBoost, SHAP, MAPIE, UMAP, skrub, skops, skl2onnx |
 | `25_lightning_onnx` | Lightning, torchmetrics, Accelerate, einops, ONNX |
 | `26_vision_backbones_kornia` | timm, kornia, supervision, OpenCLIP |
 | `27_audio_effects_loudness` | pedalboard, pyloudnorm, noisereduce, parselmouth |
 | `28_geospatial_raster_h3` | rasterio, rioxarray, H3, mapclassify, OSMnx, lonboard |
 | `29_forecasting_toolkit` | statsforecast, mlforecast, skforecast, arch, tslearn |
-| `30_nlp_toolkit` | rapidfuzz, lingua, datasets, PEFT, KeyBERT |
+| `30_nlp_toolkit` | rapidfuzz, lingua, datasets, PEFT, KeyBERT, SentencePiece |
 | `31_speech_metrics_vad` | jiwer, silero-vad, parselmouth |
+| `32_dataframe_engines` | One query in pandas, Polars, DuckDB, and Ibis; ADBC |
+| `33_lorenz_numba_dask` | Lorenz attractor with SymPy, Numba, FFT, and Dask |
 
 ## Choosing the Right Target
 

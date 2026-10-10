@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-NLP Toolkit: rapidfuzz, lingua, Hugging Face datasets, PEFT, KeyBERT
-====================================================================
+NLP Toolkit: rapidfuzz, lingua, Hugging Face datasets, PEFT, KeyBERT, SentencePiece
+====================================================================================
 Matches messy strings with rapidfuzz, detects languages with lingua (models
 ship inside the package), builds a dataset pipeline with Hugging Face
-`datasets`, attaches a LoRA adapter to a small transformer with PEFT, and
-extracts keywords with KeyBERT on the MiniLM sentence-embedding model.
+`datasets`, attaches a LoRA adapter to a small transformer with PEFT,
+extracts keywords with KeyBERT on the MiniLM sentence-embedding model, and
+trains a tiny subword tokenizer with SentencePiece.
 
 tiktoken (OpenAI tokenizers), evaluate (metrics), and BERTopic (topic models)
 are installed too; they download encodings/metrics on first use or need a
@@ -18,11 +19,14 @@ lingua:    https://github.com/pemistahl/lingua-py
 datasets:  https://huggingface.co/docs/datasets/
 PEFT:      https://huggingface.co/docs/peft/
 KeyBERT:   https://maartengr.github.io/KeyBERT/
+SentencePiece: https://github.com/google/sentencepiece
 """
 
+import io
 import json
 import os
 
+import sentencepiece as spm
 import torch
 from datasets import Dataset
 from keybert import KeyBERT
@@ -140,6 +144,42 @@ keywords = KeyBERT(model=embedder).extract_keywords(document, keyphrase_ngram_ra
 for phrase, score in keywords:
     print(f"{score:.3f}  {phrase}")
 results['keywords'] = [phrase for phrase, _ in keywords]
+
+# =============================================================================
+# SentencePiece — train a subword tokenizer in memory
+# =============================================================================
+print("\n" + "=" * 60)
+print("SentencePiece: Train a Subword Tokenizer")
+print("=" * 60)
+
+corpus = [
+    'Supervised learning trains models on labeled examples.',
+    'Unsupervised learning finds structure in unlabeled data.',
+    'Gradient boosting builds an ensemble of shallow decision trees.',
+    'Neural networks learn representations from raw inputs.',
+    'Tokenizers split text into subword units before modeling.',
+    'Transformers attend to every token in the input sequence.',
+    'Language models predict the next token from the previous ones.',
+    'Embeddings map words and sentences to dense vectors.',
+]
+model_buffer = io.BytesIO()
+# hard_vocab_limit=False lets a corpus this small end below the requested size.
+spm.SentencePieceTrainer.train(
+    sentence_iterator=iter(corpus * 4),
+    model_writer=model_buffer,
+    vocab_size=120,
+    model_type='unigram',
+    hard_vocab_limit=False,
+    minloglevel=2,
+)
+tokenizer = spm.SentencePieceProcessor(model_proto=model_buffer.getvalue())
+sentence = 'Unlabeled tokens learn dense representations.'
+pieces = tokenizer.encode(sentence, out_type=str)
+print(f"Vocabulary: {tokenizer.get_piece_size()} pieces")
+print(f"{sentence!r} -> {pieces}")
+round_trip = tokenizer.decode(tokenizer.encode(sentence)) == sentence
+print(f"Lossless round trip: {round_trip}")
+results['sentencepiece_pieces'] = pieces
 
 with open(os.path.join(OUTPUT_DIR, 'nlp_toolkit.json'), 'w') as f:
     json.dump(results, f, indent=2)
