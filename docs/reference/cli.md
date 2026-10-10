@@ -190,7 +190,7 @@ The single positional argument selects which weights to download:
 
 | Target | What it downloads |
 |---|---|
-| `vision` | YOLOv8n weights (`yolov8n.pt`) into `~/.cache/ultralytics/`, verified against a pinned SHA-256 |
+| `vision` | YOLO26n weights (`yolo26n.pt`) into `~/.cache/ultralytics/`, verified against a pinned SHA-256 |
 | `nlp` | NLTK resources (punkt, stopwords, wordnet, taggers, …) into `~/nltk_data`, plus the `all-MiniLM-L6-v2` sentence-transformers model |
 | `speech` | Whisper `tiny` model |
 | `face` | face-alignment detector + landmark nets (s3fd, 2DFAN) |

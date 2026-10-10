@@ -233,7 +233,7 @@ Computer vision and image manipulation.
 | OpenCV (headless) | Computer vision |
 | scikit-image | Image algorithms |
 | imageio | Image I/O |
-| Ultralytics | YOLOv8 object detection |
+| Ultralytics | YOLO26 object detection |
 | timm, OpenCLIP | Backbones and image–text models |
 | kornia | Differentiable image ops and augmentation |
 | supervision | Detection annotation and tracking |
@@ -427,7 +427,7 @@ jupytext (`just nb`) and CI verifies they stay in sync:
 | `10_deep_learning_pytorch` | PyTorch neural networks |
 | `11_deep_learning_tensorflow` | TensorFlow and Keras |
 | `12_image_processing` | PIL, OpenCV, scikit-image |
-| `13_object_detection_yolo` | YOLOv8 object detection |
+| `13_object_detection_yolo` | YOLO26 object detection |
 | `14_nlp_text_analysis` | spaCy, NLTK, sentence-transformers |
 | `15_audio_analysis` | librosa, torchaudio features |
 | `16_altair_panel_viz` | Altair, hvPlot, Panel dashboards |

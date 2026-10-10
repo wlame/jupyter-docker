@@ -105,7 +105,7 @@ environment variable is needed to locate them and the example tests run offline.
 
 What gets baked, by target:
 
-- **vision** → `yolov8n.pt` (the one checksum-pinned download)
+- **vision** → `yolo26n.pt` (the one checksum-pinned download)
 - **nlp** → NLTK corpora and the sentence-transformers MiniLM model
 - **speech** → Whisper `tiny`
 - **face** → face-alignment s3fd + 2DFAN weights

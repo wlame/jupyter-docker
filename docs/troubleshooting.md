@@ -214,7 +214,7 @@ See [Getting started](getting-started.md) for the full run-and-open flow.
 network.
 
 **Cause**: most weights the examples need are **pre-baked into the image at build
-time** by [`scripts/bake_models.sh`](reference/cli.md) (YOLOv8n for `vision`, NLTK corpora and a
+time** by [`scripts/bake_models.sh`](reference/cli.md) (YOLO26n for `vision`, NLTK corpora and a
 sentence-transformers MiniLM for `nlp`, Whisper `tiny` for `speech`, face-alignment
 nets for `face`) so the tests run offline. The pytest run sets `HF_HUB_OFFLINE=1`
 (in `build-all.sh`, not baked into the image) so a HuggingFace Hub outage can't

@@ -14,8 +14,8 @@
 # =============================================================================
 set -euo pipefail
 
-YOLO_URL="https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt"
-YOLO_SHA256="f59b3d833e2ff32e194b5bb8e08d211dc7c5bdf144b90d2c8412c47ccfc83b36"
+YOLO_URL="https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt"
+YOLO_SHA256="9b09cc8bf347f0fc8a5f7657480587f25db09b34bf33b0652110fb03a8ad4fef"
 
 # NLTK resources example 14 requires (matches its download list).
 NLTK_RESOURCES=(
@@ -27,8 +27,8 @@ NLTK_RESOURCES=(
 py() { uv run --no-project python "$@"; }
 
 bake_vision() {
-    local dest="${HOME}/.cache/ultralytics/yolov8n.pt"
-    echo "→ YOLOv8n weights"
+    local dest="${HOME}/.cache/ultralytics/yolo26n.pt"
+    echo "→ YOLO26n weights"
     mkdir -p "$(dirname "${dest}")"
     curl -fsSL --retry 3 -o "${dest}" "${YOLO_URL}"
     echo "${YOLO_SHA256}  ${dest}" | sha256sum -c -

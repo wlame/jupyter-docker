@@ -2,7 +2,7 @@
 """
 Object Detection with Ultralytics YOLO
 ======================================
-Demonstrates object detection using Ultralytics YOLOv8.
+Demonstrates object detection using Ultralytics YOLO26.
 
 Ultralytics: https://ultralytics.com/
 Documentation: https://docs.ultralytics.com/
@@ -26,20 +26,22 @@ print("=" * 60)
 
 print("""
 YOLO (You Only Look Once) is a state-of-the-art object detection model.
-Ultralytics provides easy-to-use implementations of YOLOv8 and beyond.
+Ultralytics ships YOLO26, its current model family, alongside earlier
+ones such as YOLO11 and YOLOv8 (same API; only the weights file changes).
 
 Available model sizes (speed vs accuracy trade-off):
-  - yolov8n.pt : Nano     - fastest, lowest accuracy
-  - yolov8s.pt : Small    - fast, good accuracy
-  - yolov8m.pt : Medium   - balanced
-  - yolov8l.pt : Large    - slower, better accuracy
-  - yolov8x.pt : XLarge   - slowest, best accuracy
+  - yolo26n.pt : Nano     - fastest, lowest accuracy
+  - yolo26s.pt : Small    - fast, good accuracy
+  - yolo26m.pt : Medium   - balanced
+  - yolo26l.pt : Large    - slower, better accuracy
+  - yolo26x.pt : XLarge   - slowest, best accuracy
 
 Task-specific models:
-  - Detection:    yolov8n.pt (default)
-  - Segmentation: yolov8n-seg.pt
-  - Classification: yolov8n-cls.pt
-  - Pose:         yolov8n-pose.pt
+  - Detection:    yolo26n.pt (default)
+  - Segmentation: yolo26n-seg.pt
+  - Classification: yolo26n-cls.pt
+  - Pose:         yolo26n-pose.pt
+  - Oriented boxes: yolo26n-obb.pt
 """)
 
 # =============================================================================
@@ -96,12 +98,12 @@ print("\n" + "=" * 60)
 print("Loading YOLO Model")
 print("=" * 60)
 
-# Load pretrained YOLOv8 nano model (smallest, fastest). Prefer a pre-baked
+# Load pretrained YOLO26 nano model (smallest, fastest). Prefer a pre-baked
 # copy (present in the vision/full images) so this runs offline; otherwise
 # ultralytics downloads it on first use.
-print("Loading YOLOv8n model (this may download the model on first run)...")
-_baked_yolo = os.path.expanduser("~/.cache/ultralytics/yolov8n.pt")
-model = YOLO(_baked_yolo if os.path.exists(_baked_yolo) else "yolov8n.pt")
+print("Loading YOLO26n model (this may download the model on first run)...")
+_baked_yolo = os.path.expanduser("~/.cache/ultralytics/yolo26n.pt")
+model = YOLO(_baked_yolo if os.path.exists(_baked_yolo) else "yolo26n.pt")
 
 print(f"Model loaded successfully!")
 print(f"Model type: {type(model).__name__}")
@@ -250,7 +252,7 @@ To train YOLO on custom data:
    names: ['class1', 'class2']
 
 3. Train:
-   model = YOLO('yolov8n.pt')
+   model = YOLO('yolo26n.pt')
    model.train(data='data.yaml', epochs=100, imgsz=640)
 
 4. Validate:
@@ -269,21 +271,21 @@ print("=" * 60)
 
 print("""
 Detection (default):
-  model = YOLO('yolov8n.pt')
+  model = YOLO('yolo26n.pt')
   results = model('image.jpg')
 
 Segmentation:
-  model = YOLO('yolov8n-seg.pt')
+  model = YOLO('yolo26n-seg.pt')
   results = model('image.jpg')
   masks = results[0].masks  # Instance segmentation masks
 
 Classification:
-  model = YOLO('yolov8n-cls.pt')
+  model = YOLO('yolo26n-cls.pt')
   results = model('image.jpg')
   probs = results[0].probs  # Classification probabilities
 
 Pose Estimation:
-  model = YOLO('yolov8n-pose.pt')
+  model = YOLO('yolo26n-pose.pt')
   results = model('image.jpg')
   keypoints = results[0].keypoints  # Body keypoints
 """)
