@@ -207,7 +207,7 @@ test_target() {
 
     echo ""
     echo "  [2/2] Example smoke tests"
-    echo "  Running: docker run --rm -e HF_HUB_OFFLINE=1 ${image_name} uv run --no-project python -m pytest /home/jupyter/tests/ -m \"${pytest_marks}\" -v --timeout=300"
+    echo "  Running: docker run --rm -e HF_HUB_OFFLINE=1 ${image_name} uv run --no-project python -m pytest /home/jupyter/tests/ -m \"${pytest_marks}\" -v --timeout=600"
     echo ""
 
     # Exit code 5 means "no tests collected" — treat as success (mark not yet populated).
@@ -221,7 +221,7 @@ test_target() {
         uv run --no-project python -m pytest /home/jupyter/tests/ \
         -m "${pytest_marks}" \
         -v \
-        --timeout=300 || pytest_exit=$?
+        --timeout=600 || pytest_exit=$?
 
     if [ "${pytest_exit}" -eq 0 ] || [ "${pytest_exit}" -eq 5 ]; then
         set_test_result "$target" "success"

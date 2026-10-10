@@ -140,7 +140,7 @@ For each target, testing runs two steps against the built `ds-<target>` image:
 
     ```bash
     docker run --rm -e HF_HUB_OFFLINE=1 ds-<target> \
-      uv run --no-project python -m pytest /home/jupyter/tests/ -m "<mark>" -v --timeout=300
+      uv run --no-project python -m pytest /home/jupyter/tests/ -m "<mark>" -v --timeout=600
     ```
 
     `HF_HUB_OFFLINE=1` forces the pre-baked HuggingFace cache to be used with no
