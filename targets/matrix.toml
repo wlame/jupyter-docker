@@ -267,6 +267,16 @@ version = "1.15.0"
 module = "pylsp"
 introduced-by = ["base"]
 
+[packages."rich"]
+version = "15.0.0"
+module = "rich"
+introduced-by = ["base"]
+
+[packages."tenacity"]
+version = "9.1.4"
+module = "tenacity"
+introduced-by = ["base"]
+
 # ── introduced in: scientific ────────────────────────────────────────────────
 
 [packages."matplotlib"]
@@ -335,6 +345,31 @@ version = "2026.9.0"
 module = "xarray"
 introduced-by = ["scientific"]
 
+# Dask scales pandas/NumPy/xarray work across cores. Its dashboard needs bokeh
+# (declared on scientific for that) and is served through jupyter-server-proxy
+# at /proxy/8787/status, because the images expose only Jupyter's port.
+[packages."dask"]
+version = "2026.8.0"
+module = "dask.dataframe"
+introduced-by = ["scientific"]
+extras = ["dataframe"]
+
+# distributed pins dask exactly; bump both together.
+[packages."distributed"]
+version = "2026.8.0"
+module = "distributed"
+introduced-by = ["scientific"]
+
+[packages."jupyter-server-proxy"]
+version = "4.6.0"
+module = "jupyter_server_proxy"
+introduced-by = ["scientific"]
+
+[packages."numba"]
+version = "0.68.0"
+module = "numba"
+introduced-by = ["scientific", "audio", "speech"]
+
 # ── introduced in: visualization ─────────────────────────────────────────────
 
 [packages."altair"]
@@ -343,10 +378,10 @@ module = "altair"
 introduced-by = ["visualization"]
 
 [packages."bokeh"]
-# panel 1.9.4 requires bokeh < 3.10.
+# panel 1.9.4 requires bokeh < 3.10. On scientific it powers the Dask dashboard.
 version = "3.9.2"
 module = "bokeh"
-introduced-by = ["visualization"]
+introduced-by = ["scientific", "visualization"]
 
 [packages."holoviews"]
 version = "1.23.2"
@@ -401,6 +436,11 @@ introduced-by = ["visualization"]
 [packages."vl-convert-python"]
 version = "1.9.0.post1"
 module = "vl_convert"
+introduced-by = ["visualization"]
+
+[packages."itables"]
+version = "2.9.1"
+module = "itables"
 introduced-by = ["visualization"]
 
 # ── introduced in: dataio ────────────────────────────────────────────────────
@@ -517,6 +557,31 @@ version = "3.4.0"
 module = "zarr"
 introduced-by = ["dataio"]
 
+# One dataframe API compiled to SQL for DuckDB (and other engines). Its backends
+# live behind extras; the verify script imports the DuckDB backend itself.
+[packages."ibis-framework"]
+version = "12.0.0"
+module = "ibis.backends.duckdb"
+introduced-by = ["dataio"]
+extras = ["duckdb"]
+
+# ADBC: Arrow-native database connectivity (DBAPI and Arrow tables, no row
+# conversion). The drivers bundle their native libraries in Python-independent wheels.
+[packages."adbc-driver-manager"]
+version = "1.12.0"
+module = "adbc_driver_manager"
+introduced-by = ["dataio"]
+
+[packages."adbc-driver-postgresql"]
+version = "1.12.0"
+module = "adbc_driver_postgresql"
+introduced-by = ["dataio"]
+
+[packages."adbc-driver-sqlite"]
+version = "1.12.0"
+module = "adbc_driver_sqlite"
+introduced-by = ["dataio"]
+
 # ── introduced in: ml ────────────────────────────────────────────────────────
 
 [packages."imbalanced-learn"]
@@ -577,6 +642,22 @@ version = "0.5.12"
 module = "umap"
 introduced-by = ["ml"]
 
+[packages."onnx"]
+version = "1.23.1"
+module = "onnx"
+introduced-by = ["ml"]
+
+[packages."onnxruntime"]
+version = "1.30.0"
+module = "onnxruntime"
+introduced-by = ["ml", "vision", "face"]
+
+# Converts fitted scikit-learn pipelines to ONNX for onnxruntime serving.
+[packages."skl2onnx"]
+version = "1.20.0"
+module = "skl2onnx"
+introduced-by = ["ml"]
+
 # ── introduced in: deeplearn ─────────────────────────────────────────────────
 
 [packages."keras"]
@@ -633,16 +714,6 @@ introduced-by = ["deeplearn"]
 version = "2.6.6"
 module = "lightning"
 introduced-by = ["deeplearn"]
-
-[packages."onnx"]
-version = "1.23.1"
-module = "onnx"
-introduced-by = ["deeplearn"]
-
-[packages."onnxruntime"]
-version = "1.30.0"
-module = "onnxruntime"
-introduced-by = ["deeplearn", "vision", "face"]
 
 [packages."tensorboard"]
 version = "2.21.0"
@@ -717,11 +788,6 @@ introduced-by = ["audio"]
 version = "1.0.0"
 module = "librosa"
 introduced-by = ["audio"]
-
-[packages."numba"]
-version = "0.68.0"
-module = "numba"
-introduced-by = ["audio", "timeseries", "speech"]
 
 [packages."pydub"]
 version = "0.25.1"
@@ -964,6 +1030,12 @@ introduced-by = ["nlp"]
 [packages."tiktoken"]
 version = "0.14.0"
 module = "tiktoken"
+introduced-by = ["nlp"]
+
+# SentencePiece tokenizers (T5, many multilingual models) and training new ones.
+[packages."sentencepiece"]
+version = "0.2.2"
+module = "sentencepiece"
 introduced-by = ["nlp"]
 
 # ── introduced in: speech ────────────────────────────────────────────────────

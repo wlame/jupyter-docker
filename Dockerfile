@@ -43,12 +43,15 @@ LABEL org.opencontainers.image.authors="wlame" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.description="ds-base: Base Python environment with common utilities for data science"
 
+# DASK_DISTRIBUTED__DASHBOARD__LINK makes Dask print dashboard links through
+# jupyter-server-proxy (installed with Dask), since only Jupyter's port is exposed.
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     JUPYTER_ENABLE_LAB=yes \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
-    UV_PYTHON=python${PYTHON_VERSION}
+    UV_PYTHON=python${PYTHON_VERSION} \
+    DASK_DISTRIBUTED__DASHBOARD__LINK="/proxy/{port}/status"
 
 # Install the selected Python and basic system dependencies
 RUN export DEBIAN_FRONTEND=noninteractive \

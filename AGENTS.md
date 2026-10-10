@@ -34,6 +34,10 @@ any drift between them, the lockfiles, and the matrix.
   rejects bare dates, which uv reads in the local timezone. A package may carry
   its own later `exclude-newer` for an urgent fix, with a comment saying when to
   drop it (currently pedalboard).
+- A package that needs optional dependencies lists them in `extras` (rendered
+  as `name[extra]==version`). Point its `module` at the part those extras enable
+  (`ibis.backends.duckdb`, `dask.dataframe`), so the verify script catches a
+  missing extra.
 - Images run `uv sync --locked` and never resolve at build time.
 - Every pyproject carries `required-environments` for each of its Python versions
   on linux x86_64, so a pin without a wheel for one of them fails `just lock`
@@ -62,6 +66,9 @@ any drift between them, the lockfiles, and the matrix.
   list and in `full`'s.
 - The container user is `jupyter`, UID 1000, and `uv sync` runs as that user so
   `pip install` keeps working inside notebooks.
+- Images expose only Jupyter's port. Web UIs inside the container go through
+  jupyter-server-proxy at `/proxy/<port>/`; the base stage sets
+  `DASK_DISTRIBUTED__DASHBOARD__LINK` so Dask prints links in that form.
 - Jupyter generates a random token per start (`JUPYTER_TOKEN` overrides); keep
   the config free of `token = ''`.
 - `.dockerignore` uses Docker semantics: bare names match only at the context

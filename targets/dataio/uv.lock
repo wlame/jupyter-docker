@@ -20,6 +20,56 @@ required-markers = [
 exclude-newer = "2026-10-01T00:00:00Z"
 
 [[package]]
+name = "adbc-driver-manager"
+version = "1.12.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9c/f8/ed6475b49a7cf35ea888d5c95e7d4bc9dc6568f9d741f14c0573d622cc1e/adbc_driver_manager-1.12.0.tar.gz", hash = "sha256:45991f0c2de369d330c6a211ca2edbcce6389c5dc81cde70461bdeb6f8f7b268", size = 217579, upload-time = "2026-07-28T00:43:03.512Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/56/5f/c1d888d787330801edae282d2a9def3765e8157547cc20e71154ff38c1bb/adbc_driver_manager-1.12.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:c894117c8f5c484b902c8b070bcfd9d31d90efe0288b2b58a3ddab97c80f66e7", size = 608277, upload-time = "2026-07-28T00:42:15.643Z" },
+    { url = "https://files.pythonhosted.org/packages/06/4b/ee799babf171e39690ef45560451096f869d9e7387bc0e5a754bb243ed2a/adbc_driver_manager-1.12.0-cp313-cp313-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:214f80f9b65562f08b4d1c52a756b5db557530e3c0652f587c43aaa80039579a", size = 4667230, upload-time = "2026-07-28T00:42:17.97Z" },
+    { url = "https://files.pythonhosted.org/packages/00/c6/a35e38ef5e0db391be79e0e14c019ce378b87d9d7e31d1dfcd451e9d291f/adbc_driver_manager-1.12.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:532ab290b3d923ce0a75bca21dc6e13f55835625f78808e1664755939f3ebdf6", size = 4745299, upload-time = "2026-07-28T00:42:20.189Z" },
+    { url = "https://files.pythonhosted.org/packages/ba/57/6208e66d9256550c2aff75db4a323a855a0d5d2d1bd639526f825d3e08b4/adbc_driver_manager-1.12.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:8a77ae39832e67946009816d83c321e540a3024aad1419ccba24ddeb7b6a01f4", size = 610337, upload-time = "2026-07-28T00:42:25.051Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/cd/f5ea3f08191af5ae15041821fcb52bf35837dce1a9ac16fa039b3bfe308c/adbc_driver_manager-1.12.0-cp314-cp314-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:690f140ca67d49f995afac59f85441c3d5e896cd2fc8fd381423fe900e51f1f7", size = 4664297, upload-time = "2026-07-28T00:42:27.474Z" },
+    { url = "https://files.pythonhosted.org/packages/df/81/823a71a515078545eab8a4be8381206887129e11b91e9bf51ca2a9eea44d/adbc_driver_manager-1.12.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:fd568c94874c0586d82f99de2bb5d2c02b4fa9c5bafe3d0d8ab353bddf9d2fd6", size = 4733739, upload-time = "2026-07-28T00:42:29.814Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/a0/0592c85e653f005aa28de7733b3c3c4f0282238301694f76806e5f3cc1e1/adbc_driver_manager-1.12.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:07cae26bd5ccee6caa4227f817c0fd57f9ac131c2dd98e0c5d7fecfef61819c7", size = 628341, upload-time = "2026-07-28T00:42:33.481Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/00/65705a72f768bc2dda82623a74cf816609dfdff56f3ad22b073d4a1ea7f8/adbc_driver_manager-1.12.0-cp314-cp314t-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:442ed2ee8ea62c475bf3478385555bb4f0b25d9d551087ffe40c73b91bf5431e", size = 4730268, upload-time = "2026-07-28T00:42:35.661Z" },
+    { url = "https://files.pythonhosted.org/packages/44/b9/60ecde5d9dde5acc5576cb0ba5ffa34e154464e07fa295c57cd975ea27c7/adbc_driver_manager-1.12.0-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9c2aa05c5dc52164692284b2df27fba5680dbc967b8e3ca704aabf5399667996", size = 4777527, upload-time = "2026-07-28T00:42:37.709Z" },
+]
+
+[[package]]
+name = "adbc-driver-postgresql"
+version = "1.12.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "adbc-driver-manager" },
+    { name = "importlib-resources" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ef/9e/cc757dfc1bb5472e35bf066ee4044f6b101bef61036512e8dfb4e97e7e08/adbc_driver_postgresql-1.12.0.tar.gz", hash = "sha256:766a002531bb99b691d2b92e7d928dea21c24ea567c03a6ee1edb61fe95b9187", size = 17793, upload-time = "2026-07-28T00:43:04.481Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2f/d3/f17e69423ed7217b70155d8e531c5cf6fb74f3b598a583e6cfe541dc3e7e/adbc_driver_postgresql-1.12.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:03c617aee8796f38a0a2f1af50ceae92d40f0974f3abbe7eefbaf009fecdc5ce", size = 3337707, upload-time = "2026-07-28T00:42:45.568Z" },
+    { url = "https://files.pythonhosted.org/packages/93/60/3b018e75661ac14a7aab7bb5cc1a95d72ddb9684abaee1e88a685406df81/adbc_driver_postgresql-1.12.0-py3-none-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:b523f15051b27eef18c3a822296c2d94b894be552a0dbe49fe14059e2c706155", size = 3822540, upload-time = "2026-07-28T00:42:47.619Z" },
+    { url = "https://files.pythonhosted.org/packages/00/bb/ee19e7d56824c05892f82a3a2abca94fd2345b7de3dc22baac9e65a46acc/adbc_driver_postgresql-1.12.0-py3-none-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:2c2dc9c29db07ba3e0caf293c57a7ab1259dd772d3725ff1f1aeedb7a1895dd4", size = 3512701, upload-time = "2026-07-28T00:42:49.519Z" },
+]
+
+[[package]]
+name = "adbc-driver-sqlite"
+version = "1.12.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "adbc-driver-manager" },
+    { name = "importlib-resources" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/02/2dc143bdd2a62c52d103d4b0ae491a347944aaed25b3d40fb11797750c70/adbc_driver_sqlite-1.12.0.tar.gz", hash = "sha256:18466a2f0c14f94cb0b17818157cc14ed6b93aef0a48ef648de945e9bac1540d", size = 12849, upload-time = "2026-07-28T00:43:05.408Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/31/5d1d637e6ae76fcc57d5116d537aa78d2ab687354d5a0b2d527e085b61d4/adbc_driver_sqlite-1.12.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:5a81f53791e4aec69afbf8f77dac6acf48749fd84684e86601eafdd36d2eb7c3", size = 1357479, upload-time = "2026-07-28T00:42:55.194Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/99/415bf90eb912403d2d5d0c31baa1cedf200bd510f40027ee8fd3421c4c02/adbc_driver_sqlite-1.12.0-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:c987d03e3f4850e57f218c8a0b9d224209123af642469ee1f36901c5a51725bd", size = 1501753, upload-time = "2026-07-28T00:42:57.442Z" },
+    { url = "https://files.pythonhosted.org/packages/69/10/a3156f19fadd254a4f58a328a8aa9472c981ff93bb4d23f3c22a4341796e/adbc_driver_sqlite-1.12.0-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:3005a80bedf6624c6856da98037ea943a791aa8e82dad458259e0558be32912c", size = 1548999, upload-time = "2026-07-28T00:42:59.163Z" },
+]
+
+[[package]]
 name = "adlfs"
 version = "2026.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -277,6 +327,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e8/1f/989ecfef8e64109a489fff357450cb73fa73a865a92bd8c272170a6922c2/async_lru-2.3.0.tar.gz", hash = "sha256:89bdb258a0140d7313cf8f4031d816a042202faa61d0ab310a0a538baa1c24b6", size = 16332, upload-time = "2026-03-19T01:04:32.413Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e5/e2/c2e3abf398f80732e58b03be77bde9022550d221dd8781bf586bd4d97cc1/async_lru-2.3.0-py3-none-any.whl", hash = "sha256:eea27b01841909316f2cc739807acea1c623df2be8c5cfad7583286397bb8315", size = 8403, upload-time = "2026-03-19T01:04:30.883Z" },
+]
+
+[[package]]
+name = "atpublic"
+version = "8.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c2/da/105fb4e9e966f61eedef4cee081a99a8bf18792ad56aa64467618e8b23c0/atpublic-8.0.1.tar.gz", hash = "sha256:4cc00a2b8ea5645a268edc310667302fe1de2b91aba88d0bd634c0e6564f6ef4", size = 27401, upload-time = "2026-09-21T23:15:08.96Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/98/53/6864ee88ca91a6b1ecc0c0dff9fb6114628a416f3786e0dd80bddbce207f/atpublic-8.0.1-py3-none-any.whl", hash = "sha256:8696fe5b26ec7c8ea521cc8e5487495ba1d3530a9b9a9dc350c8f4f82848f77c", size = 11111, upload-time = "2026-09-21T23:15:08.112Z" },
 ]
 
 [[package]]
@@ -734,6 +793,9 @@ name = "datascience-dataio"
 version = "1.0.0"
 source = { editable = "." }
 dependencies = [
+    { name = "adbc-driver-manager" },
+    { name = "adbc-driver-postgresql" },
+    { name = "adbc-driver-sqlite" },
     { name = "adlfs" },
     { name = "aiohttp" },
     { name = "beautifulsoup4" },
@@ -744,6 +806,7 @@ dependencies = [
     { name = "gcsfs" },
     { name = "h5py" },
     { name = "httpx" },
+    { name = "ibis-framework", extra = ["duckdb"] },
     { name = "ipython" },
     { name = "joblib" },
     { name = "jupyter" },
@@ -779,10 +842,12 @@ dependencies = [
     { name = "pytz" },
     { name = "pyyaml" },
     { name = "requests" },
+    { name = "rich" },
     { name = "s3fs" },
     { name = "simplejson" },
     { name = "sqlalchemy" },
     { name = "tables" },
+    { name = "tenacity" },
     { name = "toolz" },
     { name = "tqdm" },
     { name = "ujson" },
@@ -794,6 +859,9 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "adbc-driver-manager", specifier = "==1.12.0" },
+    { name = "adbc-driver-postgresql", specifier = "==1.12.0" },
+    { name = "adbc-driver-sqlite", specifier = "==1.12.0" },
     { name = "adlfs", specifier = "==2026.8.0" },
     { name = "aiohttp", specifier = "==3.14.3" },
     { name = "beautifulsoup4", specifier = "==4.15.0" },
@@ -804,6 +872,7 @@ requires-dist = [
     { name = "gcsfs", specifier = "==2026.8.1" },
     { name = "h5py", specifier = "==3.16.0" },
     { name = "httpx", specifier = "==0.28.1" },
+    { name = "ibis-framework", extras = ["duckdb"], specifier = "==12.0.0" },
     { name = "ipython", specifier = "==9.17.1" },
     { name = "joblib", specifier = "==1.6.0" },
     { name = "jupyter", specifier = "==1.1.1" },
@@ -839,10 +908,12 @@ requires-dist = [
     { name = "pytz", specifier = "==2026.4" },
     { name = "pyyaml", specifier = "==6.0.3" },
     { name = "requests", specifier = "==2.34.2" },
+    { name = "rich", specifier = "==15.0.0" },
     { name = "s3fs", specifier = "==2026.9.0" },
     { name = "simplejson", specifier = "==4.1.2" },
     { name = "sqlalchemy", specifier = "==2.1.1" },
     { name = "tables", specifier = "==3.11.1" },
+    { name = "tenacity", specifier = "==9.1.4" },
     { name = "toolz", specifier = "==1.1.0" },
     { name = "tqdm", specifier = "==4.70.1" },
     { name = "ujson", specifier = "==6.0.0" },
@@ -1428,6 +1499,35 @@ wheels = [
 ]
 
 [[package]]
+name = "ibis-framework"
+version = "12.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "atpublic" },
+    { name = "parsy" },
+    { name = "python-dateutil" },
+    { name = "sqlglot" },
+    { name = "toolz" },
+    { name = "typing-extensions" },
+    { name = "tzdata" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f2/8e/2e7ad9bdeaf45350da7beeb67a0d4317d400dac882825eb7c3bd4d3c6ae1/ibis_framework-12.0.0.tar.gz", hash = "sha256:238624f2c14fdab8382ca2f4f667c3cdb81e29844cd5f8db8a325d0743767c61", size = 1351369, upload-time = "2026-02-07T14:31:13.171Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9d/b3/11d406849715b47c9d69bb22f50874f80caee96bd1cbe7b61abbebbf5a05/ibis_framework-12.0.0-py3-none-any.whl", hash = "sha256:0bbd790f268da9cb87926d5eaad2b827a573927113c4ed3be5095efa89b9e512", size = 2079219, upload-time = "2026-02-07T14:31:10.646Z" },
+]
+
+[package.optional-dependencies]
+duckdb = [
+    { name = "duckdb" },
+    { name = "numpy" },
+    { name = "packaging" },
+    { name = "pandas" },
+    { name = "pyarrow" },
+    { name = "pyarrow-hotfix" },
+    { name = "rich" },
+]
+
+[[package]]
 name = "idna"
 version = "3.20"
 source = { registry = "https://pypi.org/simple" }
@@ -1446,6 +1546,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/6f/7e/1e7e8dc30634b93ebb3d58a3dea569ad146e656218d3960ab04f62047b29/importlib_metadata-9.0.1.tar.gz", hash = "sha256:ab830580bc0ef3db61ce8fae716389e5462b67e033018bab6d8f80ef17172f99", size = 59124, upload-time = "2026-08-28T15:30:34.646Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b3/55/ecca97ae19075f1fac62def77731e7f535e6c1fb8f92ff08160c5e6dade8/importlib_metadata-9.0.1-py3-none-any.whl", hash = "sha256:bba5600596a7e21f3eef53281cf28d6a5195634d2f2b78ff9501a3272c6eaab0", size = 27920, upload-time = "2026-08-28T15:30:33.433Z" },
+]
+
+[[package]]
+name = "importlib-resources"
+version = "7.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/06/b56dfa750b44e86157093bc8fca0ab81dccbf5260510de4eaf1cb69b5b99/importlib_resources-7.1.0.tar.gz", hash = "sha256:0722d4c6212489c530f2a145a34c0a7a3b4721bc96a15fada5930e2a0b760708", size = 44985, upload-time = "2026-04-12T16:36:09.232Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8a/db/55a262f3606bebcae07cc14095338471ad7c0bbcaa37707e6f0ee49725b7/importlib_resources-7.1.0-py3-none-any.whl", hash = "sha256:1bd7b48b4088eddb2cd16382150bb515af0bd2c70128194392725f82ad2c96a1", size = 37232, upload-time = "2026-04-12T16:36:08.219Z" },
 ]
 
 [[package]]
@@ -2620,6 +2729,15 @@ wheels = [
 ]
 
 [[package]]
+name = "parsy"
+version = "2.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cc/58/1e3f382eef9e50a2a115486b0c178d22bb97d2fbb85421ccbe5d3a783530/parsy-2.2.tar.gz", hash = "sha256:e943147644a8cf0d82d1bcb5c5867dd517495254cea3e3eb058b1e421cb7561f", size = 47296, upload-time = "2025-09-12T11:39:26.783Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/fc/8cb9073bb1bee54eb49a1ae501a36402d01763812962ac811cdc1c81a9d7/parsy-2.2-py3-none-any.whl", hash = "sha256:5e981613d9d2d8b68012d1dd0afe928967bea2e4eefdb76c2f545af0dd02a9e7", size = 9538, upload-time = "2025-09-12T11:39:25.749Z" },
+]
+
+[[package]]
 name = "pathspec"
 version = "1.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2914,6 +3032,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/1b/b9/58612e977d28dc58c878448866838369ee8da2f1e7cc8ed2c84b952aafee/pyarrow-25.0.1-cp314-cp314t-manylinux_2_28_x86_64.whl", hash = "sha256:6a1fdfc6659b6b19022f2e50627fb5cf7156a66c46bf4299379955cbe742382a", size = 50079036, upload-time = "2026-08-10T12:40:29.169Z" },
     { url = "https://files.pythonhosted.org/packages/72/13/66e1402dcc860e1dc2760b1e0292c9a569b62b3bccab69def1b3e907d006/pyarrow-25.0.1-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:169d3429d5be7c752125890620f75a60776d38b0035eddae939651640822332e", size = 50040226, upload-time = "2026-08-10T12:40:35.186Z" },
     { url = "https://files.pythonhosted.org/packages/78/10/3f1a5497a7ef732ab0f03ecca3e66d89d9c0f57fdc61b4794c456b781f01/pyarrow-25.0.1-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:119297a6dc197e45d9c6d4415f7814a67ffa36c180d26f68c154c58067ae782d", size = 53149035, upload-time = "2026-08-10T12:40:41.454Z" },
+]
+
+[[package]]
+name = "pyarrow-hotfix"
+version = "0.7"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d2/ed/c3e8677f7abf3981838c2af7b5ac03e3589b3ef94fcb31d575426abae904/pyarrow_hotfix-0.7.tar.gz", hash = "sha256:59399cd58bdd978b2e42816a4183a55c6472d4e33d183351b6069f11ed42661d", size = 9910, upload-time = "2025-04-25T10:17:06.247Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2e/c3/94ade4906a2f88bc935772f59c934013b4205e773bcb4239db114a6da136/pyarrow_hotfix-0.7-py3-none-any.whl", hash = "sha256:3236f3b5f1260f0e2ac070a55c1a7b339c4bb7267839bd2015e283234e758100", size = 7923, upload-time = "2025-04-25T10:17:05.224Z" },
 ]
 
 [[package]]
@@ -3507,6 +3634,15 @@ wheels = [
 ]
 
 [[package]]
+name = "sqlglot"
+version = "30.21.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/11/c0/cd761f018601bf954c9018420eb6707e3675292dfa514cfda44d06aff2ee/sqlglot-30.21.0.tar.gz", hash = "sha256:6787ac202a3adc0e25434f1512370a655e51cb3de8c792544de5f6ff9c618d25", size = 6064227, upload-time = "2026-09-30T17:35:09.731Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7e/93/acaa0862f841051e490326c1fc8c61d618d2df26f9e7aed26c331419ab15/sqlglot-30.21.0-py3-none-any.whl", hash = "sha256:816d1a4815b7562b3976efcc0b561c928a743f976efd0fb8ad6db7a5b96c069e", size = 763892, upload-time = "2026-09-30T17:35:07.976Z" },
+]
+
+[[package]]
 name = "stack-data"
 version = "0.6.3"
 source = { registry = "https://pypi.org/simple" }
@@ -3539,6 +3675,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/84/18/bac920aee8239b572c506459607c6dd8742bc6275a43d51d2dd6ae1a1541/tables-3.11.1-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:e3cfe79484351f7216eb8f3767bfa1217bfd271b04428f79cfa7ef6d7491919d", size = 6380142, upload-time = "2026-03-01T11:43:17.213Z" },
     { url = "https://files.pythonhosted.org/packages/59/3c/f4a694aa744d2b14d536e172c28dd70c84445f4787083a82d6d44a39e39f/tables-3.11.1-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:3a9c35f87fcb6a48c79fbc4e3ab15ca8f6053c4ce13063d6ca2ec36cbb58f40f", size = 7014135, upload-time = "2026-03-01T11:43:22.359Z" },
     { url = "https://files.pythonhosted.org/packages/45/82/94d4320d6c0fe5bd55230eec90cd142d58cda37b7cce00a318ac2a6abd93/tables-3.11.1-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:4cf3218b76ba78d156d6ee75c19fb757d50682f6c7b4905370441afbfc9d77f3", size = 7349293, upload-time = "2026-03-01T11:43:27.569Z" },
+]
+
+[[package]]
+name = "tenacity"
+version = "9.1.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/47/c6/ee486fd809e357697ee8a44d3d69222b344920433d3b6666ccd9b374630c/tenacity-9.1.4.tar.gz", hash = "sha256:adb31d4c263f2bd041081ab33b498309a57c77f9acf2db65aadf0898179cf93a", size = 49413, upload-time = "2026-02-07T10:45:33.841Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d7/c1/eb8f9debc45d3b7918a32ab756658a0904732f75e555402972246b0b8e71/tenacity-9.1.4-py3-none-any.whl", hash = "sha256:6095a360c919085f28c6527de529e76a06ad89b23659fa881ae0649b867a9d55", size = 28926, upload-time = "2026-02-07T10:45:32.24Z" },
 ]
 
 [[package]]

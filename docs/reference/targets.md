@@ -80,14 +80,14 @@ extensions every image gets — Jupytext (pair notebooks with `.py` files),
 jupyterlab-git + nbdime (Git UI and notebook-aware diffs), jupyter-resource-usage
 (memory/CPU indicator), and jupyterlab-lsp + python-lsp-server (completion,
 hover, diagnostics); `requests` / `httpx` / `aiohttp` HTTP clients; Pydantic;
-loguru and tqdm.
+loguru, rich (terminal formatting), tenacity (retries), and tqdm.
 
 ??? note "Full package list (base)"
     aiohttp, beautifulsoup4, httpx, ipython, joblib, jupyter, jupyter-resource-usage,
     jupyterlab, jupyterlab-git, jupyterlab-lsp, jupytext, loguru, lxml,
     more-itertools, nbdime, orjson, pendulum, pip, pydantic, pytest, pytest-timeout,
-    python-dateutil, python-dotenv, python-lsp-server, pytz, pyyaml, requests,
-    simplejson, toolz, tqdm, ujson, xmltodict.
+    python-dateutil, python-dotenv, python-lsp-server, pytz, pyyaml, requests, rich,
+    simplejson, tenacity, toolz, tqdm, ujson, xmltodict.
 
 ## scientific
 
@@ -98,7 +98,11 @@ Scientific computing with NumPy, SciPy, and Pandas.
 **Adds:** NumPy, SciPy, Pandas, Statsmodels, SymPy, and Matplotlib, plus the
 modern tabular and array stack — polars, DuckDB, PyArrow (which also backs pandas 3's
 default string type), xarray, pint (units), and pandas' numexpr/bottleneck
-accelerators. System libraries: OpenBLAS, LAPACK, and libgfortran.
+accelerators. Numba compiles numeric Python functions to machine code, and Dask
+(with distributed) runs pandas, NumPy, and xarray work in parallel or out of core.
+`Client()` in a notebook links to the Dask dashboard, which opens through
+JupyterLab at `/proxy/8787/status` (jupyter-server-proxy; Bokeh renders it), so no
+extra port has to be published. System libraries: OpenBLAS, LAPACK, and libgfortran.
 
 ## visualization
 
@@ -108,7 +112,8 @@ Data visualization with Matplotlib, Seaborn, Plotly, and Bokeh.
 
 **Adds:** Matplotlib, Seaborn, Plotly, Bokeh, Altair, HoloViews, hvPlot, and Panel,
 plus plotnine (ggplot2 grammar), great-tables, datashader (millions of points),
-vl-convert (static Altair export), and the JupyterLab renderers ipympl
+vl-convert (static Altair export), itables (sortable, searchable DataFrame
+tables), and the JupyterLab renderers ipympl
 (`%matplotlib widget`) and jupyter-bokeh. Because its parent is `base` (not
 `scientific`), it re-declares NumPy and Pandas for its own examples. System
 libraries: FreeType, libpng, libjpeg-turbo.
@@ -123,8 +128,10 @@ Data I/O for Parquet, HDF5, Excel, and databases.
 polars and DuckDB, Delta Lake tables (deltalake), fast Excel reading (python-calamine)
 and formatted writing (xlsxwriter), SPSS/SAS/Stata files (pyreadstat), zarr and
 netCDF4, cloud filesystems for fsspec (s3fs, gcsfs, adlfs), database drivers
-(psycopg with its binary build, pymysql), and connectorx for fast SQL-to-DataFrame
-loading (plus NumPy and Pandas). System libraries: HDF5.
+(psycopg with its binary build, pymysql), connectorx for fast SQL-to-DataFrame
+loading, Ibis (one dataframe API compiled to SQL, with its DuckDB backend), and
+ADBC drivers for SQLite and PostgreSQL (Arrow tables in and out of a database
+without row conversion) (plus NumPy and Pandas). System libraries: HDF5.
 
 ## ml
 
@@ -134,7 +141,8 @@ Classical machine learning with scikit-learn, XGBoost, and LightGBM.
 
 **Adds:** scikit-learn, XGBoost, LightGBM, imbalanced-learn, and Optuna, plus
 CatBoost, SHAP (explanations), MAPIE (conformal prediction intervals), UMAP, skrub
-(DataFrame preparation), and skops (safe model persistence). XGBoost
+(DataFrame preparation), skops (safe model persistence), and ONNX + onnxruntime
+with skl2onnx (export pipelines and serve them without scikit-learn). XGBoost
 pulls the ~200 MB `nvidia-nccl-cu13` wheel (distributed GPU only); it stays, because
 `deeplearn` and `full` inherit this target's exclusions and torch needs it.
 
@@ -145,8 +153,8 @@ pulls the ~200 MB `nvidia-nccl-cu13` wheel (distributed GPU only); it stays, bec
 Deep learning with PyTorch and TensorFlow.
 
 **Adds:** PyTorch, TorchVision, TorchAudio, TensorFlow, and Keras, plus Lightning,
-torchmetrics, Accelerate, einops, TensorBoard, and ONNX + onnxruntime for portable
-inference. This is the only target that stacks the full classical-ML and
+torchmetrics, Accelerate, einops, and TensorBoard; ONNX + onnxruntime for portable
+inference come from `ml`. This is the only target that stacks the full classical-ML and
 deep-learning frameworks together. It does not install triton, which segfaults
 when TensorFlow is already loaded, so `torch.compile` is unavailable; eager PyTorch,
 including on a GPU, is unaffected.
@@ -218,8 +226,8 @@ Natural language processing.
 
 **Adds:** spaCy (with the `en_core_web_sm` model), Transformers, sentence-transformers,
 NLTK, and tokenizers, plus the Hugging Face training stack (datasets, evaluate,
-Accelerate, PEFT), rapidfuzz, lingua (language detection), tiktoken, BERTopic, KeyBERT,
-and PyTorch. Because its parent is `base` (not `scientific`), it
+Accelerate, PEFT), rapidfuzz, lingua (language detection), tiktoken, SentencePiece,
+BERTopic, KeyBERT, and PyTorch. Because its parent is `base` (not `scientific`), it
 re-declares NumPy and Matplotlib for its own examples. System libraries: OpenBLAS, LAPACK,
 and libgfortran.
 

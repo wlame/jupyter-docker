@@ -123,7 +123,8 @@ Essential utilities included in all specialized targets.
 | PyYAML | YAML processing |
 | requests, httpx, aiohttp | HTTP clients |
 | Pydantic | Data validation |
-| tqdm, loguru | Progress bars, logging |
+| tqdm, loguru, rich | Progress bars, logging, terminal formatting |
+| tenacity | Retries with backoff |
 | python-dotenv | .env file loading |
 | python-dateutil, pytz, pendulum | Date/time utilities |
 | joblib, toolz, more-itertools | Utilities |
@@ -145,6 +146,8 @@ Core libraries for numerical and statistical computing.
 | polars, DuckDB, PyArrow | Fast DataFrames, SQL over DataFrames, Arrow |
 | xarray, pint | Labeled N-D arrays, physical units |
 | numexpr, bottleneck | pandas accelerators |
+| Numba | JIT compiler for numeric Python |
+| Dask, distributed | Parallel and out-of-core computing (dashboard through JupyterLab) |
 
 ### Visualization (Charts & Dashboards)
 
@@ -163,6 +166,7 @@ Interactive and static visualization libraries.
 | great-tables | Publication-quality tables |
 | datashader | Rendering millions of points |
 | vl-convert | Static Altair export |
+| itables | Sortable, searchable DataFrame tables |
 | ipympl, jupyter-bokeh | Interactive matplotlib and Bokeh widgets |
 
 ### DataIO (Data Formats & Databases)
@@ -183,6 +187,8 @@ Read and write various data formats.
 | zarr, netCDF4 | Chunked and scientific arrays |
 | s3fs, gcsfs, adlfs | Cloud storage for fsspec |
 | psycopg, pymysql, connectorx | Database drivers, fast SQL loading |
+| Ibis | One dataframe API compiled to SQL (DuckDB backend) |
+| ADBC (SQLite, PostgreSQL) | Arrow tables in and out of databases |
 
 ### ML (Machine Learning)
 
@@ -200,6 +206,7 @@ Classical machine learning algorithms.
 | MAPIE | Conformal prediction intervals |
 | UMAP | Non-linear embeddings |
 | skrub, skops | DataFrame preparation, safe model persistence |
+| ONNX, onnxruntime, skl2onnx | Export pipelines, serve them without scikit-learn |
 
 ### DeepLearn (Neural Networks)
 
@@ -214,7 +221,7 @@ Deep learning frameworks.
 | Keras | High-level neural network API |
 | Lightning, torchmetrics | Training loops and metrics |
 | Accelerate, einops | Device handling, tensor reshaping |
-| ONNX, onnxruntime, TensorBoard | Portable models, fast inference, dashboards |
+| TensorBoard | Training dashboards (ONNX comes from ML) |
 
 ### Vision (Image Processing)
 
@@ -297,7 +304,7 @@ Text processing and language models.
 | datasets, evaluate | Hugging Face datasets and metrics |
 | Accelerate, PEFT | Fine-tuning, LoRA adapters |
 | rapidfuzz, lingua | Fuzzy matching, language detection |
-| tiktoken | OpenAI tokenizers |
+| tiktoken, SentencePiece | OpenAI tokenizers, subword tokenizer training |
 | BERTopic, KeyBERT | Topic modelling, keyword extraction |
 
 ### Speech (Speech Recognition & TTS)
