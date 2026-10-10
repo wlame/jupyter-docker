@@ -29,7 +29,7 @@ want everything in one place, but it is the exception rather than the default.
    [`targets/matrix.toml`](reference/configuration.md). The per-target `pyproject.toml` and `verify_imports.py` files
    are *generated* from it by [`scripts/gen_targets.py`](reference/cli.md); they are never hand-edited, and
    CI fails if they drift from the matrix. Changing a dependency means changing a value,
-   not editing 14 files.
+   not editing a file per target.
 2. **Layered targets — build only what you need** — targets form an inheritance tree
    (`base` → `scientific` → `ml` → `deeplearn`, and so on). A child image is its parent
    plus a curated addition, so image size scales with the specialization you actually use

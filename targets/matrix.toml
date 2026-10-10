@@ -127,6 +127,19 @@ examples = [
     "29_forecasting_toolkit",
 ]
 
+[targets.optimization]
+parent = "scientific"
+description = "Mathematical optimization: linear, integer, convex, routing, and scheduling"
+examples = [
+    "34_optimization",
+]
+# OR-Tools bundles its own libhighs.so.1, and highspy ships an incompatible one
+# under the same name: whichever loads first breaks the other's import. OR-Tools
+# already embeds HiGHS, SCIP, CBC, and CP-SAT, so highspy (a cvxpy dependency,
+# imported only for its HIGHS solver) is dropped; PuLP and Pyomo use the CBC
+# binary from the coinor-cbc system package instead. full inherits this exclusion.
+exclude-dependencies = ["highspy"]
+
 [targets.nlp]
 parent = "base"
 description = "Natural language processing"
@@ -1002,6 +1015,30 @@ introduced-by = ["timeseries"]
 version = "0.9.0"
 module = "tslearn"
 introduced-by = ["timeseries"]
+
+# ── introduced in: optimization ──────────────────────────────────────────────
+
+# The verify scripts import the native routing module, so a libhighs clash
+# (see the optimization target) fails verification instead of a notebook.
+[packages."ortools"]
+version = "9.15.6755"
+module = "ortools.constraint_solver.pywrapcp"
+introduced-by = ["optimization"]
+
+[packages."cvxpy"]
+version = "1.9.3"
+module = "cvxpy"
+introduced-by = ["optimization"]
+
+[packages."pyomo"]
+version = "6.10.1"
+module = "pyomo.environ"
+introduced-by = ["optimization"]
+
+[packages."pulp"]
+version = "4.0.0"
+module = "pulp"
+introduced-by = ["optimization"]
 
 # ── introduced in: nlp ───────────────────────────────────────────────────────
 

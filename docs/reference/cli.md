@@ -96,6 +96,7 @@ target is given, all targets are built and tested** in dependency order.
     audio
     geospatial
     timeseries
+    optimization
     nlp
     speech
     face

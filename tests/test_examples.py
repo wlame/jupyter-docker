@@ -405,6 +405,24 @@ def test_example_29_forecasting_toolkit():
 
 
 # =============================================================================
+# OPTIMIZATION target — OR-Tools, CVXPY, Pyomo, PuLP (with the CBC solver)
+# =============================================================================
+
+@pytest.mark.optimization
+def test_example_34_optimization():
+    """Assignment (SciPy vs PuLP+CBC), OR-Tools routing, CVXPY frontier, Pyomo MILP."""
+    run_example(
+        '34_optimization.py',
+        expected_outputs=[
+            'optimization_routes.png',
+            'optimization_frontier.png',
+            'optimization_summary.json',
+        ],
+        timeout=300,
+    )
+
+
+# =============================================================================
 # NLP target — spaCy, NLTK, transformers, sentence-transformers, datasets, PEFT
 # =============================================================================
 

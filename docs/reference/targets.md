@@ -56,6 +56,7 @@ docker pull ghcr.io/wlame/jupyter-docker:scientific-py3.14-a1b2c3d
 | `audio` | `base` | 3.14, 3.13 | ~3360 MB | Audio processing and analysis |
 | `geospatial` | `scientific` | 3.14, 3.13 | ~750 MB | Geospatial analysis and mapping |
 | `timeseries` | `scientific` | 3.14, 3.13 | ~810 MB | Time series analysis and forecasting |
+| `optimization` | `scientific` | 3.14, 3.13 | not yet measured | Linear, integer, convex, routing, scheduling |
 | `nlp` | `base` | 3.14, 3.13 | ~3390 MB | Natural language processing |
 | `speech` | `base` | 3.14, 3.13 | ~3680 MB | Speech recognition and text-to-speech |
 | `face` | `base` | 3.13 | ~4130 MB | Face detection, recognition, and analysis |
@@ -217,6 +218,22 @@ Time series analysis and forecasting.
 ??? note "Full package list (timeseries)"
     arch, imbalanced-learn, lightgbm, mlforecast, numba, optuna, pmdarima, prophet,
     scikit-learn, skforecast, sktime, statsforecast, tsfresh, tslearn, xgboost.
+
+## optimization
+
+**Inherits from:** `scientific`
+
+Mathematical optimization: linear, integer, convex, routing, and scheduling.
+
+**Adds:** OR-Tools (CP-SAT, vehicle routing, and embedded SCIP, CBC, HiGHS, GLOP,
+and PDLP solvers), CVXPY (convex problems, with Clarabel, OSQP, and SCS), Pyomo,
+and PuLP. System package: coinor-cbc, the `cbc` command that PuLP and Pyomo call.
+
+!!! note "No highspy"
+    highspy ships a `libhighs.so.1` that clashes with the one OR-Tools bundles:
+    whichever loads first breaks the other's import. The image leaves highspy out
+    (OR-Tools already embeds HiGHS, and CVXPY solves integer problems through
+    SciPy's HiGHS), so PuLP and Pyomo use CBC. Don't `pip install highspy` here.
 
 ## nlp
 

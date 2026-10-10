@@ -58,7 +58,7 @@ Each `[packages."<name>"]` block declares three required fields:
 - **`introduced-by`** — the list of targets that add the package. It lands in
   those targets **and all their descendants**. Adding to `["base"]` reaches every
   image; adding to `["scientific"]` reaches `scientific`, `ml`, `deeplearn`,
-  `geospatial`, and `timeseries`.
+  `geospatial`, `timeseries`, and `optimization`.
 
 Two optional fields cover harder cases: `overrides` pins a different version for
 specific targets (with a comment explaining the constraint), and `source-url`
@@ -125,7 +125,7 @@ same `just gen` → `just lock` → `just build <target>` → `just test <target
 
 Set `introduced-by` to the narrowest target that needs the library. Adding to
 `["scientific"]` keeps it out of unrelated images like `vision` or `audio` while
-still reaching `ml`, `deeplearn`, `geospatial`, and `timeseries`.
+still reaching `ml`, `deeplearn`, `geospatial`, `timeseries`, and `optimization`.
 
 ### Limit a target to some Python versions
 

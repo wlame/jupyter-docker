@@ -172,6 +172,11 @@ IMPORTS = [
     ("statsforecast", "statsforecast"),
     ("tsfresh", "tsfresh"),
     ("tslearn", "tslearn"),
+    # --- optimization ---
+    ("cvxpy", "cvxpy"),
+    ("ortools.constraint_solver.pywrapcp", "ortools"),
+    ("pulp", "pulp"),
+    ("pyomo.environ", "pyomo"),
     # --- nlp ---
     ("bertopic", "bertopic"),
     ("datasets", "datasets"),

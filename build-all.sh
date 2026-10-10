@@ -31,6 +31,7 @@ ALL_TARGETS=(
     "audio"
     "geospatial"
     "timeseries"
+    "optimization"
     "nlp"
     "speech"
     "face"

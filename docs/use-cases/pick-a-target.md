@@ -33,6 +33,7 @@ Map the work you're doing to a target, then pull it:
 | Audio processing | `audio` | `docker pull ghcr.io/wlame/jupyter-docker:audio` |
 | Geographic data / maps / GIS | `geospatial` | `docker pull ghcr.io/wlame/jupyter-docker:geospatial` |
 | Time series forecasting | `timeseries` | `docker pull ghcr.io/wlame/jupyter-docker:timeseries` |
+| Optimization (LP/MIP, routing, scheduling) | `optimization` | `docker pull ghcr.io/wlame/jupyter-docker:optimization` |
 | Text / NLP work | `nlp` | `docker pull ghcr.io/wlame/jupyter-docker:nlp` |
 | Speech recognition / synthesis | `speech` | `docker pull ghcr.io/wlame/jupyter-docker:speech` |
 | Face detection / recognition | `face` | `docker pull ghcr.io/wlame/jupyter-docker:face` |
@@ -60,7 +61,8 @@ base
 │   ├── ml
 │   │   └── deeplearn
 │   ├── geospatial
-│   └── timeseries
+│   ├── timeseries
+│   └── optimization
 ├── visualization
 ├── dataio
 ├── vision
@@ -95,6 +97,7 @@ Deeper and broader targets are larger. Approximate **compressed download** sizes
 | `audio` | ~3.4 GB | base |
 | `geospatial` | ~750 MB | scientific |
 | `timeseries` | ~810 MB | scientific |
+| `optimization` | not yet measured | scientific |
 | `nlp` | ~3.4 GB | base |
 | `speech` | ~3.7 GB | base |
 | `face` | ~4.1 GB | base |

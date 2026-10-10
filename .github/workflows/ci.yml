@@ -369,6 +369,30 @@ jobs:
           image-name: ${{ env.IMAGE_NAME }}
           registry-token: ${{ secrets.GITHUB_TOKEN }}
 
+  optimization:
+    name: optimization (py${{ matrix.python }})
+    needs: [plan, scientific]
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ fromJSON(needs.plan.outputs.pythons).optimization }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/build-and-test
+        with:
+          target: optimization
+          python-version: ${{ matrix.python }}
+          default-python: ${{ fromJSON(needs.plan.outputs.pythons).optimization[0] }}
+          cache-scopes: base scientific
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+          image-name: ${{ env.IMAGE_NAME }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
+
   # ─── Tier 4 — heavyweight images ─────────────────────────────────────────────
   deeplearn:
     name: deeplearn (py${{ matrix.python }})

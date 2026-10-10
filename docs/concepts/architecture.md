@@ -68,6 +68,7 @@ flowchart TD
     scientific --> ml[ml]
     scientific --> geospatial[geospatial]
     scientific --> timeseries[timeseries]
+    scientific --> optimization[optimization]
     ml --> deeplearn[deeplearn]
 ```
 
@@ -75,8 +76,8 @@ The chains that matter:
 
 - `base` → `scientific` → `ml` → `deeplearn` — numerical stack, then classical ML,
   then the deep learning frameworks.
-- `scientific` → `geospatial` and `scientific` → `timeseries` — both build on the
-  NumPy/SciPy/Pandas core.
+- `scientific` → `geospatial`, `timeseries`, and `optimization` — each builds on
+  the NumPy/SciPy/Pandas core.
 - `base` → `visualization`, `dataio`, `vision`, `audio`, `nlp`, `speech`, `face` —
   siblings that each inherit only the common utilities.
 - `full` is `FROM base` but installs the **union** of every target's packages and

@@ -66,6 +66,7 @@ Access Jupyter Lab at: **http://localhost:8888**
 | `audio` | ~3GB | Librosa, TorchAudio, soundfile | base |
 | `geospatial` | ~2GB | Cartopy, GeoPandas, Folium | scientific |
 | `timeseries` | ~2GB | tsfresh, sktime, Prophet | scientific |
+| `optimization` | not yet measured | OR-Tools, CVXPY, Pyomo, PuLP | scientific |
 | `nlp` | ~4GB | spaCy, Transformers, NLTK | base |
 | `speech` | ~4GB | Whisper, gTTS, SpeechBrain | base |
 | `face` | ~7GB | DeepFace, dlib, face-alignment | base |
@@ -79,7 +80,8 @@ base
 │   ├── ml
 │   │   └── deeplearn
 │   ├── geospatial
-│   └── timeseries
+│   ├── timeseries
+│   └── optimization
 ├── visualization
 ├── dataio
 ├── vision
@@ -290,6 +292,16 @@ Time series modeling and forecasting.
 | arch | Volatility (GARCH) models |
 | tslearn | Time-series clustering and DTW |
 
+### Optimization (Operations Research)
+
+Linear, integer, and convex optimization, routing, and scheduling.
+
+| Library | Description |
+|---------|-------------|
+| OR-Tools | CP-SAT, vehicle routing, embedded SCIP/CBC/HiGHS/GLOP/PDLP |
+| CVXPY | Convex optimization (Clarabel, OSQP, SCS) |
+| Pyomo, PuLP | Algebraic modeling, solved with the bundled CBC command |
+
 ### NLP (Natural Language Processing)
 
 Text processing and language models.
@@ -450,6 +462,7 @@ examples), and `full` ships all of them:
 | `31_speech_metrics_vad` | `speech` | jiwer, silero-vad, parselmouth |
 | `32_dataframe_engines` | `dataio` | One query in pandas, Polars, DuckDB, and Ibis; ADBC |
 | `33_lorenz_numba_dask` | `scientific` | Lorenz attractor with SymPy, Numba, FFT, and Dask |
+| `34_optimization` | `optimization` | Assignment, OR-Tools routing, CVXPY portfolios, Pyomo MILP |
 
 ## Choosing the Right Target
 
@@ -463,6 +476,7 @@ examples), and `full` ships all of them:
 | Audio processing | `audio` |
 | Geographic data/maps | `geospatial` |
 | Time series forecasting | `timeseries` |
+| Optimization (LP/MIP, routing, scheduling) | `optimization` |
 | Text/NLP work | `nlp` |
 | Speech recognition/synthesis | `speech` |
 | Face detection/recognition | `face` |

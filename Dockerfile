@@ -14,6 +14,7 @@
 #   docker build --target audio -t ds-audio .
 #   docker build --target geospatial -t ds-geospatial .
 #   docker build --target timeseries -t ds-timeseries .
+#   docker build --target optimization -t ds-optimization .
 #   docker build --target nlp -t ds-nlp .
 #   docker build --target speech -t ds-speech .
 #   docker build --target face -t ds-face .
@@ -374,6 +375,33 @@ RUN --mount=type=bind,source=examples,target=/tmp/examples \
 
 
 # =============================================================================
+# OPTIMIZATION: LP, MILP, convex, routing, scheduling (inherits from scientific)
+# =============================================================================
+FROM scientific AS optimization
+LABEL org.opencontainers.image.description="ds-optimization: Mathematical optimization: linear, integer, convex, routing, and scheduling"
+
+# The cbc command is the solver PuLP and Pyomo call (OR-Tools embeds its own).
+USER 0:0
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    coinor-cbc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --chown=jupyter:jupyter targets/optimization/pyproject.toml targets/optimization/uv.lock /home/jupyter/
+COPY --chown=jupyter:jupyter targets/optimization/verify_imports.py /home/jupyter/scripts/verify_optimization.py
+
+USER 1000:1000
+RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
+    uv sync --locked --no-install-project
+
+# Ship this target's examples: its own and its ancestors' (targets/optimization/examples.txt).
+RUN --mount=type=bind,source=examples,target=/tmp/examples \
+    --mount=type=bind,source=targets/optimization/examples.txt,target=/tmp/examples.txt \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+
+
+# =============================================================================
 # NLP: Natural language processing (inherits from base, needs torch)
 # =============================================================================
 FROM base AS nlp
@@ -588,6 +616,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     libatomic1 \
     # Face (mediapipe -> sounddevice)
     libportaudio2 \
+    # Optimization (the solver PuLP and Pyomo call)
+    coinor-cbc \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
