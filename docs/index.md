@@ -32,7 +32,7 @@ published to GitHub Container Registry on every push to `main`.
 
 ## Features
 
-- **14 composable targets** — an inheritance tree from a ~330 MB `base` to a ~5.3 GB `full` image (compressed); build only what you need.
+- **18 composable targets** — an inheritance tree from a ~240 MB `base` to a ~6.5 GB `full` image (compressed); build only what you need.
 - **Single source of truth** — all dependencies live in `targets/matrix.toml`; per-target files are generated, never hand-edited.
 - **Reproducible builds** — a committed `uv.lock` per target; the Dockerfile runs `uv sync --locked` and never resolves at build time.
 - **Choose your Python** — each target is published for every Python it supports: 3.14 by default, 3.13 alongside it (TensorFlow targets are 3.13-only for now). Ubuntu 24.04, deadsnakes, and a version-pinned uv 0.12.23.

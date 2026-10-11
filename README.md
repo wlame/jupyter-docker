@@ -54,26 +54,26 @@ Access Jupyter Lab at: **http://localhost:8888**
 
 ## Available Targets
 
-| Target | Size | Description | Inherits From |
-|--------|------|-------------|---------------|
-| `base` | ~500MB | Common utilities (JSON, HTTP, dates) | Ubuntu 24.04 |
-| `scientific` | ~1.2GB | NumPy, SciPy, Pandas, Statsmodels | base |
-| `visualization` | ~900MB | Matplotlib, Plotly, Bokeh, Altair | base |
-| `dataio` | ~800MB | Parquet, HDF5, Excel, SQL | base |
-| `ml` | ~2GB | Scikit-learn, XGBoost, LightGBM | scientific |
-| `deeplearn` | ~6GB | PyTorch, TensorFlow, Keras | ml |
-| `vision` | ~2GB | OpenCV, Pillow, YOLO | base |
-| `audio` | ~3GB | Librosa, TorchAudio, soundfile | base |
-| `geospatial` | ~2GB | Cartopy, GeoPandas, Folium | scientific |
-| `timeseries` | ~2GB | tsfresh, sktime, Prophet | scientific |
-| `optimization` | not yet measured | OR-Tools, CVXPY, Pyomo, PuLP | scientific |
-| `jax` | not yet measured | JAX, Optax, Flax, Equinox, NumPyro | scientific |
-| `probabilistic` | not yet measured | PyMC, nutpie, ArviZ, Bambi | jax |
-| `nlp` | ~4GB | spaCy, Transformers, NLTK | base |
-| `genai` | not yet measured | TRL, FAISS, bm25s, diffusers, LLM clients | nlp |
-| `speech` | ~4GB | Whisper, gTTS, SpeechBrain | base |
-| `face` | ~7GB | DeepFace, dlib, face-alignment | base |
-| `full` | ~14GB | Everything combined | standalone |
+| Target | Compressed size | Description | Inherits From |
+|--------|-----------------|-------------|---------------|
+| `base` | ~240 MB | Common utilities (JSON, HTTP, dates) | Ubuntu 24.04 |
+| `scientific` | ~640 MB | NumPy, SciPy, Pandas, Statsmodels | base |
+| `visualization` | ~580 MB | Matplotlib, Plotly, Bokeh, Altair | base |
+| `dataio` | ~650 MB | Parquet, HDF5, Excel, SQL | base |
+| `ml` | ~1.2 GB | Scikit-learn, XGBoost, LightGBM | scientific |
+| `deeplearn` | ~4.6 GB | PyTorch, TensorFlow, Keras | ml |
+| `vision` | ~3.7 GB | OpenCV, Pillow, YOLO | base |
+| `audio` | ~3.7 GB | Librosa, TorchAudio, soundfile | base |
+| `geospatial` | ~890 MB | Cartopy, GeoPandas, Folium | scientific |
+| `timeseries` | ~1.1 GB | tsfresh, sktime, Prophet | scientific |
+| `optimization` | ~760 MB | OR-Tools, CVXPY, Pyomo, PuLP | scientific |
+| `jax` | ~780 MB | JAX, Optax, Flax, Equinox, NumPyro | scientific |
+| `probabilistic` | ~890 MB | PyMC, nutpie, ArviZ, Bambi | jax |
+| `nlp` | ~4.0 GB | spaCy, Transformers, NLTK | base |
+| `genai` | ~4.3 GB | TRL, FAISS, bm25s, diffusers, LLM clients | nlp |
+| `speech` | ~4.1 GB | Whisper, gTTS, SpeechBrain | base |
+| `face` | ~4.2 GB | DeepFace, dlib, face-alignment | base |
+| `full` | ~6.5 GB | Everything combined | standalone |
 
 ### Target Inheritance Tree
 

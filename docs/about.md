@@ -69,7 +69,7 @@ versus a layered family you compose from:
 | Dimension | jupyter-docker | Monolithic notebook image |
 |---|---|---|
 | Pull only the libraries you need | ✅ Yes — pick a target | ❌ No — one large image |
-| Image size scales with the task | ✅ Yes (~330 MB base → ~5.3 GB full, compressed) | ⚠️ Always the full stack |
+| Image size scales with the task | ✅ Yes (~240 MB base → ~6.5 GB full, compressed) | ⚠️ Always the full stack |
 | Single-file dependency source of truth | ✅ Yes (`targets/matrix.toml`) | ⚠️ Varies |
 | Reproducible pinned builds (`uv sync --locked`) | ✅ Yes, per target | ⚠️ Varies |
 | One image with everything preinstalled | ⚠️ Only the `full` target | ✅ Yes |
@@ -81,7 +81,7 @@ versus a layered family you compose from:
   until TensorFlow 2.22 (and tf-keras 2.22 for `face`) are released; every other
   target builds for both 3.14 and 3.13.
 - **Heavy targets are large** — image size climbs with the stack: deep learning, speech,
-  vision, and face targets run to several gigabytes, up to roughly 5.3 GB compressed for
+  vision, and face targets run to several gigabytes, up to roughly 6.5 GB compressed for
   `full`. This is inherent to bundling frameworks like PyTorch and TensorFlow.
 - **The constraint web pins some libraries below latest** — real upstream conflicts force
   version holds (for example, coqui-tts needs transformers 4, which also holds back

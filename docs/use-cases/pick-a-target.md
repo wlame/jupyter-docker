@@ -9,9 +9,9 @@ tags:
 ## Scenario
 
 You know what you want to do — analyze data, train a model, process audio — but
-not which of the 14 images to pull. Picking well matters: targets inherit from
-one another, and bigger targets mean bigger images (from ~330 MB for `base` to
-~5.3 GB for `full`, compressed). The goal is the **smallest** target that carries
+not which of the 18 images to pull. Picking well matters: targets inherit from
+one another, and bigger targets mean bigger images (from ~240 MB for `base` to
+~6.5 GB for `full`, compressed). The goal is the **smallest** target that carries
 every library your work needs.
 
 ## Prerequisites
@@ -93,29 +93,29 @@ Deeper and broader targets are larger. Approximate **compressed download** sizes
 
 | Target | Approx. compressed size | Inherits from |
 |---|---|---|
-| `base` | ~330 MB | Ubuntu 24.04 |
-| `scientific` | ~530 MB | base |
-| `visualization` | ~470 MB | base |
-| `dataio` | ~465 MB | base |
-| `ml` | ~655 MB | scientific |
-| `deeplearn` | ~3.9 GB | ml |
-| `vision` | ~4.7 GB | base |
-| `audio` | ~3.4 GB | base |
-| `geospatial` | ~750 MB | scientific |
-| `timeseries` | ~810 MB | scientific |
-| `optimization` | not yet measured | scientific |
-| `jax` | not yet measured | scientific |
-| `probabilistic` | not yet measured | jax |
-| `nlp` | ~3.4 GB | base |
-| `genai` | not yet measured | nlp |
-| `speech` | ~3.7 GB | base |
-| `face` | ~4.1 GB | base |
-| `full` | ~5.3 GB | standalone |
+| `base` | ~240 MB | Ubuntu 24.04 |
+| `scientific` | ~640 MB | base |
+| `visualization` | ~580 MB | base |
+| `dataio` | ~650 MB | base |
+| `ml` | ~1.2 GB | scientific |
+| `deeplearn` | ~4.6 GB | ml |
+| `vision` | ~3.7 GB | base |
+| `audio` | ~3.7 GB | base |
+| `geospatial` | ~890 MB | scientific |
+| `timeseries` | ~1.1 GB | scientific |
+| `optimization` | ~760 MB | scientific |
+| `jax` | ~780 MB | scientific |
+| `probabilistic` | ~890 MB | jax |
+| `nlp` | ~4.0 GB | base |
+| `genai` | ~4.3 GB | nlp |
+| `speech` | ~4.1 GB | base |
+| `face` | ~4.2 GB | base |
+| `full` | ~6.5 GB | standalone |
 
 See [Image targets](../reference/targets.md) for the full catalog.
 
 !!! tip "Reach for `full` only when you truly need everything"
-    `full` (~5.3 GB) is a convenience for exploratory work that crosses many
+    `full` (~6.5 GB) is a convenience for exploratory work that crosses many
     domains. For a focused task, a specialized target pulls and starts far faster.
     `full` also holds a few libraries back to co-exist (e.g. it pins transformers 4
     and its neighbours so the TTS and NLP stacks resolve together).
