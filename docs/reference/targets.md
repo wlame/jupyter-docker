@@ -6,7 +6,7 @@ tags:
 
 # Targets
 
-`jupyter-docker` ships as a family of 14 image targets. Each is a separate build
+`jupyter-docker` ships as a family of 18 image targets. Each is a separate build
 stage in one `Dockerfile`, published to the GitHub Container Registry at:
 
 ```
@@ -214,14 +214,15 @@ Time series analysis and forecasting.
 
 **Adds:** sktime, tsfresh, pmdarima, and Prophet, plus statsforecast and mlforecast
 (Nixtla), skforecast, arch (volatility models), tslearn, the classical-ML family
-(scikit-learn, XGBoost, LightGBM, imbalanced-learn, Optuna), and numba.
+(scikit-learn, XGBoost, LightGBM, imbalanced-learn, Optuna). Numba comes from
+`scientific`.
 
 !!! note "pandas 2.x"
     statsforecast, mlforecast, and skforecast require pandas < 3, so this target
     (and `full`) holds pandas 2.3.3 while the other targets run pandas 3.
 
 ??? note "Full package list (timeseries)"
-    arch, imbalanced-learn, lightgbm, mlforecast, numba, optuna, pmdarima, prophet,
+    arch, imbalanced-learn, lightgbm, mlforecast, optuna, pmdarima, prophet,
     scikit-learn, skforecast, sktime, statsforecast, tsfresh, tslearn, xgboost.
 
 ## optimization
@@ -348,8 +349,8 @@ builder stage and only the finished virtual environment ships in the runtime ima
 
 Most packages are permissively licensed. A few are copyleft, which matters if you
 redistribute an image or code linked against them: Ultralytics (`vision`, `full`)
-is AGPL-3.0; pedalboard and praat-parselmouth (`audio`, `speech`, `full`) are
-GPL-3.0; psycopg (`dataio`, `full`) is LGPL-3.0. Some additions are large on their
+is AGPL-3.0; pedalboard (`audio`, `full`) and praat-parselmouth (`audio`, `speech`,
+`full`) are GPL-3.0; psycopg (`dataio`, `full`) is LGPL-3.0. Some additions are large on their
 own: lingua's language models (~160 MB, `nlp`), CatBoost (~90 MB, `ml`),
 connectorx (~55 MB, `dataio`), and XGBoost's `nvidia-nccl-cu13` (~200 MB, `ml`,
 `timeseries`).
@@ -367,8 +368,10 @@ Because it merges every stack in one environment, `full` carries the same
 constraint-driven pins as the individual targets — OpenCV 4.13 (from `face`) and
 transformers 4.57.6 (from `speech`) — plus the holds transformers 4 forces on its
 neighbours here: tokenizers 0.22, diffusers 0.39, sentence-transformers 5.2, and
-spaCy 3.8.14. Every target's model weights (YOLO26n, NLTK + MiniLM,
-Whisper tiny, face-alignment) are pre-baked. See [Configuration](configuration.md)
+spaCy 3.8.14. It also holds pandas 2.3.3 (from `timeseries`), numba 0.67.0 (from
+`probabilistic`), and protobuf 6.33 without highspy (from `optimization`). Every
+target's model weights (YOLO26n, NLTK + MiniLM, SmolLM2-135M-Instruct, Whisper tiny,
+face-alignment) are pre-baked. See [Configuration](configuration.md)
 for the complete override table.
 
 ## Related pages

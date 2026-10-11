@@ -52,7 +52,8 @@ system package. The base image installs `libgomp1` explicitly because the runtim
 images ship no build toolchain that would otherwise pull it in transitively.
 
 **Fix**: keep `libgomp1` in the base stage's `apt-get install` list. If you trim it
-to slim the image, these imports break across every target that inherits `ml`.
+to slim the image, these imports break in every target that ships them (`ml`,
+`deeplearn`, `timeseries`, `full`).
 
 ---
 
@@ -110,8 +111,9 @@ DeepFace needs, so staying on the last 4.x release keeps DeepFace working.
 **Symptom**: the CI `consistency` job (or a local `just gen-check`) fails and prints
 `STALE:` followed by a generated file path.
 
-**Cause**: a generated `targets/<name>/pyproject.toml` or
-`targets/<name>/verify_imports.py` no longer matches `targets/matrix.toml` — usually
+**Cause**: a generated `targets/<name>/pyproject.toml`,
+`targets/<name>/verify_imports.py`, or `targets/<name>/examples.txt` no longer
+matches `targets/matrix.toml` — usually
 because a generated file was hand-edited, or the matrix was changed without
 regenerating.
 
@@ -119,13 +121,13 @@ regenerating.
 
 ```bash
 # edit targets/matrix.toml, then:
-just gen     # regenerate pyproject.toml + verify_imports.py from the matrix
+just gen     # regenerate pyproject.toml, verify_imports.py, examples.txt
 just lock    # re-resolve every target's uv.lock
 ```
 
 !!! warning "Never edit generated files by hand"
     `targets/matrix.toml` is the single source of truth. Every
-    `targets/<name>/pyproject.toml` and `verify_imports.py` is generated from it by
+    `targets/<name>/pyproject.toml`, `verify_imports.py`, and `examples.txt` is generated from it by
     [`scripts/gen_targets.py`](reference/cli.md). Edit the matrix and regenerate — changes made directly
     to a generated file are reported as `STALE:` and will not survive the next
     `just gen`.
@@ -241,6 +243,20 @@ DeepFace's ~1.5 GB attribute models are deliberately *not* baked; example 20 ski
 them when offline, so their absence is expected, not a failure. If you add an
 example that downloads a new model, add it to `scripts/bake_models.sh` and keep the
 download call as a fallback for runs outside the image.
+
+### `torch.cuda.is_available()` returns `False`
+
+**Symptom**: in `deeplearn` or `full`, PyTorch reports no GPU and runs on the CPU.
+
+**Cause**: the container cannot see the GPU. The usual reasons are a missing
+`--gpus` flag on `docker run`, a host without the NVIDIA Container Toolkit, or a
+host driver older than the R580 branch (the bundled CUDA 13.0 runtime needs 580
+or later).
+
+**Fix**: run `nvidia-smi` on the host to check the driver version, install and
+configure the NVIDIA Container Toolkit, then start the container with
+`--gpus all`. See [GPU deep learning](use-cases/gpu-deep-learning.md) for the full
+setup.
 
 ## Related pages
 

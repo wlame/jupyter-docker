@@ -17,7 +17,7 @@ default:
 
 # ── Generation (targets/matrix.toml is the source of truth) ─────────────────
 
-# Regenerate per-target pyproject.toml / verify_imports.py from the matrix
+# Regenerate per-target pyproject.toml / verify_imports.py / examples.txt from the matrix
 gen:
     python3 scripts/gen_targets.py
 

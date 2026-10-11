@@ -7,22 +7,22 @@ tags:
 # Configuration
 
 `targets/matrix.toml` is the **single source of truth** for every Python
-dependency in every image target. You never edit a per-target `pyproject.toml` or
-`verify_imports.py` by hand — those are generated from the matrix by
+dependency in every image target. You never edit a per-target `pyproject.toml`,
+`verify_imports.py`, or `examples.txt` by hand — those are generated from the matrix by
 [`scripts/gen_targets.py`](cli.md). Change a version, add a package, or hold a dependency
 back in exactly one place: this file.
 
 The matrix has three sections:
 
 - `[settings]` — global values stamped into every generated `pyproject.toml`.
-- `[targets.<name>]` — one Docker build target: its parent, description, and any
-  transitive packages to force-exclude.
+- `[targets.<name>]` — one Docker build target: its parent, description, owned
+  examples, optional Python versions, and any transitive packages to force-exclude.
 - `[packages."<name>"]` — one dependency: its pin, import name, which targets add
   it, and any per-target version holds.
 
 !!! note "Generated files are never edited directly"
-    Every `targets/<name>/pyproject.toml` and `targets/<name>/verify_imports.py`
-    carries a `GENERATED FILE — do not edit by hand` header. Edit the matrix, then
+    Every `targets/<name>/pyproject.toml`, `targets/<name>/verify_imports.py`, and
+    `targets/<name>/examples.txt` carries a `GENERATED FILE — do not edit by hand` header. Edit the matrix, then
     run `just gen`. CI fails if the generated files or lockfiles drift from the
     matrix.
 
@@ -33,7 +33,7 @@ Global values applied to every target.
 | Key | Meaning | Example |
 |-----|---------|---------|
 | `python` | Python versions targets are built for, newest first. The first is the **default**: the version behind the plain `:<target>` image tag. A target can narrow the list (see below). Each version becomes one `required-environments` entry, and the list sets the generated `requires-python` (`>=3.13,<3.15` for two versions, `==3.13.*` for one). | `["3.14", "3.13"]` |
-| `exclude-newer` | Supply-chain guard emitted into `[tool.uv]`. `uv` refuses to resolve any package published after this instant, so a freshly published malicious release can't slip in. Bump it when upgrading. Write a full UTC timestamp: uv reads a bare date in the machine's local timezone, so lockfiles would differ between machines and CI. | `"2026-07-05T00:00:00Z"` |
+| `exclude-newer` | Supply-chain guard emitted into `[tool.uv]`. `uv` refuses to resolve any package published after this instant, so a freshly published malicious release can't slip in. Bump it when upgrading. Write a full UTC timestamp: uv reads a bare date in the machine's local timezone, so lockfiles would differ between machines and CI. | `"2026-10-01T00:00:00Z"` |
 
 ```toml
 [settings]
@@ -128,11 +128,12 @@ full = "4.13.0.90"                      # full merges the face stack, same hold
 
 ## How it's consumed
 
-`scripts/gen_targets.py` reads the matrix and materializes, for each of the 14
+`scripts/gen_targets.py` reads the matrix and materializes, for each of the 18
 targets, a `pyproject.toml` (dependency list, `requires-python`, `exclude-newer`,
 `environments`, `required-environments`, `override-dependencies`,
-`[tool.uv.sources]`) and a `verify_imports.py` (every declared `module`,
-torch-family first).
+`[tool.uv.sources]`), a `verify_imports.py` (every declared `module`,
+torch-family first), and an `examples.txt` (the examples its image ships). `uv lock`
+then resolves each target's committed `uv.lock` from its `pyproject.toml`.
 
 `environments` limits each lockfile to Linux (the images) and Apple-silicon macOS
 (local `uv sync` for development). Without it, uv resolves for every platform, and a
@@ -159,8 +160,8 @@ python3 scripts/gen_targets.py --check  # or: just gen-check  (CI drift gate)
 
 `just gen` rewrites the generated files in place. The `--check` form writes
 nothing and exits non-zero if any generated file would differ — this is the CI
-gate that guarantees the committed `pyproject.toml`/`verify_imports.py` files
-always match the matrix.
+gate that guarantees the committed `pyproject.toml`, `verify_imports.py`, and
+`examples.txt` files always match the matrix.
 
 The loader validates the matrix before generating and raises `SystemExit` listing
 every problem it finds:
@@ -168,7 +169,13 @@ every problem it finds:
 - a target whose `parent` isn't a defined target (`unknown parent`),
 - a package missing its `module` key (`missing module`),
 - a target name in `introduced-by` or `overrides` that isn't defined
-  (`unknown target`).
+  (`unknown target`),
+- an `extras` value that isn't a list of extra names,
+- an `exclude-newer` (global or per package) that isn't a full UTC timestamp,
+- a `python` list that breaks the version rules (a version missing from
+  `[settings] python`, or a child listing a version its parent doesn't build),
+- an example listed by several targets, an example listed but missing from
+  `examples/`, or an example script no target lists.
 
 After editing the matrix, re-resolve the lockfiles too (`just lock`), since the
 Dockerfile builds with `uv sync --locked`.

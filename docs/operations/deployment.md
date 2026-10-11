@@ -184,11 +184,13 @@ Publishing is fully automated by GitHub Actions (`.github/workflows/ci.yml` and
 `.github/actions/build-and-test/action.yml`). On every push to `main`, each target
 is:
 
-1. **Built** for its `--target` stage with registry layer-caching.
+1. **Built** for its `--target` stage, once per supported Python, with registry
+   layer-caching.
 2. **Tested** by running its import verification and example suite
    (`./build-all.sh --test-only <target>`).
 3. **Scanned** with Trivy (report-only, as above).
-4. **Pushed** to GHCR as both `:<target>` and `:<target>-<short-sha>`, with a short
+4. **Pushed** to GHCR as `:<target>-py<X.Y>` and `:<target>-py<X.Y>-<short-sha>`,
+   plus `:<target>` and `:<target>-<short-sha>` for the default Python, with a short
    retry to ride out occasional registry blob races.
 
 The jobs are **tiered to mirror the image inheritance tree** — a fast no-Docker
@@ -214,8 +216,8 @@ patches.
 
 Before running an image in production:
 
-- [ ] **Pin the immutable SHA tag** (`:<target>-<short-sha>`), never the moving
-      `:<target>` tag.
+- [ ] **Pin an immutable SHA tag**, preferably `:<target>-py<X.Y>-<short-sha>`,
+      never the moving `:<target>` tag.
 - [ ] **Require authentication** — set a strong `JUPYTER_TOKEN`, or front the
       container with a reverse proxy that enforces its own auth and TLS.
 - [ ] **Do not publish port `8888` to the public internet.** Bind it to localhost

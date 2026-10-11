@@ -79,8 +79,9 @@ every start, so copy the `?token=...` URL from the terminal. Because this run us
 
 `WORKDIR` is `/home/jupyter`, so the file browser shows the mounted `notebooks/`
 and `data/` alongside the baked-in `examples/`. Opening and running
-`examples/02_pandas_data_analysis.ipynb` exercises Pandas, and its outputs write
-under the examples `output/` directory inside the container.
+`examples/02_pandas_data_analysis.ipynb` exercises Pandas and prints its results;
+examples that save figures or files write them under `examples/output/` inside the
+container.
 
 !!! note "Foreground vs. background"
     `--rm` runs in the foreground and removes the container on exit, so the token
@@ -128,7 +129,7 @@ docker run --rm -p 8888:8888 \
 
 ### Use a different target
 
-`scientific` is just one of 14 targets. Swap the tag for any other — e.g.
+`scientific` is just one of 18 targets. Swap the tag for any other — e.g.
 `ghcr.io/wlame/jupyter-docker:ml` or `:full`. See
 [Pick the right target](pick-a-target.md) to choose.
 

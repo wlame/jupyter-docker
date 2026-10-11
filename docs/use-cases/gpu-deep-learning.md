@@ -71,7 +71,7 @@ docker run --rm --gpus all -p 8888:8888 \
 
 The `torch.cuda.is_available()` check above returns `True` when the driver,
 toolkit, and container runtime line up. If it returns `False`, the notebook is
-running on CPU — see [Troubleshooting](../troubleshooting.md).
+running on CPU — see [Troubleshooting](../troubleshooting.md#torchcudais_available-returns-false).
 
 !!! note "No torch.compile in the TensorFlow images"
     `deeplearn` and `full` bundle both PyTorch and TensorFlow, and triton (torch's

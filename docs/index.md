@@ -13,13 +13,14 @@ Modular, multi-target Docker images for data science on Python 3.14 (and 3.13). 
 
 General-purpose data science notebook images bundle every library under one roof, so
 you pull gigabytes of tooling you will never import. `jupyter-docker` splits the stack
-into 14 composable [**targets**](reference/targets.md) arranged in an inheritance tree — from a lean `base`
+into 18 composable [**targets**](reference/targets.md) arranged in an inheritance tree — from a lean `base`
 image up to an all-in-one `full` environment — so each image carries only the libraries
 its work actually needs.
 
 Every target is defined once in [`targets/matrix.toml`](reference/configuration.md), the single source of truth for
-dependencies. Per-target `pyproject.toml`, import-verification scripts, and committed
-`uv.lock` files are generated from it, giving reproducible `uv sync --locked` builds.
+dependencies. Per-target `pyproject.toml` files, import-verification scripts, and
+example lists are generated from it, and committed `uv.lock` files resolved from those
+give reproducible `uv sync --locked` builds.
 Images run JupyterLab as a non-root user on Ubuntu 24.04 with Python 3.14 or 3.13, and are
 published to GitHub Container Registry on every push to `main`.
 
@@ -75,5 +76,5 @@ Replace `scientific` with any target name. JupyterLab starts on port 8888.
 ## Related pages
 
 - [About the project](about.md) — design philosophy and how it compares to a monolithic image
-- [Configuration reference](reference/configuration.md) — the matrix, environment variables, and build options
+- [Configuration reference](reference/configuration.md) — the matrix keys and the constraint web
 - [Deployment](operations/deployment.md) — running the images in production

@@ -1,8 +1,8 @@
 # =============================================================================
 # Dependency matrix — single source of truth for all Docker targets.
 #
-# Edit this file, then regenerate the per-target pyproject.toml and
-# verify_imports.py files with:
+# Edit this file, then regenerate the per-target pyproject.toml,
+# verify_imports.py, and examples.txt files with:
 #
 #     python3 scripts/gen_targets.py        # rewrite generated files
 #     python3 scripts/gen_targets.py --check # verify nothing drifted (CI)

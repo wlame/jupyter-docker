@@ -5,7 +5,7 @@ tags:
 
 # Use cases
 
-`jupyter-docker` ships one `Dockerfile` with 14 curated [build targets](../reference/targets.md), so the
+`jupyter-docker` ships one `Dockerfile` with 18 curated [build targets](../reference/targets.md), so the
 right image depends on the work you're doing. Each page below walks through a
 complete, copy-pasteable scenario — from a first JupyterLab session to extending
 the dependency matrix — with the exact commands and what to expect.

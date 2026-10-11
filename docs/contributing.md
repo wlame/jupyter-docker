@@ -27,7 +27,7 @@ host-only gates below.
 
 !!! warning "The one rule that matters"
     **[`targets/matrix.toml`](reference/configuration.md) is the single source of truth for dependencies.** Every
-    `targets/<name>/pyproject.toml` and `verify_imports.py` is *generated* from it
+    `targets/<name>/pyproject.toml`, `verify_imports.py`, and `examples.txt` is *generated* from it
     by [`scripts/gen_targets.py`](reference/cli.md). Never hand-edit the generated files — edit the
     matrix and regenerate. CI's consistency check fails if generated files or
     lockfiles drift from the matrix.
@@ -35,11 +35,16 @@ host-only gates below.
 ## Contribution workflow
 
 1. **Edit `targets/matrix.toml`** — change a version, target membership, or override.
-2. **`just gen`** — regenerate the per-target `pyproject.toml` and `verify_imports.py`.
+2. **`just gen`** — regenerate the per-target `pyproject.toml`, `verify_imports.py`, and `examples.txt`.
 3. **`just lock`** — re-resolve every target's committed `uv.lock`.
 4. **`just ci`** — run every fast host gate (see below) before pushing.
 5. **Build and test the affected target(s)** — `just build <target>` then `just test <target>`.
 6. **Open a pull request against `main`** with a clear description of what changed and why.
+
+A new example (`examples/NN_name.py`) also needs an entry in the owning target's
+`examples` list in the matrix and a test in `tests/test_examples.py` marked with
+that target; `just gen` fails while an example script has no owner. Run `just nb`
+to generate its notebook.
 
 !!! note "CI is the arbiter for image builds"
     Image changes cannot be fully verified without Docker. The GitHub Actions

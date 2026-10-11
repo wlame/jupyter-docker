@@ -16,8 +16,8 @@ artifact is regenerated from it in a fixed order.
 ```mermaid
 flowchart TD
     edit["Edit targets/matrix.toml<br/>(the single source of truth)"]
-    edit --> gen["just gen<br/>regenerate per-target<br/>pyproject.toml + verify_imports.py"]
-    gen --> lock["just lock<br/>re-resolve all 14 uv.lock files"]
+    edit --> gen["just gen<br/>regenerate per-target<br/>pyproject.toml, verify_imports.py,<br/>examples.txt"]
+    gen --> lock["just lock<br/>re-resolve all 18 uv.lock files"]
     lock --> ci["just ci<br/>fast host gate (no Docker)"]
     ci --> build["just build &lt;t&gt;<br/>docker build one target"]
     build --> test["just test &lt;t&gt;<br/>verify_imports + pytest examples"]
@@ -38,16 +38,17 @@ Nothing else is edited by hand. A package entry records its `version`, import
 ### 2. `just gen` — regenerate per-target files
 
 [`scripts/gen_targets.py`](../reference/cli.md) reads the matrix and rewrites, for every target,
-`targets/<t>/pyproject.toml` and `targets/<t>/verify_imports.py`. It resolves each
-target's full package set by walking its lineage, so a child's files include
-everything its parent introduced. The `verify_imports.py` script imports every
+`targets/<t>/pyproject.toml`, `targets/<t>/verify_imports.py`, and
+`targets/<t>/examples.txt`. It resolves each target's full package set (and its
+example list) by walking its lineage, so a child's files include everything its
+parent introduced. The `verify_imports.py` script imports every
 declared package (torch-family modules first, ahead of anything that may load TensorFlow).
 
 ### 3. `just lock` — re-resolve the lockfiles
 
 For each `targets/<t>/`, `uv lock` (the pinned uv 0.12.23, run through `uvx`) re-resolves the committed
 `uv.lock` from the freshly generated `pyproject.toml`. The Dockerfile builds with
-`uv sync --locked`, so these 14 lockfiles are what make image builds
+`uv sync --locked`, so these 18 lockfiles are what make image builds
 reproducible — resolution happens here, never at `docker build` time.
 
 ### 4. `just build <t> [python]` — build the image
@@ -90,7 +91,7 @@ cannot disagree.
 !!! warning "Generated files must never be hand-edited"
     `gen-check` and `lock-check` re-run the generator and `uv lock --check` and
     fail if the committed files differ from what the matrix produces. If you edit
-    a generated `pyproject.toml`, `verify_imports.py`, or `uv.lock` directly, CI's
+    a generated `pyproject.toml`, `verify_imports.py`, `examples.txt`, or `uv.lock` directly, CI's
     `consistency` job fails on the drift. Always edit `targets/matrix.toml` and run
     `just gen && just lock`.
 
@@ -98,8 +99,8 @@ cannot disagree.
 
 Some example tests need model weights, which would otherwise require network
 access during the test run. Instead, weights are **pre-baked at build time**:
-[`scripts/bake_models.sh <target>`](../reference/cli.md) runs in the `vision`, `nlp`, `speech`, `face`,
-and `full` stages, right after `uv sync`. It fetches each model into its library's
+[`scripts/bake_models.sh <target>`](../reference/cli.md) runs in the `vision`, `nlp`, `genai`, `speech`,
+`face`, and `full` stages, right after `uv sync`. It fetches each model into its library's
 default cache under `/home/jupyter` (as the `jupyter` user), so no runtime
 environment variable is needed to locate them and the example tests run offline.
 
@@ -107,6 +108,7 @@ What gets baked, by target:
 
 - **vision** → `yolo26n.pt` (the one checksum-pinned download)
 - **nlp** → NLTK corpora and the sentence-transformers MiniLM model
+- **genai** → SmolLM2-135M-Instruct at a pinned revision (plus the inherited `nlp` models)
 - **speech** → Whisper `tiny`
 - **face** → face-alignment s3fd + 2DFAN weights
 - **full** → every target's weights

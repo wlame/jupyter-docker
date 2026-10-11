@@ -306,7 +306,7 @@ Linear, integer, and convex optimization, routing, and scheduling.
 |---------|-------------|
 | OR-Tools | CP-SAT, vehicle routing, embedded SCIP/CBC/HiGHS/GLOP/PDLP |
 | CVXPY | Convex optimization (Clarabel, OSQP, SCS) |
-| Pyomo, PuLP | Algebraic modeling, solved with the bundled CBC command |
+| Pyomo, PuLP | Algebraic modeling, solved with the `cbc` command from the coinor-cbc package |
 
 ### JAX (Accelerated Numerics)
 
@@ -400,8 +400,8 @@ All libraries from all targets combined. Use when you need everything.
 ## Updating Dependencies
 
 All package versions live in one file: `targets/matrix.toml`. The per-target
-`pyproject.toml` and `verify_imports.py` files are generated from it, and each
-target has a committed `uv.lock` for reproducible image builds.
+`pyproject.toml`, `verify_imports.py`, and `examples.txt` files are generated from
+it, and each target has a committed `uv.lock` for reproducible image builds.
 
 ```bash
 # 1. Edit targets/matrix.toml (versions, target membership, overrides)
@@ -458,7 +458,10 @@ docker run --rm -it ds-scientific uv run --no-project ipython
 |-----------------|----------------|---------|
 | `./notebooks` | `/home/jupyter/notebooks` | Your notebooks |
 | `./data` | `/home/jupyter/data` | Data files |
-| `./examples` | `/home/jupyter/examples` | Example scripts |
+
+Each image already contains its own examples in `/home/jupyter/examples`.
+Mounting the repository's `examples/` there would replace them with every example,
+including ones whose libraries the image lacks.
 
 ## Example Files
 

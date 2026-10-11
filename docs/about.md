@@ -14,7 +14,7 @@ stacks, audio and vision libraries, and everything in between. That is convenien
 it isn't — the image is many gigabytes, most of which a given project never imports, and
 a version conflict in one corner of the stack can hold the whole image back.
 
-`jupyter-docker` takes the opposite stance. It decomposes the data science stack into 14
+`jupyter-docker` takes the opposite stance. It decomposes the data science stack into 18
 focused **targets** and arranges them in an inheritance tree, so a project pulls the
 `base` utilities plus exactly the specialization it needs — `scientific`, `ml`, `vision`,
 `nlp`, and so on — and nothing else. A `full` target still exists for when you genuinely
@@ -26,8 +26,8 @@ want everything in one place, but it is the exception rather than the default.
 
 1. **Data-driven single source of truth** — the entire dependency surface (versions,
    which target introduces each package, per-target version overrides) lives as data in
-   [`targets/matrix.toml`](reference/configuration.md). The per-target `pyproject.toml` and `verify_imports.py` files
-   are *generated* from it by [`scripts/gen_targets.py`](reference/cli.md); they are never hand-edited, and
+   [`targets/matrix.toml`](reference/configuration.md). The per-target `pyproject.toml`, `verify_imports.py`, and
+   `examples.txt` files are *generated* from it by [`scripts/gen_targets.py`](reference/cli.md); they are never hand-edited, and
    CI fails if they drift from the matrix. Changing a dependency means changing a value,
    not editing a file per target.
 2. **Layered targets — build only what you need** — targets form an inheritance tree
@@ -45,16 +45,18 @@ want everything in one place, but it is the exception rather than the default.
 
 ## Architecture summary
 
-`targets/matrix.toml` is read by a generator (`scripts/gen_targets.py`) that writes the
-per-target `pyproject.toml`, `verify_imports.py`, and lockfiles. A single multi-stage
+`targets/matrix.toml` is read by a generator (`scripts/gen_targets.py`) that writes each
+target's `pyproject.toml`, `verify_imports.py`, and `examples.txt`; `uv lock` then resolves
+each target's committed `uv.lock`. A single multi-stage
 `Dockerfile` then builds each target as a Docker stage, installing its pinned
 dependencies with `uv sync --locked` on top of an Ubuntu 24.04 base with the selected Python (3.14 or 3.13).
 
 ```mermaid
 flowchart TD
     A[targets/matrix.toml<br/>single source of truth] --> B[scripts/gen_targets.py]
-    B --> C[per-target pyproject.toml<br/>+ verify_imports.py + uv.lock]
-    C --> D[Dockerfile stages<br/>uv sync --locked]
+    B --> C[per-target pyproject.toml<br/>+ verify_imports.py + examples.txt]
+    C --> L[uv lock<br/>committed uv.lock]
+    L --> D[Dockerfile stages<br/>uv sync --locked]
     D --> E[ghcr.io/wlame/jupyter-docker:&lt;target&gt;]
 ```
 

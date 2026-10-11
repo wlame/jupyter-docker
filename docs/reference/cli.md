@@ -27,7 +27,7 @@ arguments and the underlying command it runs (with `justfile` variables resolved
 | Recipe | Args | Description | Underlying command |
 |---|---|---|---|
 | `default` | — | List available recipes | `just --list --unsorted` |
-| `gen` | — | Regenerate per-target `pyproject.toml` / `verify_imports.py` from the matrix | `python3 scripts/gen_targets.py` |
+| `gen` | — | Regenerate per-target `pyproject.toml` / `verify_imports.py` / `examples.txt` from the matrix | `python3 scripts/gen_targets.py` |
 | `gen-check` | — | Verify generated files match the matrix (CI gate) | `python3 scripts/gen_targets.py --check` |
 | `lock` | — | Re-resolve every target's `uv.lock` (run after editing the matrix) | `uvx uv@0.12.23 lock` in each `targets/*/` |
 | `lock-check` | — | Verify all lockfiles are up to date (CI gate) | `uvx uv@0.12.23 lock --check` in each `targets/*/` |
@@ -127,8 +127,8 @@ Examples (from the script header):
 
 For each target, testing runs two steps against the built `ds-<target>` image:
 
-1. **Import verification** — a fast smoke test that imports every package the
-   target adds. It runs the generated `verify_<target>.py` (the `full` and `base`
+1. **Import verification** — a fast smoke test that imports every package in the
+   target, inherited ones included. It runs the generated `verify_<target>.py` (the `full` and `base`
    targets use `verify_imports.py`):
 
     ```bash
@@ -231,6 +231,6 @@ runs (`examples/output/`) never reach the image.
 ## Related pages
 
 - [Image targets](targets.md) — every target, its libraries, and its tag
-- [Configuration](configuration.md) — environment variables and build settings
+- [Configuration](configuration.md) — the matrix keys and the constraint web
 - [Extend the matrix](../use-cases/extend-the-matrix.md) — add a package or target via `targets/matrix.toml`
 - [Contributing](../contributing.md) — dev setup and the PR checklist

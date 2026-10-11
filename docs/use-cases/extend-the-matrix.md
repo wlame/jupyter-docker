@@ -10,8 +10,8 @@ tags:
 ## Scenario
 
 You need a library that isn't in a target yet, or you want to bump one to a newer
-version. In this project you never edit a target's `pyproject.toml` or
-`verify_imports.py` by hand — they are **generated**. The single source of truth
+version. In this project you never edit a target's `pyproject.toml`,
+`verify_imports.py`, or `examples.txt` by hand — they are **generated**. The single source of truth
 for every Python dependency is [`targets/matrix.toml`](../reference/configuration.md). Change it, regenerate, and
 re-resolve the lockfiles.
 
@@ -38,7 +38,7 @@ introduced-by = ["base"]
 Then run the generate → lock → build → test loop:
 
 ```bash
-just gen                 # regenerate every pyproject.toml + verify_imports.py
+just gen                 # regenerate every pyproject.toml, verify_imports.py, examples.txt
 just lock                # re-resolve all committed uv.lock files
 just build base          # build the affected image (BuildKit required)
 just test base           # verify imports + run marked example tests in the image
@@ -60,9 +60,12 @@ Each `[packages."<name>"]` block declares three required fields:
   image; adding to `["scientific"]` reaches `scientific`, `ml`, `deeplearn`,
   `geospatial`, `timeseries`, `optimization`, `jax`, and `probabilistic`.
 
-Two optional fields cover harder cases: `overrides` pins a different version for
-specific targets (with a comment explaining the constraint), and `source-url`
-installs from a direct wheel URL instead of PyPI.
+Optional fields cover harder cases: `overrides` pins a different version for
+specific targets (with a comment explaining the constraint), `source-url` installs
+from a direct wheel URL instead of PyPI, `extras` requests a package's optional
+dependencies, a per-package `exclude-newer` lets one urgent fix past the global
+cutoff, and `verify-first` orders the torch family first in the verify scripts.
+See the [Configuration reference](../reference/configuration.md).
 
 ### Step 2: Regenerate the per-target files
 
@@ -70,8 +73,8 @@ installs from a direct wheel URL instead of PyPI.
 just gen
 ```
 
-This rewrites every `targets/<name>/pyproject.toml` and
-`targets/<name>/verify_imports.py` from the matrix. `just gen-check` is the
+This rewrites every `targets/<name>/pyproject.toml`,
+`targets/<name>/verify_imports.py`, and `targets/<name>/examples.txt` from the matrix. `just gen-check` is the
 read-only CI gate that fails if these drift from the matrix.
 
 ### Step 3: Re-resolve the lockfiles
@@ -102,14 +105,15 @@ target that changed — if you added to `base`, higher targets pick it up too.
 
 !!! warning "The `exclude-newer` supply-chain guard"
     `[settings].exclude-newer` in the matrix refuses to resolve any package
-    published within roughly the last week. If you pin a version newer than that
-    date, `just lock` fails to find it — bump the `exclude-newer` date in
-    `[settings]` when upgrading to a fresh release.
+    published after its fixed UTC timestamp (currently `2026-10-01T00:00:00Z`). If
+    you pin a version newer than that, `just lock` fails to find it — bump the
+    timestamp in `[settings]` when upgrading to a fresh release, or give that one
+    package its own later `exclude-newer`.
 
 ## Expected output
 
 - `just gen` and `just lock` complete without error, updating the generated
-  `pyproject.toml`, `verify_imports.py`, and `uv.lock` files.
+  `pyproject.toml`, `verify_imports.py`, and `examples.txt` files and the `uv.lock` files.
 - `just test base` reports the new package's import verifying successfully inside
   the built image.
 
@@ -150,7 +154,7 @@ carries a `required-environments` entry per version.
 ### Pin a different version for one target
 
 When one target needs an older version to satisfy a constraint, add an
-`overrides` block (mirroring how the matrix caps `pandas` and `scikit-learn` for
+`overrides` block (mirroring how the matrix holds `pandas` at 2.3.3 for
 `timeseries` and `full`):
 
 ```toml

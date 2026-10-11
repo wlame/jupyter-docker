@@ -6,7 +6,7 @@ tags:
 
 # Architecture
 
-`jupyter-docker` is a family of 14 data science images built from a single
+`jupyter-docker` is a family of 18 data science images built from a single
 `Dockerfile`, where every image's Python environment is derived from one
 declarative source: [`targets/matrix.toml`](../reference/configuration.md). This page describes the components,
 how they fit together, and the two structural ideas that shape the build — the
@@ -17,14 +17,16 @@ how they fit together, and the two structural ideas that shape the build — the
 The system is a short generation-and-build pipeline. Each component consumes the
 output of the previous one:
 
-- **`targets/matrix.toml`** — the single source of truth. It declares the 14
+- **`targets/matrix.toml`** — the single source of truth. It declares the 18
   targets and their parent chains, and every package (version, import `module`,
-  which targets `introduced-by`, and per-target `overrides`).
+  which targets `introduced-by`, and per-target `overrides`), plus the examples
+  each target owns.
 - **[`scripts/gen_targets.py`](../reference/cli.md)** — the generator. It materializes the matrix into
   the files the build actually consumes, resolving each target's full package set
   by walking its lineage (a child inherits everything its parent has).
 - **Per-target generated files** — for each target, `gen_targets.py` writes
-  `targets/<t>/pyproject.toml` and `targets/<t>/verify_imports.py`. From each
+  `targets/<t>/pyproject.toml`, `targets/<t>/verify_imports.py`, and
+  `targets/<t>/examples.txt` (the examples its image ships). From each
   `pyproject.toml`, `uv lock` resolves the committed `targets/<t>/uv.lock`.
 - **`Dockerfile`** — a multi-stage build with one stage per target. Each stage
   installs its OS libraries, then runs `uv sync --locked --no-install-project`
@@ -37,12 +39,13 @@ output of the previous one:
 The flow, end to end:
 
 `targets/matrix.toml` → `scripts/gen_targets.py` → per-target
-`pyproject.toml` / `uv.lock` / `verify_imports.py` → multi-stage `Dockerfile` →
+`pyproject.toml` / `verify_imports.py` / `examples.txt` → `uv lock` → `uv.lock` →
+multi-stage `Dockerfile` →
 `ds-<target>` / `ghcr.io/wlame/jupyter-docker:<target>` → CI.
 
 !!! warning "Generated files are never hand-edited"
-    `targets/<t>/pyproject.toml` and `targets/<t>/verify_imports.py` carry a
-    "GENERATED FILE — do not edit by hand" header. Edit `targets/matrix.toml` and
+    `targets/<t>/pyproject.toml`, `targets/<t>/verify_imports.py`, and
+    `targets/<t>/examples.txt` carry a "GENERATED FILE — do not edit by hand" header. Edit `targets/matrix.toml` and
     regenerate. CI's `consistency` job fails if any generated file or lockfile
     drifts from the matrix. See [Data flow](data-flow.md).
 
@@ -157,7 +160,8 @@ flowchart TD
 
 `full` follows the identical pattern with `full-builder`, and additionally installs
 the union of every specialized target's runtime libraries (geospatial, HDF5,
-audio, speech, vision, and PortAudio for face's MediaPipe).
+audio, speech, vision, PortAudio for face's MediaPipe, libatomic for pedalboard,
+and coinor-cbc for optimization's PuLP and Pyomo).
 
 ## One image per Python version
 
@@ -192,6 +196,6 @@ For how a change propagates through this pipeline step by step, see
 ## Related pages
 
 - [Data flow](data-flow.md) — how an edit to the matrix reaches a published image
-- [Targets reference](../reference/targets.md) — the 14 targets and their packages
+- [Targets reference](../reference/targets.md) — the 18 targets and their packages
 - [Configuration reference](../reference/configuration.md) — matrix and settings keys
 - [Deployment](../operations/deployment.md) — pulling and running the images
