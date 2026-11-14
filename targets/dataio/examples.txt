@@ -5,3 +5,4 @@
 18_sqlalchemy_database
 23_modern_data_formats
 32_dataframe_engines
+49_messy_csv_to_parquet

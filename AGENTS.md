@@ -9,7 +9,7 @@ bare to list recipes.
 
 `targets/matrix.toml` is the single source of truth for Python dependencies.
 `scripts/gen_targets.py` generates `targets/<t>/pyproject.toml`,
-`targets/<t>/verify_imports.py`, and `targets/<t>/examples.txt` from it, and
+`targets/<t>/verify_imports.py`, `targets/<t>/examples.txt`, and `targets/<t>/examples.md` from it, and
 `uv lock` resolves the committed `targets/<t>/uv.lock` from the pyproject.
 Change dependencies by editing the matrix, then:
 
@@ -113,8 +113,9 @@ any drift between them, the lockfiles, and the matrix.
 - Each example belongs to one target: its matrix `examples` list. An image ships
   its own target's and its ancestors' examples (`full` ships all), selected at the
   end of each Dockerfile stage by `scripts/select_examples.sh` from the generated
-  `targets/<t>/examples.txt`. A new example needs a matrix entry, or `just gen`
-  fails.
+  `targets/<t>/examples.txt`, with the generated `targets/<t>/examples.md` as its
+  `README.md` (titles come from each example's `# # ` heading). A new example
+  needs a matrix entry, or `just gen` fails.
 - Each example has a test in `tests/test_examples.py` marked with its owning
   target (a generator test checks the match); tests marked `slow` touch the network. A network-dependent section skips
   loudly when offline; a test passes only on real outputs.

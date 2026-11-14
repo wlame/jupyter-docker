@@ -204,6 +204,20 @@ def test_example_32_dataframe_engines():
     )
 
 
+@pytest.mark.dataio
+def test_example_49_messy_csv_to_parquet():
+    """Messy CSV cleaned, validated with Pydantic, written to Parquet, DuckDB report."""
+    run_example(
+        '49_messy_csv_to_parquet.py',
+        expected_outputs=[
+            'orders_clean.parquet',
+            'orders_rejected.csv',
+            'orders_summary.json',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
 # ML target — scikit-learn, XGBoost, LightGBM, CatBoost, SHAP, MAPIE, UMAP, ONNX
 # =============================================================================
@@ -236,6 +250,21 @@ def test_example_24_ml_explain_and_uncertainty():
     )
 
 
+@pytest.mark.ml
+def test_example_38_tabular_ml_end_to_end():
+    """Hold-out split, CV model comparison, Optuna, calibration, SHAP, skops."""
+    run_example(
+        '38_tabular_ml_end_to_end.py',
+        expected_outputs=[
+            'tabular_calibration.png',
+            'tabular_shap.png',
+            'tabular_model.skops',
+            'tabular_summary.json',
+        ],
+        timeout=600,
+    )
+
+
 # =============================================================================
 # DEEPLEARN target — PyTorch, TensorFlow/Keras, Lightning, ONNX
 # =============================================================================
@@ -262,6 +291,19 @@ def test_example_25_lightning_onnx():
         expected_outputs=[
             'lightning_training.png',
             'tiny_mlp.onnx',
+        ],
+        timeout=300,
+    )
+
+
+@pytest.mark.deeplearn
+def test_example_42_same_network_torch_keras():
+    """One MLP on the digits in PyTorch and in Keras."""
+    run_example(
+        '42_same_network_torch_keras.py',
+        expected_outputs=[
+            'torch_keras_loss.png',
+            'torch_keras_summary.json',
         ],
         timeout=300,
     )
@@ -310,6 +352,21 @@ def test_example_26_vision_backbones_kornia():
     )
 
 
+@pytest.mark.vision
+def test_example_43_coins_and_superpixels():
+    """Coin counting with region measurement, SLIC superpixels and merging."""
+    run_example(
+        '43_coins_and_superpixels.py',
+        expected_outputs=[
+            'coins_measured.png',
+            'superpixels.png',
+            'coins.csv',
+            'segmentation_summary.json',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
 # AUDIO target — librosa, torchaudio, soundfile, pedalboard, parselmouth
 # =============================================================================
@@ -340,6 +397,21 @@ def test_example_27_audio_effects_loudness():
             'pedalboard_fx.wav',
             'audio_effects.png',
         ],
+    )
+
+
+@pytest.mark.audio
+def test_example_45_chord_synthesis():
+    """Synthesized chord, note detection, chroma, Griffin-Lim rebuild."""
+    run_example(
+        '45_chord_synthesis.py',
+        expected_outputs=[
+            'chord.wav',
+            'chord_rebuilt.wav',
+            'chord_analysis.png',
+            'chord_summary.json',
+        ],
+        timeout=300,
     )
 
 
@@ -404,6 +476,21 @@ def test_example_29_forecasting_toolkit():
     )
 
 
+@pytest.mark.timeseries
+def test_example_44_co2_forecast():
+    """Mauna Loa CO2: cross-validated ETS/ARIMA vs seasonal naive, 5-year forecast."""
+    run_example(
+        '44_co2_forecast.py',
+        expected_outputs=[
+            'co2_forecast.png',
+            'co2_error_by_horizon.png',
+            'co2_forecast.csv',
+            'co2_summary.json',
+        ],
+        timeout=600,
+    )
+
+
 # =============================================================================
 # OPTIMIZATION target — OR-Tools, CVXPY, Pyomo, PuLP (with the CBC solver)
 # =============================================================================
@@ -417,6 +504,20 @@ def test_example_34_optimization():
             'optimization_routes.png',
             'optimization_frontier.png',
             'optimization_summary.json',
+        ],
+        timeout=300,
+    )
+
+
+@pytest.mark.optimization
+def test_example_41_shift_scheduling():
+    """CP-SAT rota with hard rules and soft day-off requests."""
+    run_example(
+        '41_shift_scheduling.py',
+        expected_outputs=[
+            'shift_rota.png',
+            'shift_rota.csv',
+            'shift_summary.json',
         ],
         timeout=300,
     )
@@ -458,6 +559,19 @@ def test_example_36_bayesian_modeling():
     )
 
 
+@pytest.mark.probabilistic
+def test_example_39_bayesian_ab_test():
+    """Exact Beta-Binomial A/B posterior, expected loss, PyMC cross-check."""
+    run_example(
+        '39_bayesian_ab_test.py',
+        expected_outputs=[
+            'ab_posteriors.png',
+            'ab_summary.json',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
 # NLP target — spaCy, NLTK, transformers, sentence-transformers, datasets, PEFT
 # =============================================================================
@@ -490,6 +604,19 @@ def test_example_30_nlp_toolkit():
     )
 
 
+@pytest.mark.nlp
+def test_example_46_review_analysis():
+    """VADER sentiment, spaCy entities, MiniLM topic clusters on reviews."""
+    run_example(
+        '46_review_analysis.py',
+        expected_outputs=[
+            'reviews_by_topic.png',
+            'reviews_summary.json',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
 # GENAI target — bm25s, FAISS, SmolLM2 (baked), TRL, OpenAI-compatible clients
 # =============================================================================
@@ -502,6 +629,18 @@ def test_example_37_retrieval_and_generation():
         expected_outputs=[
             'genai_answer.txt',
             'genai_results.json',
+        ],
+        timeout=600,
+    )
+
+
+@pytest.mark.genai
+def test_example_40_ask_your_documents():
+    """Chunking, BM25 + MiniLM hybrid retrieval, SmolLM2 answers; server section skips."""
+    run_example(
+        '40_ask_your_documents.py',
+        expected_outputs=[
+            'ask_documents.json',
         ],
         timeout=600,
     )
@@ -540,6 +679,20 @@ def test_example_31_speech_metrics_vad():
     )
 
 
+@pytest.mark.speech
+def test_example_48_speech_roundtrip():
+    """espeak-ng speech, Whisper transcript with word times, WER and CER."""
+    run_example(
+        '48_speech_roundtrip.py',
+        expected_outputs=[
+            'speech_reference.wav',
+            'speech_roundtrip.png',
+            'speech_roundtrip.json',
+        ],
+        timeout=300,
+    )
+
+
 # =============================================================================
 # FACE target — dlib, deepface, face-alignment, mtcnn
 # =============================================================================
@@ -559,6 +712,21 @@ def test_example_20_face_analysis():
             'face_synthetic_input.png',
             'face_detection.png',
             'face_landmarks.png',
+        ],
+        timeout=300,
+    )
+
+
+@pytest.mark.face
+def test_example_47_face_anonymization():
+    """Haar and MTCNN face detection; blur, pixelate, and solid-box anonymization."""
+    run_example(
+        '47_face_anonymization.py',
+        expected_outputs=[
+            'face_anonymization.png',
+            'face_blur.png',
+            'face_pixelate.png',
+            'face_solid_box.png',
         ],
         timeout=300,
     )

@@ -8,3 +8,4 @@
 21_polars_duckdb_xarray
 29_forecasting_toolkit
 33_lorenz_numba_dask
+44_co2_forecast

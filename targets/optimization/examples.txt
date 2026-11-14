@@ -7,3 +7,4 @@
 21_polars_duckdb_xarray
 33_lorenz_numba_dask
 34_optimization
+41_shift_scheduling

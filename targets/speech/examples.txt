@@ -3,3 +3,4 @@
 # Examples copied into this target's image: its own and its ancestors', one per line.
 19_speech_processing
 31_speech_metrics_vad
+48_speech_roundtrip

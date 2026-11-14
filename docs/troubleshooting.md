@@ -112,7 +112,7 @@ DeepFace needs, so staying on the last 4.x release keeps DeepFace working.
 `STALE:` followed by a generated file path.
 
 **Cause**: a generated `targets/<name>/pyproject.toml`,
-`targets/<name>/verify_imports.py`, or `targets/<name>/examples.txt` no longer
+`targets/<name>/verify_imports.py`, `targets/<name>/examples.txt`, or `targets/<name>/examples.md` no longer
 matches `targets/matrix.toml` — usually
 because a generated file was hand-edited, or the matrix was changed without
 regenerating.
@@ -121,13 +121,13 @@ regenerating.
 
 ```bash
 # edit targets/matrix.toml, then:
-just gen     # regenerate pyproject.toml, verify_imports.py, examples.txt
+just gen     # regenerate pyproject.toml, verify_imports.py, examples.txt, examples.md
 just lock    # re-resolve every target's uv.lock
 ```
 
 !!! warning "Never edit generated files by hand"
     `targets/matrix.toml` is the single source of truth. Every
-    `targets/<name>/pyproject.toml`, `verify_imports.py`, and `examples.txt` is generated from it by
+    `targets/<name>/pyproject.toml`, `verify_imports.py`, `examples.txt`, and `examples.md` is generated from it by
     [`scripts/gen_targets.py`](reference/cli.md). Edit the matrix and regenerate — changes made directly
     to a generated file are reported as `STALE:` and will not survive the next
     `just gen`.
@@ -155,8 +155,9 @@ just lock
 
 **Symptom**: `just build visualization` (or another target) on an arm64 host stops
 at `uv sync` with `Failed to build <package>` and `No such file or directory: 'gcc'`
-— for example `multimark`, which great-tables pulls in, or `hdbscan`, which BERTopic
-pulls into `nlp` (and so `genai`) on Python 3.14.
+— for example `multimark`, which great-tables pulls in; `hdbscan`, which BERTopic
+pulls into `nlp` (and so `genai`) on Python 3.14; or `praat-parselmouth` in `audio`
+and `speech`, which publishes no linux arm64 wheels at all.
 
 **Cause**: the lockfiles guarantee wheels for linux **x86_64**, the published
 platform. A few packages ship no linux **arm64** wheel, so an arm64 build tries to

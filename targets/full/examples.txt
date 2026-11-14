@@ -38,3 +38,15 @@
 35_jax_jit_autodiff
 36_bayesian_modeling
 37_retrieval_and_generation
+38_tabular_ml_end_to_end
+39_bayesian_ab_test
+40_ask_your_documents
+41_shift_scheduling
+42_same_network_torch_keras
+43_coins_and_superpixels
+44_co2_forecast
+45_chord_synthesis
+46_review_analysis
+47_face_anonymization
+48_speech_roundtrip
+49_messy_csv_to_parquet

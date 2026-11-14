@@ -8,7 +8,7 @@ tags:
 
 `targets/matrix.toml` is the **single source of truth** for every Python
 dependency in every image target. You never edit a per-target `pyproject.toml`,
-`verify_imports.py`, or `examples.txt` by hand — those are generated from the matrix by
+`verify_imports.py`, `examples.txt`, or `examples.md` by hand — those are generated from the matrix by
 [`scripts/gen_targets.py`](cli.md). Change a version, add a package, or hold a dependency
 back in exactly one place: this file.
 
@@ -21,8 +21,8 @@ The matrix has three sections:
   it, and any per-target version holds.
 
 !!! note "Generated files are never edited directly"
-    Every `targets/<name>/pyproject.toml`, `targets/<name>/verify_imports.py`, and
-    `targets/<name>/examples.txt` carries a `GENERATED FILE — do not edit by hand` header. Edit the matrix, then
+    Every `targets/<name>/pyproject.toml`, `targets/<name>/verify_imports.py`,
+    `targets/<name>/examples.txt`, and `targets/<name>/examples.md` carries a `GENERATED FILE — do not edit by hand` header. Edit the matrix, then
     run `just gen`. CI fails if the generated files or lockfiles drift from the
     matrix.
 
@@ -132,7 +132,8 @@ full = "4.13.0.90"                      # full merges the face stack, same hold
 targets, a `pyproject.toml` (dependency list, `requires-python`, `exclude-newer`,
 `environments`, `required-environments`, `override-dependencies`,
 `[tool.uv.sources]`), a `verify_imports.py` (every declared `module`,
-torch-family first), and an `examples.txt` (the examples its image ships). `uv lock`
+torch-family first), an `examples.txt` (the examples its image ships), and an
+`examples.md` (their README, with titles taken from each example's `# # ` heading). `uv lock`
 then resolves each target's committed `uv.lock` from its `pyproject.toml`.
 
 `environments` limits each lockfile to Linux (the images) and Apple-silicon macOS
@@ -160,8 +161,8 @@ python3 scripts/gen_targets.py --check  # or: just gen-check  (CI drift gate)
 
 `just gen` rewrites the generated files in place. The `--check` form writes
 nothing and exits non-zero if any generated file would differ — this is the CI
-gate that guarantees the committed `pyproject.toml`, `verify_imports.py`, and
-`examples.txt` files always match the matrix.
+gate that guarantees the committed `pyproject.toml`, `verify_imports.py`,
+`examples.txt`, and `examples.md` files always match the matrix.
 
 The loader validates the matrix before generating and raises `SystemExit` listing
 every problem it finds:

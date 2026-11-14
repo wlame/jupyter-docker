@@ -425,6 +425,52 @@ def test_examples_list_includes_ancestor_examples(python_matrix_root: Path):
     assert shipped_examples('grandchild', root=python_matrix_root) == ['01_root', '02_leaf']
 
 
+def test_examples_readme_lists_titles_with_own_examples_first(python_matrix_root: Path):
+    matrix = python_matrix_root / 'targets' / 'matrix.toml'
+    matrix.write_text(
+        matrix.read_text()
+        .replace('description = "root that inherits [settings] python"', 'description = "r"\nexamples = ["01_root"]')
+        .replace('description = "inherits the narrowed list"', 'description = "g"\nexamples = ["02_leaf"]')
+    )
+    (python_matrix_root / 'examples').mkdir()
+    (python_matrix_root / 'examples' / '01_root.py').write_text('#!/usr/bin/env python3\n# # Root Title\n')
+    (python_matrix_root / 'examples' / '02_leaf.py').write_text('# # Leaf Title\n#\n# body\n')
+
+    result = run_gen(root=python_matrix_root)
+    readme = (python_matrix_root / 'targets' / 'grandchild' / 'examples.md').read_text()
+    rows = [line for line in readme.splitlines() if line.startswith('| [')]
+
+    assert result.returncode == 0, result.stderr
+    assert rows == [
+        '| [02_leaf](02_leaf.ipynb) | Leaf Title | `grandchild` |',
+        '| [01_root](01_root.ipynb) | Root Title | `base` |',
+    ]
+
+
+@pytest.mark.parametrize('notebook', sorted((REPO_ROOT / 'examples').glob('[0-9][0-9]_*.ipynb')), ids=lambda p: p.stem)
+def test_every_notebook_code_cell_compiles(notebook: Path):
+    """Each cell must parse on its own: jupytext can split a try/except or uncomment a
+    comment that starts with an IPython command name, which only breaks the notebook."""
+    cells = json.loads(notebook.read_text())['cells']
+    broken = []
+    for index, cell in enumerate(cells):
+        if cell['cell_type'] != 'code':
+            continue
+        try:
+            ast.parse(''.join(cell['source']))
+        except SyntaxError as error:
+            broken.append(f"cell {index}: {error.msg}")
+
+    assert not broken, f"{notebook.name}: {broken}"
+
+
+def test_every_example_has_a_markdown_title():
+    untitled = [path.name for path in sorted((REPO_ROOT / 'examples').glob('[0-9][0-9]_*.py'))
+                if not re.search(r'^# # \S', path.read_text(), flags=re.MULTILINE)]
+
+    assert not untitled, f"examples without a '# # Title' heading: {untitled}"
+
+
 def test_package_extras_render_in_the_requirement(python_matrix_root: Path):
     matrix = python_matrix_root / 'targets' / 'matrix.toml'
     matrix.write_text(matrix.read_text() + """

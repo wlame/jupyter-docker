@@ -400,7 +400,7 @@ All libraries from all targets combined. Use when you need everything.
 ## Updating Dependencies
 
 All package versions live in one file: `targets/matrix.toml`. The per-target
-`pyproject.toml`, `verify_imports.py`, and `examples.txt` files are generated from
+`pyproject.toml`, `verify_imports.py`, `examples.txt`, and `examples.md` files are generated from
 it, and each target has a committed `uv.lock` for reproducible image builds.
 
 ```bash
@@ -469,7 +469,9 @@ The `examples/` directory contains Python scripts and Jupyter notebooks. The
 `.py` files are the source of truth; notebooks are generated from them with
 jupytext (`just nb`) and CI verifies they stay in sync. Each image ships the
 examples of its own target and its parents (`ml` also has the `scientific`
-examples), and `full` ships all of them:
+examples), plus a `README.md` listing them, and `full` ships all of them. Open a
+notebook in JupyterLab and run all cells; files it writes go to `output/` next to
+it, and examples that take your own data read it from `/home/jupyter/data`:
 
 | Example | Image | Description |
 |---------|-------|-------------|
@@ -510,6 +512,18 @@ examples), and `full` ships all of them:
 | `35_jax_jit_autodiff` | `jax` | jit Mandelbrot, grad, Optax, Flax NNX and Equinox |
 | `36_bayesian_modeling` | `probabilistic` | PreliZ prior, three NUTS samplers, eight schools, Bambi |
 | `37_retrieval_and_generation` | `genai` | BM25 vs embeddings vs hybrid search, RAG with SmolLM2, TRL |
+| `38_tabular_ml_end_to_end` | `ml` | Hold-out, CV, Optuna, calibration, SHAP on a real dataset |
+| `39_bayesian_ab_test` | `probabilistic` | A/B test: probability B wins, lift, expected loss |
+| `40_ask_your_documents` | `genai` | Questions over your own files: hybrid search + small LM |
+| `41_shift_scheduling` | `optimization` | Two-week staff rota with CP-SAT |
+| `42_same_network_torch_keras` | `deeplearn` | One MLP written in PyTorch and in Keras |
+| `43_coins_and_superpixels` | `vision` | Count and measure coins; SLIC superpixels |
+| `44_co2_forecast` | `timeseries` | Cross-validated CO₂ forecast with intervals |
+| `45_chord_synthesis` | `audio` | Synthesize a chord, find its notes, rebuild it |
+| `46_review_analysis` | `nlp` | Review sentiment, entities, and topics |
+| `47_face_anonymization` | `face` | Detect faces and blur, pixelate, or box them |
+| `48_speech_roundtrip` | `speech` | Speak, transcribe with Whisper, score WER |
+| `49_messy_csv_to_parquet` | `dataio` | Clean and validate a messy CSV into Parquet |
 
 ## Choosing the Right Target
 

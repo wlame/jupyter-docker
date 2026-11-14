@@ -4,3 +4,5 @@
 14_nlp_text_analysis
 30_nlp_toolkit
 37_retrieval_and_generation
+40_ask_your_documents
+46_review_analysis

@@ -26,8 +26,8 @@ want everything in one place, but it is the exception rather than the default.
 
 1. **Data-driven single source of truth** — the entire dependency surface (versions,
    which target introduces each package, per-target version overrides) lives as data in
-   [`targets/matrix.toml`](reference/configuration.md). The per-target `pyproject.toml`, `verify_imports.py`, and
-   `examples.txt` files are *generated* from it by [`scripts/gen_targets.py`](reference/cli.md); they are never hand-edited, and
+   [`targets/matrix.toml`](reference/configuration.md). The per-target `pyproject.toml`, `verify_imports.py`,
+   `examples.txt`, and `examples.md` files are *generated* from it by [`scripts/gen_targets.py`](reference/cli.md); they are never hand-edited, and
    CI fails if they drift from the matrix. Changing a dependency means changing a value,
    not editing a file per target.
 2. **Layered targets — build only what you need** — targets form an inheritance tree
@@ -46,7 +46,7 @@ want everything in one place, but it is the exception rather than the default.
 ## Architecture summary
 
 `targets/matrix.toml` is read by a generator (`scripts/gen_targets.py`) that writes each
-target's `pyproject.toml`, `verify_imports.py`, and `examples.txt`; `uv lock` then resolves
+target's `pyproject.toml`, `verify_imports.py`, `examples.txt`, and `examples.md`; `uv lock` then resolves
 each target's committed `uv.lock`. A single multi-stage
 `Dockerfile` then builds each target as a Docker stage, installing its pinned
 dependencies with `uv sync --locked` on top of an Ubuntu 24.04 base with the selected Python (3.14 or 3.13).
@@ -54,7 +54,7 @@ dependencies with `uv sync --locked` on top of an Ubuntu 24.04 base with the sel
 ```mermaid
 flowchart TD
     A[targets/matrix.toml<br/>single source of truth] --> B[scripts/gen_targets.py]
-    B --> C[per-target pyproject.toml<br/>+ verify_imports.py + examples.txt]
+    B --> C[per-target pyproject.toml<br/>+ verify_imports.py<br/>+ examples.txt + examples.md]
     C --> L[uv lock<br/>committed uv.lock]
     L --> D[Dockerfile stages<br/>uv sync --locked]
     D --> E[ghcr.io/wlame/jupyter-docker:&lt;target&gt;]

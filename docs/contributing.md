@@ -27,7 +27,7 @@ host-only gates below.
 
 !!! warning "The one rule that matters"
     **[`targets/matrix.toml`](reference/configuration.md) is the single source of truth for dependencies.** Every
-    `targets/<name>/pyproject.toml`, `verify_imports.py`, and `examples.txt` is *generated* from it
+    `targets/<name>/pyproject.toml`, `verify_imports.py`, `examples.txt`, and `examples.md` is *generated* from it
     by [`scripts/gen_targets.py`](reference/cli.md). Never hand-edit the generated files — edit the
     matrix and regenerate. CI's consistency check fails if generated files or
     lockfiles drift from the matrix.
@@ -35,7 +35,7 @@ host-only gates below.
 ## Contribution workflow
 
 1. **Edit `targets/matrix.toml`** — change a version, target membership, or override.
-2. **`just gen`** — regenerate the per-target `pyproject.toml`, `verify_imports.py`, and `examples.txt`.
+2. **`just gen`** — regenerate the per-target `pyproject.toml`, `verify_imports.py`, `examples.txt`, and `examples.md`.
 3. **`just lock`** — re-resolve every target's committed `uv.lock`.
 4. **`just ci`** — run every fast host gate (see below) before pushing.
 5. **Build and test the affected target(s)** — `just build <target>` then `just test <target>`.

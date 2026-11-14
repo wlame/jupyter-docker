@@ -64,6 +64,7 @@ examples = [
     "18_sqlalchemy_database",
     "23_modern_data_formats",
     "32_dataframe_engines",
+    "49_messy_csv_to_parquet",
 ]
 
 [targets.ml]
@@ -72,6 +73,7 @@ description = "Classical machine learning with scikit-learn, XGBoost, and LightG
 examples = [
     "09_machine_learning",
     "24_ml_explain_and_uncertainty",
+    "38_tabular_ml_end_to_end",
 ]
 
 [targets.deeplearn]
@@ -81,6 +83,7 @@ examples = [
     "10_deep_learning_pytorch",
     "11_deep_learning_tensorflow",
     "25_lightning_onnx",
+    "42_same_network_torch_keras",
 ]
 # triton (torch's GPU kernel compiler) segfaults when TensorFlow is already
 # loaded, so any TensorFlow-first import (keras, deepface, umap-learn's
@@ -98,6 +101,7 @@ examples = [
     "12_image_processing",
     "13_object_detection_yolo",
     "26_vision_backbones_kornia",
+    "43_coins_and_superpixels",
 ]
 # ultralytics requires GUI opencv-python, which double-installs cv2 over our
 # pinned opencv-python-headless (same paths, corrupted mix).
@@ -109,6 +113,7 @@ description = "Audio processing and analysis"
 examples = [
     "15_audio_analysis",
     "27_audio_effects_loudness",
+    "45_chord_synthesis",
 ]
 
 [targets.geospatial]
@@ -125,6 +130,7 @@ description = "Time series analysis and forecasting"
 examples = [
     "07_timeseries_analysis",
     "29_forecasting_toolkit",
+    "44_co2_forecast",
 ]
 
 [targets.optimization]
@@ -132,6 +138,7 @@ parent = "scientific"
 description = "Mathematical optimization: linear, integer, convex, routing, and scheduling"
 examples = [
     "34_optimization",
+    "41_shift_scheduling",
 ]
 # OR-Tools bundles its own libhighs.so.1, and highspy ships an incompatible one
 # under the same name: whichever loads first breaks the other's import. OR-Tools
@@ -152,6 +159,7 @@ parent = "jax"
 description = "Bayesian statistics and probabilistic programming"
 examples = [
     "36_bayesian_modeling",
+    "39_bayesian_ab_test",
 ]
 
 [targets.nlp]
@@ -160,6 +168,7 @@ description = "Natural language processing"
 examples = [
     "14_nlp_text_analysis",
     "30_nlp_toolkit",
+    "46_review_analysis",
 ]
 
 [targets.genai]
@@ -167,6 +176,7 @@ parent = "nlp"
 description = "Generative AI: retrieval, fine-tuning, diffusion, and LLM API clients"
 examples = [
     "37_retrieval_and_generation",
+    "40_ask_your_documents",
 ]
 
 [targets.speech]
@@ -175,6 +185,7 @@ description = "Speech recognition and text-to-speech synthesis"
 examples = [
     "19_speech_processing",
     "31_speech_metrics_vad",
+    "48_speech_roundtrip",
 ]
 
 [targets.face]
@@ -182,6 +193,7 @@ parent = "base"
 description = "Face detection, recognition, analysis, and generation"
 examples = [
     "20_face_analysis",
+    "47_face_anonymization",
 ]
 # tensorflow 2.21 ships no cp314 wheels; widen once tensorflow 2.22 and
 # tf-keras 2.22 are released.
@@ -284,6 +296,8 @@ module = "pytest_timeout"
 introduced-by = ["base"]
 
 [packages."python-dateutil"]
+# aiobotocore (behind s3fs in dataio) caps python-dateutil < 3; raise this once
+# it accepts 4.x.
 version = "2.9.0.post0"
 module = "dateutil"
 introduced-by = ["base"]
@@ -296,8 +310,6 @@ introduced-by = ["base"]
 [packages."pytz"]
 version = "2026.6"
 module = "pytz"
-# aiobotocore (behind s3fs in dataio) caps python-dateutil < 3; raise this once
-# it accepts 4.x.
 introduced-by = ["base"]
 
 [packages."pyyaml"]
@@ -1183,6 +1195,10 @@ introduced-by = ["nlp"]
 version = "5.1.0"
 module = "datasets"
 introduced-by = ["nlp"]
+# datasets >= 5.1 requires huggingface-hub >= 1.31, but full holds transformers
+# 4.57.6 (coqui-tts), which requires huggingface-hub < 1.0.
+[packages."datasets".overrides]
+full = "5.0.1"
 
 [packages."evaluate"]
 version = "0.4.6"
@@ -1195,10 +1211,6 @@ module = "keybert"
 introduced-by = ["nlp"]
 
 [packages."lingua-language-detector"]
-# datasets >= 5.1 requires huggingface-hub >= 1.31, but full holds transformers
-# 4.57.6 (coqui-tts), which requires huggingface-hub < 1.0.
-[packages."datasets".overrides]
-full = "5.0.1"
 version = "2.2.0"
 module = "lingua"
 introduced-by = ["nlp"]

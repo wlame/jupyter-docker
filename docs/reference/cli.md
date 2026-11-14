@@ -27,7 +27,7 @@ arguments and the underlying command it runs (with `justfile` variables resolved
 | Recipe | Args | Description | Underlying command |
 |---|---|---|---|
 | `default` | — | List available recipes | `just --list --unsorted` |
-| `gen` | — | Regenerate per-target `pyproject.toml` / `verify_imports.py` / `examples.txt` from the matrix | `python3 scripts/gen_targets.py` |
+| `gen` | — | Regenerate per-target `pyproject.toml` / `verify_imports.py` / `examples.txt` / `examples.md` from the matrix | `python3 scripts/gen_targets.py` |
 | `gen-check` | — | Verify generated files match the matrix (CI gate) | `python3 scripts/gen_targets.py --check` |
 | `lock` | — | Re-resolve every target's `uv.lock` (run after editing the matrix) | `uvx uv@0.12.23 lock` in each `targets/*/` |
 | `lock-check` | — | Verify all lockfiles are up to date (CI gate) | `uvx uv@0.12.23 lock --check` in each `targets/*/` |
@@ -155,7 +155,7 @@ For each target, testing runs two steps against the built `ds-<target>` image:
 
 ## `scripts/gen_targets.py`
 
-Generates each target's `pyproject.toml`, `verify_imports.py`, and `examples.txt` from
+Generates each target's `pyproject.toml`, `verify_imports.py`, `examples.txt`, and `examples.md` from
 [`targets/matrix.toml`](configuration.md), which is the single source of truth for which package (at
 which version) and which example belongs to which target. Wrapped by the `just gen` and `just gen-check`
 recipes.
@@ -216,16 +216,18 @@ Any other target value is accepted and simply prints `no models to bake for targ
 ## `scripts/select_examples.sh`
 
 Copies one image's examples into `/home/jupyter/examples` at build time, so each
-image ships only the examples its libraries can run.
+image ships only the examples its libraries can run, with a `README.md` that lists
+them.
 
 ```bash
-select_examples.sh <examples-dir> <examples.txt>
+select_examples.sh <examples-dir> <target-dir>
 ```
 
 The Dockerfile runs it at the end of every stage with the repository's `examples/`
-bind-mounted and the stage's generated `targets/<target>/examples.txt`. That list
-holds the target's own examples and its ancestors' (`full` lists every example), as
-declared by the `examples` key in the matrix. The script rebuilds the directory
+and the stage's generated `targets/<target>/` folder bind-mounted. Its
+`examples.txt` holds the target's own examples and its ancestors' (`full` lists
+every example), as declared by the `examples` key in the matrix; its `examples.md`
+becomes the folder's `README.md`, a table of those notebooks with their titles. The script rebuilds the directory
 from scratch, so a child stage replaces its parent's set. Example outputs from local
 runs (`examples/output/`) never reach the image.
 

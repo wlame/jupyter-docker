@@ -11,7 +11,7 @@ tags:
 
 You need a library that isn't in a target yet, or you want to bump one to a newer
 version. In this project you never edit a target's `pyproject.toml`,
-`verify_imports.py`, or `examples.txt` by hand — they are **generated**. The single source of truth
+`verify_imports.py`, `examples.txt`, or `examples.md` by hand — they are **generated**. The single source of truth
 for every Python dependency is [`targets/matrix.toml`](../reference/configuration.md). Change it, regenerate, and
 re-resolve the lockfiles.
 
@@ -38,7 +38,7 @@ introduced-by = ["base"]
 Then run the generate → lock → build → test loop:
 
 ```bash
-just gen                 # regenerate every pyproject.toml, verify_imports.py, examples.txt
+just gen                 # regenerate every pyproject.toml, verify_imports.py, examples.txt, examples.md
 just lock                # re-resolve all committed uv.lock files
 just build base          # build the affected image (BuildKit required)
 just test base           # verify imports + run marked example tests in the image
@@ -74,7 +74,7 @@ just gen
 ```
 
 This rewrites every `targets/<name>/pyproject.toml`,
-`targets/<name>/verify_imports.py`, and `targets/<name>/examples.txt` from the matrix. `just gen-check` is the
+`targets/<name>/verify_imports.py`, `targets/<name>/examples.txt`, and `targets/<name>/examples.md` from the matrix. `just gen-check` is the
 read-only CI gate that fails if these drift from the matrix.
 
 ### Step 3: Re-resolve the lockfiles
@@ -113,7 +113,7 @@ target that changed — if you added to `base`, higher targets pick it up too.
 ## Expected output
 
 - `just gen` and `just lock` complete without error, updating the generated
-  `pyproject.toml`, `verify_imports.py`, and `examples.txt` files and the `uv.lock` files.
+  `pyproject.toml`, `verify_imports.py`, `examples.txt`, and `examples.md` files and the `uv.lock` files.
 - `just test base` reports the new package's import verifying successfully inside
   the built image.
 

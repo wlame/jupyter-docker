@@ -25,8 +25,9 @@ output of the previous one:
   the files the build actually consumes, resolving each target's full package set
   by walking its lineage (a child inherits everything its parent has).
 - **Per-target generated files** — for each target, `gen_targets.py` writes
-  `targets/<t>/pyproject.toml`, `targets/<t>/verify_imports.py`, and
-  `targets/<t>/examples.txt` (the examples its image ships). From each
+  `targets/<t>/pyproject.toml`, `targets/<t>/verify_imports.py`,
+  `targets/<t>/examples.txt` (the examples its image ships), and
+  `targets/<t>/examples.md` (their README). From each
   `pyproject.toml`, `uv lock` resolves the committed `targets/<t>/uv.lock`.
 - **`Dockerfile`** — a multi-stage build with one stage per target. Each stage
   installs its OS libraries, then runs `uv sync --locked --no-install-project`
@@ -39,13 +40,13 @@ output of the previous one:
 The flow, end to end:
 
 `targets/matrix.toml` → `scripts/gen_targets.py` → per-target
-`pyproject.toml` / `verify_imports.py` / `examples.txt` → `uv lock` → `uv.lock` →
+`pyproject.toml` / `verify_imports.py` / `examples.txt` / `examples.md` → `uv lock` → `uv.lock` →
 multi-stage `Dockerfile` →
 `ds-<target>` / `ghcr.io/wlame/jupyter-docker:<target>` → CI.
 
 !!! warning "Generated files are never hand-edited"
-    `targets/<t>/pyproject.toml`, `targets/<t>/verify_imports.py`, and
-    `targets/<t>/examples.txt` carry a "GENERATED FILE — do not edit by hand" header. Edit `targets/matrix.toml` and
+    `targets/<t>/pyproject.toml`, `targets/<t>/verify_imports.py`,
+    `targets/<t>/examples.txt`, and `targets/<t>/examples.md` carry a "GENERATED FILE — do not edit by hand" header. Edit `targets/matrix.toml` and
     regenerate. CI's `consistency` job fails if any generated file or lockfile
     drifts from the matrix. See [Data flow](data-flow.md).
 

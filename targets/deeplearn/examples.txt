@@ -11,3 +11,5 @@
 24_ml_explain_and_uncertainty
 25_lightning_onnx
 33_lorenz_numba_dask
+38_tabular_ml_end_to_end
+42_same_network_torch_keras

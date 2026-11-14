@@ -8,3 +8,4 @@
 21_polars_duckdb_xarray
 24_ml_explain_and_uncertainty
 33_lorenz_numba_dask
+38_tabular_ml_end_to_end

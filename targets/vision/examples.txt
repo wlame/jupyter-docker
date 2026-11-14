@@ -4,3 +4,4 @@
 12_image_processing
 13_object_detection_yolo
 26_vision_backbones_kornia
+43_coins_and_superpixels

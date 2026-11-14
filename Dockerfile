@@ -116,10 +116,10 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 COPY --chown=jupyter:jupyter tests/ /home/jupyter/tests/
 COPY --chown=jupyter:jupyter scripts/bake_models.sh scripts/select_examples.sh /home/jupyter/scripts/
 
-# Ship this target's examples: its own and its ancestors' (targets/base/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/base/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/base/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/base,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 # Configure Jupyter.
 # No token/password lines: jupyter-server generates a random token per start
@@ -158,10 +158,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/scientific/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/scientific/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/scientific/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/scientific,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -186,10 +186,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/visualization/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/visualization/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/visualization/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/visualization,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -213,10 +213,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/dataio/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/dataio/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/dataio/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/dataio,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -232,10 +232,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/ml/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/ml/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/ml/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/ml,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -251,10 +251,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/deeplearn/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/deeplearn/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/deeplearn/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/deeplearn,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -287,10 +287,10 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 # Pre-bake model weights so example tests run offline (see scripts/bake_models.sh)
 RUN bash /home/jupyter/scripts/bake_models.sh vision
 
-# Ship this target's examples: its own and its ancestors' (targets/vision/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/vision/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/vision/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/vision,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -319,10 +319,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/audio/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/audio/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/audio/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/audio,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -352,10 +352,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/geospatial/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/geospatial/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/geospatial/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/geospatial,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -371,10 +371,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/timeseries/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/timeseries/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/timeseries/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/timeseries,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -398,10 +398,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/optimization/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/optimization/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/optimization/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/optimization,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -417,10 +417,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/jax/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/jax/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/jax/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/jax,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -436,10 +436,10 @@ USER 1000:1000
 RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
     uv sync --locked --no-install-project
 
-# Ship this target's examples: its own and its ancestors' (targets/probabilistic/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/probabilistic/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/probabilistic/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/probabilistic,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -467,10 +467,10 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 # Pre-bake model weights so example tests run offline (see scripts/bake_models.sh)
 RUN bash /home/jupyter/scripts/bake_models.sh nlp
 
-# Ship this target's examples: its own and its ancestors' (targets/nlp/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/nlp/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/nlp/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/nlp,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -490,10 +490,10 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 # baked MiniLM and NLTK data; see scripts/bake_models.sh)
 RUN bash /home/jupyter/scripts/bake_models.sh genai
 
-# Ship this target's examples: its own and its ancestors' (targets/genai/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/genai/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/genai/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/genai,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -524,10 +524,10 @@ RUN --mount=type=cache,target=/home/jupyter/.cache/uv,uid=1000,gid=1000 \
 # Pre-bake model weights so example tests run offline (see scripts/bake_models.sh)
 RUN bash /home/jupyter/scripts/bake_models.sh speech
 
-# Ship this target's examples: its own and its ancestors' (targets/speech/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/speech/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/speech/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/speech,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -596,10 +596,10 @@ USER 1000:1000
 # the example already skips them offline). See scripts/bake_models.sh.
 RUN bash /home/jupyter/scripts/bake_models.sh face
 
-# Ship this target's examples: its own and its ancestors' (targets/face/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/face/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/face/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/face,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target
 
 
 # =============================================================================
@@ -703,7 +703,7 @@ USER 1000:1000
 # Pre-bake every target's model weights so example tests run offline
 RUN bash /home/jupyter/scripts/bake_models.sh full
 
-# Ship this target's examples: its own and its ancestors' (targets/full/examples.txt).
+# Ship this target's examples (its own and its ancestors') and their README (targets/full/).
 RUN --mount=type=bind,source=examples,target=/tmp/examples \
-    --mount=type=bind,source=targets/full/examples.txt,target=/tmp/examples.txt \
-    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/examples.txt
+    --mount=type=bind,source=targets/full,target=/tmp/target \
+    bash /home/jupyter/scripts/select_examples.sh /tmp/examples /tmp/target

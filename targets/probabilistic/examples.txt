@@ -8,3 +8,4 @@
 33_lorenz_numba_dask
 35_jax_jit_autodiff
 36_bayesian_modeling
+39_bayesian_ab_test

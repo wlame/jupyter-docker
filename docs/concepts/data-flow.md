@@ -16,7 +16,7 @@ artifact is regenerated from it in a fixed order.
 ```mermaid
 flowchart TD
     edit["Edit targets/matrix.toml<br/>(the single source of truth)"]
-    edit --> gen["just gen<br/>regenerate per-target<br/>pyproject.toml, verify_imports.py,<br/>examples.txt"]
+    edit --> gen["just gen<br/>regenerate per-target<br/>pyproject.toml, verify_imports.py,<br/>examples.txt, examples.md"]
     gen --> lock["just lock<br/>re-resolve all 18 uv.lock files"]
     lock --> ci["just ci<br/>fast host gate (no Docker)"]
     ci --> build["just build &lt;t&gt;<br/>docker build one target"]
@@ -38,8 +38,8 @@ Nothing else is edited by hand. A package entry records its `version`, import
 ### 2. `just gen` — regenerate per-target files
 
 [`scripts/gen_targets.py`](../reference/cli.md) reads the matrix and rewrites, for every target,
-`targets/<t>/pyproject.toml`, `targets/<t>/verify_imports.py`, and
-`targets/<t>/examples.txt`. It resolves each target's full package set (and its
+`targets/<t>/pyproject.toml`, `targets/<t>/verify_imports.py`,
+`targets/<t>/examples.txt`, and `targets/<t>/examples.md`. It resolves each target's full package set (and its
 example list) by walking its lineage, so a child's files include everything its
 parent introduced. The `verify_imports.py` script imports every
 declared package (torch-family modules first, ahead of anything that may load TensorFlow).
@@ -91,7 +91,7 @@ cannot disagree.
 !!! warning "Generated files must never be hand-edited"
     `gen-check` and `lock-check` re-run the generator and `uv lock --check` and
     fail if the committed files differ from what the matrix produces. If you edit
-    a generated `pyproject.toml`, `verify_imports.py`, `examples.txt`, or `uv.lock` directly, CI's
+    a generated `pyproject.toml`, `verify_imports.py`, `examples.txt`, `examples.md`, or `uv.lock` directly, CI's
     `consistency` job fails on the drift. Always edit `targets/matrix.toml` and run
     `just gen && just lock`.
 

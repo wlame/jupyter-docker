@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate per-target pyproject.toml, verify_imports.py, and examples.txt from targets/matrix.toml.
+"""Generate per-target pyproject.toml, verify_imports.py, examples.txt, and examples.md from targets/matrix.toml.
 
 The matrix is the single source of truth for which package (at which version)
 belongs to which Docker target. This script materializes it into the files the
@@ -51,6 +51,8 @@ GENERATED_HEADER_TXT = """\
 # Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py).
 # Examples copied into this target's image: its own and its ancestors', one per line.
 """
+
+EXAMPLE_TITLE = re.compile(r'^# # (.+)$', flags=re.MULTILINE)
 
 GENERATED_HEADER_PY = '''\
 #!/usr/bin/env python3
@@ -413,6 +415,60 @@ def render_examples(target: str, matrix: dict) -> str:
     return GENERATED_HEADER_TXT + ''.join(f'{stem}\n' for stem in target_examples(target, matrix))
 
 
+def example_title(examples_dir: Path, stem: str) -> str:
+    """An example's title: the first `# # ` markdown heading of its .py (the stem if none)."""
+    path = examples_dir / f'{stem}.py'
+    match = EXAMPLE_TITLE.search(path.read_text()) if path.exists() else None
+    return match.group(1).strip() if match else stem
+
+
+def example_owner(stem: str, matrix: dict) -> str:
+    """The target whose `examples` list names this example."""
+    return next(name for name, spec in matrix['targets'].items() if stem in spec.get('examples', []))
+
+
+def render_examples_readme(target: str, matrix: dict, examples_dir: Path) -> str:
+    """Render targets/<target>/examples.md, shipped in the image as examples/README.md."""
+    image = f'ghcr.io/wlame/jupyter-docker:{target}'
+    lines = [
+        '<!-- GENERATED FILE — do not edit by hand. Source: targets/matrix.toml and the example titles. -->',
+        f'# Examples in `{image}`',
+        '',
+        f'{matrix["targets"][target]["description"]}.',
+        '',
+    ]
+    stems = target_examples(target, matrix)
+    if not stems:
+        lines += [
+            'This image carries the common utilities every other image builds on, and no',
+            'examples of its own. The `scientific` image is the smallest one with examples.',
+            '',
+        ]
+        return '\n'.join(lines)
+    lines += [
+        'Open a notebook and run it top to bottom (**Run > Run All Cells**). Files an',
+        'example writes go to `output/` in this folder. Your own data belongs in',
+        '`/home/jupyter/data`: mount a host folder there with',
+        '`-v "$(pwd)/data:/home/jupyter/data"`.',
+        '',
+        '| Notebook | What it covers | Image it comes from |',
+        '|---|---|---|',
+    ]
+    # The image's own examples first, then its ancestors' (each group in number order).
+    stems = sorted(stems, key=lambda stem: (example_owner(stem, matrix) != target, stem))
+    lines += [
+        f'| [{stem}]({stem}.ipynb) | {example_title(examples_dir, stem)} | `{example_owner(stem, matrix)}` |'
+        for stem in stems
+    ]
+    lines += [
+        '',
+        'Each notebook has a matching `.py` file with the same code, which you can run',
+        'with `python <name>.py` or open as a notebook through Jupytext.',
+        '',
+    ]
+    return '\n'.join(lines)
+
+
 def render_verify(target: str, matrix: dict) -> str:
     """Render the verify_imports.py content for one target."""
     targets = matrix['targets']
@@ -450,6 +506,7 @@ def generate(root: Path, check: bool) -> int:
             ('pyproject.toml', render_pyproject(target, matrix)),
             ('verify_imports.py', render_verify(target, matrix)),
             ('examples.txt', render_examples(target, matrix)),
+            ('examples.md', render_examples_readme(target, matrix, root / 'examples')),
         ):
             path = root / 'targets' / target / filename
             current = path.read_text() if path.exists() else None
