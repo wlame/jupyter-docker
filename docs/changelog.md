@@ -22,6 +22,35 @@ To review what changed, browse the commit history on GitHub:
 
 ## Notable changes
 
+### November 2026 — runnable notebooks, 12 new examples, dependency refresh
+
+- Every example notebook now runs in JupyterLab as shipped. Before, 32 of 37
+  stopped at their first cell (`__file__` does not exist in a kernel), plots never
+  appeared inline, and three notebooks had a `try` block split across cells. The
+  notebooks now open with a title and explanation, use markdown headings for each
+  section, and show figures inline.
+- The image tests execute the notebooks instead of the scripts, and a generator
+  test compiles every notebook cell, so these failures cannot return unnoticed.
+- Each image's `examples/` folder has a `README.md` listing its notebooks, its own
+  first.
+- Twelve new examples (38–49), one per image, on real or generated data that works
+  offline: tabular ML end to end, a Bayesian A/B test, questions over your own
+  documents, shift scheduling, one network in PyTorch and Keras, coin counting and
+  superpixels, a CO₂ forecast, chord synthesis, review analysis, face
+  anonymization, a speech round trip with WER, and messy CSV to Parquet. Examples
+  that take your own data read it from `/home/jupyter/data`.
+- Dependencies refreshed to a 2026-11-07 cutoff, including Polars 2.1, PyArrow 26,
+  DuckDB 2.0, Pillow 13, pandas 3.1, torch 2.15, transformers 5.22, JAX 0.12, and
+  the `anthropic` client 2.x. DuckDB 2.0 removed `.pl()` and `.arrow()` from
+  `execute()` results; use `con.sql(..., params=...)` for those.
+- Lifted holds: numba 0.68 everywhere (PyTensor allows it), bokeh 3.10 with panel
+  1.10, and pedalboard's own `exclude-newer` exception. New holds: python-dateutil
+  2.9 (aiobotocore caps it below 3) and datasets 5.0.1 in `full` (transformers
+  4.57.6 there needs huggingface-hub < 1.0).
+- `face` and `full` now also exclude `opencv-contrib-python-headless`, which
+  deepface and retina-face started requiring and which would install a second
+  `cv2` over the pinned OpenCV.
+
 ### October 2026 — four new images and per-image examples
 
 - New images: `optimization` (OR-Tools, CVXPY, Pyomo, PuLP), `jax` (JAX, Optax,
