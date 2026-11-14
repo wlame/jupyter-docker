@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-"""
-Plotly Interactive Visualizations
-=================================
-Demonstrates interactive visualizations with Plotly.
-
-Plotly: https://plotly.com/python/
-
-Note: Best viewed in Jupyter notebooks for full interactivity.
-HTML files can be opened in any web browser.
-"""
+# # Plotly Interactive Visualizations
+#
+# Demonstrates interactive visualizations with Plotly.
+#
+# - [Plotly](https://plotly.com/python/)
+#
+# Note: Best viewed in Jupyter notebooks for full interactivity.
+# HTML files can be opened in any web browser.
 
 import numpy as np
 import pandas as pd
@@ -17,15 +15,11 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import os
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# Plotly Express Quick Plots
-# =============================================================================
-print("=" * 60)
-print("Plotly Express Quick Plots")
-print("=" * 60)
+# ## Plotly Express Quick Plots
 
 # Create sample data
 np.random.seed(42)
@@ -79,12 +73,7 @@ fig = px.bar(
 fig.write_html(os.path.join(OUTPUT_DIR, "plotly_bar.html"))
 print("Saved: plotly_bar.html")
 
-# =============================================================================
-# Advanced Plotly Graph Objects
-# =============================================================================
-print("\n" + "=" * 60)
-print("Advanced Plotly Graph Objects")
-print("=" * 60)
+# ## Advanced Plotly Graph Objects
 
 # Subplots
 fig = make_subplots(
@@ -122,12 +111,7 @@ fig.update_layout(height=800, title_text="Dashboard with Multiple Chart Types")
 fig.write_html(os.path.join(OUTPUT_DIR, "plotly_subplots.html"))
 print("Saved: plotly_subplots.html")
 
-# =============================================================================
-# 3D Visualizations
-# =============================================================================
-print("\n" + "=" * 60)
-print("3D Visualizations")
-print("=" * 60)
+# ## 3D Visualizations
 
 # 3D Scatter
 fig = px.scatter_3d(
@@ -156,12 +140,7 @@ fig.update_layout(
 fig.write_html(os.path.join(OUTPUT_DIR, "plotly_3d_surface.html"))
 print("Saved: plotly_3d_surface.html")
 
-# =============================================================================
-# Animated Visualizations
-# =============================================================================
-print("\n" + "=" * 60)
-print("Animated Visualizations")
-print("=" * 60)
+# ## Animated Visualizations
 
 # Create animation data
 animation_df = []
@@ -192,12 +171,7 @@ fig = px.scatter(
 fig.write_html(os.path.join(OUTPUT_DIR, "plotly_animated.html"))
 print("Saved: plotly_animated.html")
 
-# =============================================================================
-# Financial Charts
-# =============================================================================
-print("\n" + "=" * 60)
-print("Financial Charts")
-print("=" * 60)
+# ## Financial Charts
 
 # Candlestick chart
 dates = pd.date_range("2024-01-01", periods=60, freq="D")

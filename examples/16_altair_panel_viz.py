@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-"""
-Altair and Panel: Declarative and Dashboard Visualization
-=========================================================
-Demonstrates declarative charts with Altair and composable dashboards with Panel.
-
-Altair: https://altair-viz.github.io/
-Panel:  https://panel.holoviz.org/
-hvplot: https://hvplot.holoviz.org/
-
-Note: Interactive Panel dashboards require a running server or Jupyter.
-      This script saves static exports of the charts.
-"""
+# # Altair and Panel: Declarative and Dashboard Visualization
+#
+# Demonstrates declarative charts with Altair and composable dashboards with Panel.
+#
+# - [Altair](https://altair-viz.github.io/)
+# - [Panel](https://panel.holoviz.org/)
+# - [hvplot](https://hvplot.holoviz.org/)
+#
+# Note: Interactive Panel dashboards require a running server or Jupyter.
+#       This script saves static exports of the charts.
 
 import os
 import json
@@ -23,12 +21,12 @@ import panel as pn
 import hvplot.pandas  # registers .hvplot accessor
 import holoviews as hv
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# Generate Sample Datasets
-# =============================================================================
+# ## Generate Sample Datasets
+
 rng = np.random.default_rng(seed=42)
 
 # Stock-like time series for 4 companies
@@ -63,12 +61,7 @@ scatter_df = pd.DataFrame(
 monthly = prices.resample('ME').last()
 monthly_returns = monthly.pct_change().dropna()
 
-# =============================================================================
-# Altair: Layered Line Chart with Selection
-# =============================================================================
-print("=" * 60)
-print("Altair: Stock Price Time Series")
-print("=" * 60)
+# ## Altair: Stock Price Time Series
 
 # Brush selection for zooming/filtering
 brush = alt.selection_interval(encodings=['x'])
@@ -104,9 +97,8 @@ stock_chart = detail & overview
 stock_chart.save(os.path.join(OUTPUT_DIR, 'altair_stock_prices.html'))
 print("Saved: altair_stock_prices.html  (interactive)")
 
-# =============================================================================
-# Altair: Scatter with Brush-Linked Histogram
-# =============================================================================
+# ## Altair: Scatter with Brush-Linked Histogram
+
 print("\nAltair: Linked Scatter and Histogram")
 
 color_scale = alt.Scale(
@@ -155,9 +147,8 @@ linked_chart = scatter & histogram
 linked_chart.save(os.path.join(OUTPUT_DIR, 'altair_scatter_linked.html'))
 print("Saved: altair_scatter_linked.html  (interactive)")
 
-# =============================================================================
-# Altair: Heatmap (Correlation Matrix)
-# =============================================================================
+# ## Altair: Heatmap (Correlation Matrix)
+
 print("\nAltair: Correlation Heatmap")
 
 corr = monthly_returns.corr().reset_index().melt(id_vars='index', var_name='variable', value_name='correlation')
@@ -191,12 +182,7 @@ text_layer = heatmap.mark_text(fontSize=13).encode(
 (heatmap + text_layer).save(os.path.join(OUTPUT_DIR, 'altair_correlation.html'))
 print("Saved: altair_correlation.html  (interactive)")
 
-# =============================================================================
-# hvplot: Quick Exploratory Charts
-# =============================================================================
-print("\n" + "=" * 60)
-print("hvplot: Quick Exploratory Visualization")
-print("=" * 60)
+# ## hvplot: Quick Exploratory Visualization
 
 # hvplot returns HoloViews objects — export as HTML via Panel
 price_hvplot = prices.hvplot.line(
@@ -223,12 +209,7 @@ pn.panel(return_hist).save(os.path.join(OUTPUT_DIR, 'hvplot_returns_hist.html'))
 print("Saved: hvplot_prices.html")
 print("Saved: hvplot_returns_hist.html")
 
-# =============================================================================
-# Panel: Composable Dashboard Layout
-# =============================================================================
-print("\n" + "=" * 60)
-print("Panel: Dashboard Composition")
-print("=" * 60)
+# ## Panel: Dashboard Composition
 
 # KPI cards using Panel panes
 def kpi_card(title: str, value: str, delta: str, positive: bool) -> pn.Column:
@@ -284,9 +265,8 @@ dashboard = pn.Column(
 dashboard.save(os.path.join(OUTPUT_DIR, 'panel_dashboard.html'))
 print("Saved: panel_dashboard.html  (interactive)")
 
-# =============================================================================
-# Altair: Summary Stats — Grouped Bar Chart
-# =============================================================================
+# ## Altair: Summary Stats — Grouped Bar Chart
+
 print("\nAltair: Grouped Statistics Chart")
 
 sector_stats = (
@@ -315,9 +295,8 @@ grouped_bar = (
 grouped_bar.save(os.path.join(OUTPUT_DIR, 'altair_grouped_bar.html'))
 print("Saved: altair_grouped_bar.html  (interactive)")
 
-# =============================================================================
-# Summary
-# =============================================================================
+# ## Summary
+
 print("\n" + "=" * 60)
 print("Altair + Panel visualization complete!")
 print("All outputs are interactive HTML files — open in any browser:")

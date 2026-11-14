@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-"""
-SQLAlchemy ORM and Columnar Data Formats
-=========================================
-Demonstrates SQLAlchemy 2.0 ORM with relationships, complex queries, and
-high-performance columnar data I/O with PyArrow and Parquet.
-
-SQLAlchemy: https://docs.sqlalchemy.org/en/20/
-PyArrow:    https://arrow.apache.org/docs/python/
-Parquet:    https://parquet.apache.org/
-HDF5:       https://docs.h5py.org/
-"""
+# # SQLAlchemy ORM and Columnar Data Formats
+#
+# Demonstrates SQLAlchemy 2.0 ORM with relationships, complex queries, and
+# high-performance columnar data I/O with PyArrow and Parquet.
+#
+# - [SQLAlchemy](https://docs.sqlalchemy.org/en/20/)
+# - [PyArrow](https://arrow.apache.org/docs/python/)
+# - [Parquet](https://parquet.apache.org/)
+# - [HDF5](https://docs.h5py.org/)
 
 import os
 import time
@@ -35,22 +33,16 @@ import pyarrow.parquet as pq
 import pyarrow.compute as pc
 import h5py
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 rng = np.random.default_rng(seed=42)
 
-# =============================================================================
-# SQLAlchemy 2.0 ORM: Define Models
-# =============================================================================
-print("=" * 60)
-print("SQLAlchemy 2.0 ORM: Schema Definition")
-print("=" * 60)
-
+# ## SQLAlchemy 2.0 ORM: Schema Definition
 
 class Base(DeclarativeBase):
     pass
-
 
 class Department(Base):
     __tablename__ = 'department'
@@ -66,7 +58,6 @@ class Department(Base):
 
     def __repr__(self) -> str:
         return f"Department(id={self.id}, name={self.name!r})"
-
 
 class Employee(Base):
     __tablename__ = 'employee'
@@ -92,7 +83,6 @@ class Employee(Base):
     def __repr__(self) -> str:
         return f"Employee(id={self.id}, name={self.full_name!r}, salary={self.salary:.0f})"
 
-
 class Project(Base):
     __tablename__ = 'project'
 
@@ -104,7 +94,6 @@ class Project(Base):
     assignments: Mapped[list['ProjectAssignment']] = relationship(
         back_populates='project', cascade='all, delete-orphan'
     )
-
 
 class ProjectAssignment(Base):
     __tablename__ = 'project_assignment'
@@ -118,15 +107,9 @@ class ProjectAssignment(Base):
     employee: Mapped['Employee'] = relationship(back_populates='projects')
     project: Mapped['Project'] = relationship(back_populates='assignments')
 
-
 print("Models defined: Department, Employee, Project, ProjectAssignment")
 
-# =============================================================================
-# Create In-Memory SQLite DB and Populate with Data
-# =============================================================================
-print("\n" + "=" * 60)
-print("Populating Database")
-print("=" * 60)
+# ## Populating Database
 
 engine = create_engine('sqlite:///:memory:', echo=False)
 Base.metadata.create_all(engine)
@@ -209,12 +192,7 @@ with Session(engine) as session:
     print(f"Inserted: {len(departments)} departments, {len(employees)} employees, "
           f"{len(projects)} projects")
 
-# =============================================================================
-# Complex ORM Queries
-# =============================================================================
-print("\n" + "=" * 60)
-print("SQLAlchemy ORM Queries")
-print("=" * 60)
+# ## SQLAlchemy ORM Queries
 
 with Session(engine) as session:
 
@@ -320,12 +298,7 @@ with Session(engine) as session:
     for row in session.execute(stmt5).all():
         print(f"  {row.band:<22}: {row.count:>3} employees, avg ${row.avg:,.0f}")
 
-# =============================================================================
-# PyArrow: High-Performance Columnar Data
-# =============================================================================
-print("\n" + "=" * 60)
-print("PyArrow: Schema-First Columnar Data")
-print("=" * 60)
+# ## PyArrow: Schema-First Columnar Data
 
 # Simulate a large transaction dataset
 n_rows = 200_000
@@ -379,12 +352,7 @@ print(f"  Total amount       : ${total_amount:,.2f}")
 print(f"  Average amount     : ${avg_amount:.2f}")
 print(f"  Max amount         : ${pc.max(table.column('amount')).as_py():.2f}")
 
-# =============================================================================
-# Parquet: Write and Read with Row Groups and Filters
-# =============================================================================
-print("\n" + "=" * 60)
-print("Parquet: Partitioned Write and Predicate Pushdown")
-print("=" * 60)
+# ## Parquet: Partitioned Write and Predicate Pushdown
 
 parquet_path = os.path.join(OUTPUT_DIR, 'transactions.parquet')
 
@@ -439,12 +407,7 @@ amounts_only = pq.read_table(parquet_path, columns=['amount', 'is_fraud'])
 proj_time = time.perf_counter() - t_proj_start
 print(f"\nColumn projection (2 of {meta.num_columns} columns): {proj_time*1000:.1f} ms")
 
-# =============================================================================
-# HDF5: Hierarchical Data Format
-# =============================================================================
-print("\n" + "=" * 60)
-print("HDF5: Hierarchical Numerical Storage")
-print("=" * 60)
+# ## HDF5: Hierarchical Numerical Storage
 
 hdf5_path = os.path.join(OUTPUT_DIR, 'simulation_data.h5')
 
@@ -507,12 +470,7 @@ with h5py.File(hdf5_path, 'r') as f:
     first_10_paths = f['simulation/paths'][:10, :]
     print(f"  Slice read (10 paths): {first_10_paths.shape}  (only {first_10_paths.nbytes/1024:.1f} KB loaded)")
 
-# =============================================================================
-# Performance Comparison: JSON vs Parquet vs HDF5
-# =============================================================================
-print("\n" + "=" * 60)
-print("I/O Format Performance Comparison")
-print("=" * 60)
+# ## I/O Format Performance Comparison
 
 sample_df = pd.DataFrame({
     'id': np.arange(100_000),
@@ -547,9 +505,8 @@ print("  " + "-" * 50)
 for fmt, r in results.items():
     print(f"  {fmt:<10} {r['write_ms']:>12.1f} {r['read_ms']:>12.1f} {r['size_kb']:>12.1f}")
 
-# =============================================================================
-# Summary
-# =============================================================================
+# ## Summary
+
 print("\n" + "=" * 60)
 print("SQLAlchemy ORM and Columnar Data I/O complete!")
 print(f"Outputs: transactions.parquet  ({file_size_mb:.1f} MB)")

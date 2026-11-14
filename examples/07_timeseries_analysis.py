@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-"""
-Time Series Analysis
-====================
-Demonstrates time series analysis with tsfresh, sktime, statsmodels, and pmdarima.
-
-tsfresh: https://tsfresh.readthedocs.io/
-sktime: https://www.sktime.net/
-statsmodels: https://www.statsmodels.org/
-pmdarima: https://alkaline-ml.com/pmdarima/
-
-Note: Some operations may take time due to feature extraction.
-"""
+# # Time Series Analysis
+#
+# Demonstrates time series analysis with tsfresh, sktime, statsmodels, and pmdarima.
+#
+# - [tsfresh](https://tsfresh.readthedocs.io/)
+# - [sktime](https://www.sktime.net/)
+# - [statsmodels](https://www.statsmodels.org/)
+# - [pmdarima](https://alkaline-ml.com/pmdarima/)
+#
+# Note: Some operations may take time due to feature extraction.
 
 import numpy as np
 import pandas as pd
@@ -28,15 +26,11 @@ from sktime.forecasting.model_selection import temporal_train_test_split
 from sktime.performance_metrics.forecasting import mean_absolute_percentage_error
 import os
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# Generate Sample Time Series Data
-# =============================================================================
-print("=" * 60)
-print("Generating Sample Time Series Data")
-print("=" * 60)
+# ## Generating Sample Time Series Data
 
 np.random.seed(42)
 
@@ -58,12 +52,7 @@ print(f"Date range: {ts.index.min()} to {ts.index.max()}")
 print(f"Value range: {ts.min():.2f} to {ts.max():.2f}")
 print(ts.head(10))
 
-# =============================================================================
-# Statsmodels - Time Series Decomposition
-# =============================================================================
-print("\n" + "=" * 60)
-print("Statsmodels Time Series Decomposition")
-print("=" * 60)
+# ## Statsmodels Time Series Decomposition
 
 # Decompose the time series
 decomposition = seasonal_decompose(ts, model="additive", period=365)
@@ -78,14 +67,9 @@ decomposition.resid.plot(ax=axes[3], title="Residual")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "ts_decomposition.png"), dpi=150)
 print("Saved: ts_decomposition.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Statistical Tests
-# =============================================================================
-print("\n" + "=" * 60)
-print("Statistical Tests for Stationarity")
-print("=" * 60)
+# ## Statistical Tests for Stationarity
 
 # Augmented Dickey-Fuller test
 result = adfuller(ts.dropna())
@@ -127,14 +111,9 @@ axes[1].set_xlabel("Lag")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "ts_acf_pacf.png"), dpi=150)
 print("Saved: ts_acf_pacf.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# ARIMA Modeling with Statsmodels
-# =============================================================================
-print("\n" + "=" * 60)
-print("ARIMA Modeling (Statsmodels)")
-print("=" * 60)
+# ## ARIMA Modeling (Statsmodels)
 
 # Use monthly data for faster computation
 monthly_ts = ts.resample("ME").mean()
@@ -165,14 +144,9 @@ ax.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "ts_arima.png"), dpi=150)
 print("Saved: ts_arima.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Auto-ARIMA with pmdarima
-# =============================================================================
-print("\n" + "=" * 60)
-print("Auto-ARIMA (pmdarima)")
-print("=" * 60)
+# ## Auto-ARIMA (pmdarima)
 
 # Use pmdarima's auto_arima for automatic parameter selection
 auto_model = pm.auto_arima(
@@ -198,12 +172,7 @@ auto_forecast = pd.Series(auto_forecast, index=test.index)
 
 print(f"Auto-ARIMA MAPE: {np.mean(np.abs((test - auto_forecast) / test)) * 100:.2f}%")
 
-# =============================================================================
-# tsfresh - Feature Extraction
-# =============================================================================
-print("\n" + "=" * 60)
-print("tsfresh Feature Extraction")
-print("=" * 60)
+# ## tsfresh Feature Extraction
 
 # Prepare data for tsfresh (requires id column)
 # Create multiple time series for feature extraction
@@ -229,12 +198,7 @@ print(f"\nExtracted {features.shape[1]} features for {features.shape[0]} time se
 print("\nSample features:")
 print(features.iloc[0, :10])
 
-# =============================================================================
-# sktime - Forecasting
-# =============================================================================
-print("\n" + "=" * 60)
-print("sktime Forecasting")
-print("=" * 60)
+# ## sktime Forecasting
 
 # Prepare data for sktime
 y = monthly_ts.copy()
@@ -262,14 +226,9 @@ ax.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "ts_sktime.png"), dpi=150)
 print("Saved: ts_sktime.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Rolling Statistics and Anomaly Detection
-# =============================================================================
-print("\n" + "=" * 60)
-print("Rolling Statistics and Anomaly Detection")
-print("=" * 60)
+# ## Rolling Statistics and Anomaly Detection
 
 # Calculate rolling statistics
 window = 30
@@ -309,7 +268,7 @@ axes[1].legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "ts_anomalies.png"), dpi=150)
 print("Saved: ts_anomalies.png")
-plt.close()
+plt.show()
 
 print("\n" + "=" * 60)
 print("Time series analysis examples complete!")

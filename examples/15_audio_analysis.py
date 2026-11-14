@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
-"""
-Audio Analysis
-==============
-Demonstrates audio processing and feature extraction with librosa and torchaudio.
-
-librosa: https://librosa.org/
-torchaudio: https://pytorch.org/audio/
-soundfile: https://python-soundfile.readthedocs.io/
-
-Uses librosa's built-in audio samples — no external files required.
-"""
+# # Audio Analysis
+#
+# Demonstrates audio processing and feature extraction with librosa and torchaudio.
+#
+# - [librosa](https://librosa.org/)
+# - [torchaudio](https://pytorch.org/audio/)
+# - [soundfile](https://python-soundfile.readthedocs.io/)
+#
+# Uses librosa's built-in audio samples — no external files required.
 
 import os
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import librosa
@@ -24,15 +20,11 @@ import torch
 import torchaudio
 import torchaudio.transforms as T
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# Load Audio — librosa built-in sample
-# =============================================================================
-print("=" * 60)
-print("Loading Audio")
-print("=" * 60)
+# ## Loading Audio
 
 # librosa ships with several example audio files
 y, sr = librosa.load(librosa.ex('nutcracker'), duration=30.0)
@@ -47,12 +39,7 @@ clip_path = os.path.join(OUTPUT_DIR, 'audio_clip.wav')
 sf.write(clip_path, y, sr)
 print(f"Saved clip  : {clip_path}")
 
-# =============================================================================
-# Waveform and Basic Analysis
-# =============================================================================
-print("\n" + "=" * 60)
-print("Waveform and Zero-Crossing Rate")
-print("=" * 60)
+# ## Waveform and Zero-Crossing Rate
 
 zcr = librosa.feature.zero_crossing_rate(y)
 rms = librosa.feature.rms(y=y)
@@ -86,14 +73,9 @@ axes[2].set_title("RMS Energy")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'audio_waveform.png'), dpi=150)
 print("Saved: audio_waveform.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Harmonic-Percussive Source Separation (HPSS)
-# =============================================================================
-print("\n" + "=" * 60)
-print("Harmonic-Percussive Source Separation (HPSS)")
-print("=" * 60)
+# ## Harmonic-Percussive Source Separation (HPSS)
 
 y_harmonic, y_percussive = librosa.effects.hpss(y)
 
@@ -115,14 +97,9 @@ for ax, signal, title, color in zip(
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'audio_hpss.png'), dpi=150)
 print("Saved: audio_hpss.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Beat Tracking and Tempo Estimation
-# =============================================================================
-print("\n" + "=" * 60)
-print("Beat Tracking and Tempo Estimation")
-print("=" * 60)
+# ## Beat Tracking and Tempo Estimation
 
 # Use percussive component for more stable beat detection
 tempo, beat_frames = librosa.beat.beat_track(y=y_percussive, sr=sr)
@@ -147,14 +124,9 @@ ax.legend(loc='upper right')
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'audio_beats.png'), dpi=150)
 print("Saved: audio_beats.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Spectral Features: Mel Spectrogram, MFCC, Chroma
-# =============================================================================
-print("\n" + "=" * 60)
-print("Spectral Features")
-print("=" * 60)
+# ## Spectral Features
 
 hop_length = 512
 n_mfcc = 13
@@ -225,14 +197,9 @@ axes[3].legend(loc='upper right')
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'audio_spectral_features.png'), dpi=150)
 print("Saved: audio_spectral_features.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# MFCC Statistics — Beat-Synchronised Feature Matrix
-# =============================================================================
-print("\n" + "=" * 60)
-print("Beat-Synchronised Feature Matrix")
-print("=" * 60)
+# ## Beat-Synchronised Feature Matrix
 
 # Aggregate features at each beat interval — useful for music classification
 beat_mfcc = librosa.util.sync(mfcc, beat_frames, aggregate=np.median)
@@ -256,14 +223,9 @@ fig.colorbar(img, ax=ax)
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'audio_beat_features.png'), dpi=150)
 print("Saved: audio_beat_features.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# torchaudio: Transforms and Resampling
-# =============================================================================
-print("\n" + "=" * 60)
-print("torchaudio: Spectrogram and Resampling")
-print("=" * 60)
+# ## torchaudio: Spectrogram and Resampling
 
 # Convert to tensor
 waveform = torch.tensor(y).unsqueeze(0).float()  # shape: (1, T)
@@ -323,14 +285,9 @@ axes[1].set_title("torchaudio Mel Spectrogram (dB, 80 mel bands)")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'audio_torchaudio.png'), dpi=150)
 print("Saved: audio_torchaudio.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Summary Statistics Table
-# =============================================================================
-print("\n" + "=" * 60)
-print("Summary: Extracted Audio Features")
-print("=" * 60)
+# ## Summary: Extracted Audio Features
 
 feature_stats = {
     'Tempo (BPM)': tempo_val,

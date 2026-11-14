@@ -1,22 +1,15 @@
 #!/usr/bin/env python3
-"""
-NumPy and SciPy Basics
-======================
-Demonstrates fundamental operations with NumPy and SciPy.
-
-NumPy: https://numpy.org/
-SciPy: https://scipy.org/
-"""
+# # NumPy and SciPy Basics
+#
+# Demonstrates fundamental operations with NumPy and SciPy.
+#
+# - [NumPy](https://numpy.org/)
+# - [SciPy](https://scipy.org/)
 
 import numpy as np
 from scipy import stats, linalg, optimize
 
-# =============================================================================
-# NumPy Array Operations
-# =============================================================================
-print("=" * 60)
-print("NumPy Array Operations")
-print("=" * 60)
+# ## NumPy Array Operations
 
 # Creating arrays
 arr = np.array([1, 2, 3, 4, 5])
@@ -39,12 +32,7 @@ a = np.array([[1], [2], [3]])
 b = np.array([10, 20, 30])
 print(f"\nBroadcasting result:\n{a + b}")
 
-# =============================================================================
-# SciPy Statistical Functions
-# =============================================================================
-print("\n" + "=" * 60)
-print("SciPy Statistical Functions")
-print("=" * 60)
+# ## SciPy Statistical Functions
 
 # Generate sample data
 data = np.random.normal(loc=100, scale=15, size=1000)
@@ -64,12 +52,7 @@ print(f"\nNormality test p-value: {p_value:.4f}")
 ci = stats.t.interval(0.95, len(data) - 1, loc=np.mean(data), scale=stats.sem(data))
 print(f"95% Confidence Interval: ({ci[0]:.2f}, {ci[1]:.2f})")
 
-# =============================================================================
-# SciPy Linear Algebra
-# =============================================================================
-print("\n" + "=" * 60)
-print("SciPy Linear Algebra")
-print("=" * 60)
+# ## SciPy Linear Algebra
 
 # Matrix operations
 A = np.array([[3, 1], [1, 2]])
@@ -87,18 +70,11 @@ print(f"Eigenvalues: {eigenvalues}")
 U, s, Vh = linalg.svd(A)
 print(f"Singular values: {s}")
 
-# =============================================================================
-# SciPy Optimization
-# =============================================================================
-print("\n" + "=" * 60)
-print("SciPy Optimization")
-print("=" * 60)
-
+# ## SciPy Optimization
 
 # Define a function to minimize
 def rosenbrock(x):
     return sum(100.0 * (x[1:] - x[:-1] ** 2.0) ** 2.0 + (1 - x[:-1]) ** 2.0)
-
 
 x0 = np.array([0, 0])
 result = optimize.minimize(rosenbrock, x0, method="BFGS")

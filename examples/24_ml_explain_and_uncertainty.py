@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
-"""
-Explaining, Bounding, and Shipping Models: CatBoost, SHAP, MAPIE, UMAP, skrub, skops, ONNX
-===========================================================================================
-Fits a CatBoost model on mixed categorical/numeric data, explains it with SHAP,
-wraps a regressor in conformal prediction intervals with MAPIE, embeds the
-digits dataset with UMAP, builds features from a messy table with skrub,
-saves a model with skops (a safer format than pickle), and exports a pipeline
-to ONNX with skl2onnx so onnxruntime can serve it without scikit-learn.
-
-CatBoost: https://catboost.ai/docs/
-SHAP:     https://shap.readthedocs.io/
-MAPIE:    https://mapie.readthedocs.io/
-UMAP:     https://umap-learn.readthedocs.io/
-skrub:    https://skrub-data.org/
-skops:    https://skops.readthedocs.io/
-skl2onnx: https://onnx.ai/sklearn-onnx/
-"""
+# # Explaining, Bounding, and Shipping Models: CatBoost, SHAP, MAPIE, UMAP, skrub, skops, ONNX
+#
+# Fits a CatBoost model on mixed categorical/numeric data, explains it with SHAP,
+# wraps a regressor in conformal prediction intervals with MAPIE, embeds the
+# digits dataset with UMAP, builds features from a messy table with skrub,
+# saves a model with skops (a safer format than pickle), and exports a pipeline
+# to ONNX with skl2onnx so onnxruntime can serve it without scikit-learn.
+#
+# - [CatBoost](https://catboost.ai/docs/)
+# - [SHAP](https://shap.readthedocs.io/)
+# - [MAPIE](https://mapie.readthedocs.io/)
+# - [UMAP](https://umap-learn.readthedocs.io/)
+# - [skrub](https://skrub-data.org/)
+# - [skops](https://skops.readthedocs.io/)
+# - [skl2onnx](https://onnx.ai/sklearn-onnx/)
 
 import os
 
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import onnxruntime as ort
 import pandas as pd
@@ -37,20 +35,13 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from skrub import TableVectorizer
 
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 rng = np.random.default_rng(seed=0)
 
-# =============================================================================
-# CatBoost on mixed categorical and numeric features
-# =============================================================================
-print("=" * 60)
-print("CatBoost: Native Categorical Features")
-print("=" * 60)
+# ## CatBoost: Native Categorical Features
 
 n = 2_000
 customers = pd.DataFrame({
@@ -69,12 +60,7 @@ model = CatBoostClassifier(iterations=200, depth=4, verbose=False, random_seed=0
 model.fit(X_train, y_train, cat_features=['plan', 'country'])
 print(f"Test accuracy: {model.score(X_test, y_test):.3f}")
 
-# =============================================================================
-# SHAP — which features drive the predictions
-# =============================================================================
-print("\n" + "=" * 60)
-print("SHAP: Feature Attributions")
-print("=" * 60)
+# ## SHAP: Feature Attributions
 
 explainer = shap.TreeExplainer(model)
 shap_values = explainer(X_test)
@@ -84,15 +70,10 @@ print(mean_abs.round(3).to_string())
 shap.plots.beeswarm(shap_values, show=False)
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'shap_beeswarm.png'), dpi=120)
-plt.close()
+plt.show()
 print("Saved: shap_beeswarm.png")
 
-# =============================================================================
-# MAPIE — conformal prediction intervals
-# =============================================================================
-print("\n" + "=" * 60)
-print("MAPIE: 90% Prediction Intervals")
-print("=" * 60)
+# ## MAPIE: 90% Prediction Intervals
 
 X_reg, y_reg = make_regression(n_samples=1_500, n_features=6, noise=15.0, random_state=0)
 X_fit, X_rest, y_fit, y_rest = train_test_split(X_reg, y_reg, test_size=0.5, random_state=0)
@@ -108,12 +89,7 @@ lower, upper = intervals[:, 0, 0], intervals[:, 1, 0]
 coverage = np.mean((y_eval >= lower) & (y_eval <= upper))
 print(f"Empirical coverage: {coverage:.3f} (target 0.90), mean width {np.mean(upper - lower):.1f}")
 
-# =============================================================================
-# UMAP — non-linear embedding of handwritten digits
-# =============================================================================
-print("\n" + "=" * 60)
-print("UMAP: Digits Embedding")
-print("=" * 60)
+# ## UMAP: Digits Embedding
 
 digits = load_digits()
 embedding = umap.UMAP(n_neighbors=15, min_dist=0.1, random_state=0).fit_transform(digits.data)
@@ -123,15 +99,10 @@ ax.legend(*scatter.legend_elements(), title='digit', fontsize=7, loc='best')
 ax.set_title('UMAP projection of the digits dataset')
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'umap_digits.png'), dpi=120)
-plt.close()
+plt.show()
 print(f"Embedded {digits.data.shape} -> {embedding.shape}; saved umap_digits.png")
 
-# =============================================================================
-# skrub — features from a messy table
-# =============================================================================
-print("\n" + "=" * 60)
-print("skrub: TableVectorizer")
-print("=" * 60)
+# ## skrub: TableVectorizer
 
 messy = pd.DataFrame({
     'signup': pd.date_range('2025-01-01', periods=6, freq='17D').astype(str),
@@ -143,12 +114,7 @@ features = TableVectorizer().fit_transform(messy)
 print(f"{messy.shape[1]} raw columns -> {features.shape[1]} numeric features")
 print(list(features.columns)[:8])
 
-# =============================================================================
-# skops — safe model persistence
-# =============================================================================
-print("\n" + "=" * 60)
-print("skops: Save and Load Without Pickle")
-print("=" * 60)
+# ## skops: Save and Load Without Pickle
 
 ridge = Ridge(alpha=1.0).fit(X_fit, y_fit)
 model_path = os.path.join(OUTPUT_DIR, 'ridge.skops')
@@ -158,12 +124,7 @@ restored = sio.load(model_path, trusted=untrusted)
 print(f"Untrusted types to review: {untrusted or 'none'}")
 print(f"Predictions identical after reload: {np.allclose(restored.predict(X_eval), ridge.predict(X_eval))}")
 
-# =============================================================================
-# skl2onnx + onnxruntime — serve a pipeline without scikit-learn
-# =============================================================================
-print("\n" + "=" * 60)
-print("skl2onnx: Export a Pipeline to ONNX")
-print("=" * 60)
+# ## skl2onnx: Export a Pipeline to ONNX
 
 digit_images = digits.data.astype(np.float32)
 X_train_digits, X_test_digits, y_train_digits, y_test_digits = train_test_split(

@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-"""
-One Query, Four Engines: pandas, Polars, DuckDB, Ibis, and ADBC
-===============================================================
-Writes one million synthetic orders to a Parquet file once, then answers the
-same question four ways: eager pandas, the lazy Polars API, DuckDB SQL, and
-Ibis (one dataframe API compiled to SQL, here executed by DuckDB). The four
-answers are checked against each other and timed. The last section moves an
-Arrow table into SQLite and back with ADBC, which keeps data columnar instead
-of converting it row by row.
-
-For PostgreSQL the same ADBC calls work with
-`adbc_driver_postgresql.dbapi.connect("postgresql://user:pass@host/db")`.
-
-pandas:  https://pandas.pydata.org/docs/
-Polars:  https://docs.pola.rs/
-DuckDB:  https://duckdb.org/docs/api/python/overview
-Ibis:    https://ibis-project.org/
-ADBC:    https://arrow.apache.org/adbc/
-"""
+# # One Query, Four Engines: pandas, Polars, DuckDB, Ibis, and ADBC
+#
+# Writes one million synthetic orders to a Parquet file once, then answers the
+# same question four ways: eager pandas, the lazy Polars API, DuckDB SQL, and
+# Ibis (one dataframe API compiled to SQL, here executed by DuckDB). The four
+# answers are checked against each other and timed. The last section moves an
+# Arrow table into SQLite and back with ADBC, which keeps data columnar instead
+# of converting it row by row.
+#
+# For PostgreSQL the same ADBC calls work with
+# `adbc_driver_postgresql.dbapi.connect("postgresql://user:pass@host/db")`.
+#
+# - [pandas](https://pandas.pydata.org/docs/)
+# - [Polars](https://docs.pola.rs/)
+# - [DuckDB](https://duckdb.org/docs/api/python/overview)
+# - [Ibis](https://ibis-project.org/)
+# - [ADBC](https://arrow.apache.org/adbc/)
 
 import json
 import os
@@ -34,7 +32,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from ibis import _
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 N_ORDERS = 1_000_000
@@ -46,12 +45,7 @@ TIMING_RUNS = 3
 
 rng = np.random.default_rng(seed=0)
 
-# =============================================================================
-# One Parquet file shared by every engine
-# =============================================================================
-print("=" * 60)
-print("Synthetic Orders Written Once to Parquet")
-print("=" * 60)
+# ## Synthetic Orders Written Once to Parquet
 
 order_seconds = rng.integers(0, 730 * 24 * 3600, size=N_ORDERS)
 orders = pa.table({
@@ -70,10 +64,8 @@ print(f"Rows: {orders.num_rows:,}  Size on disk: {os.path.getsize(parquet_path) 
 print("Question: revenue, order count, and mean discount per region and category")
 print(f"for shipped orders since {START:%Y-%m-%d}, highest revenue first.")
 
+# ## The same query, four ways
 
-# =============================================================================
-# The same query, four ways
-# =============================================================================
 def query_pandas(path: str) -> pd.DataFrame:
     """Eager pandas: load everything, then filter, derive, and aggregate."""
     frame = pd.read_parquet(path)
@@ -84,7 +76,6 @@ def query_pandas(path: str) -> pd.DataFrame:
         .agg(revenue=('revenue', 'sum'), orders=('order_id', 'count'), mean_discount=('discount', 'mean'))
         .sort_values('revenue', ascending=False, ignore_index=True)
     )
-
 
 def query_polars(path: str) -> pl.DataFrame:
     """Lazy Polars: the optimizer pushes the filter and column selection into the scan."""
@@ -102,7 +93,6 @@ def query_polars(path: str) -> pl.DataFrame:
         .collect()
     )
 
-
 DUCKDB_SQL = """
 SELECT region, category,
        sum(quantity * unit_price * (1 - discount)) AS revenue,
@@ -114,11 +104,9 @@ GROUP BY region, category
 ORDER BY revenue DESC
 """
 
-
 def query_duckdb(path: str) -> pd.DataFrame:
     """DuckDB SQL straight over the Parquet file."""
     return duckdb.connect().execute(DUCKDB_SQL, [path, START]).df()
-
 
 def ibis_expression(path: str) -> ibis.Table:
     """Ibis: a lazy dataframe expression that compiles to SQL for any backend."""
@@ -131,11 +119,9 @@ def ibis_expression(path: str) -> ibis.Table:
         .order_by(ibis.desc('revenue'))
     )
 
-
 def query_ibis(path: str) -> pd.DataFrame:
     """Run the Ibis expression on DuckDB and return pandas."""
     return ibis_expression(path).to_pandas()
-
 
 ENGINES = {
     'pandas': query_pandas,
@@ -144,22 +130,18 @@ ENGINES = {
     'ibis (on duckdb)': query_ibis,
 }
 
-
 def normalized(result: pd.DataFrame | pl.DataFrame) -> pd.DataFrame:
     """Common shape for comparing engines: pandas, fixed dtypes, sorted by key."""
     frame = result.to_pandas() if isinstance(result, pl.DataFrame) else result
     frame = frame.astype({'orders': 'int64', 'revenue': 'float64', 'mean_discount': 'float64'})
     return frame.sort_values(['region', 'category'], ignore_index=True)
 
+# ## Ibis compiles the expression to SQL
 
-print("\n" + "=" * 60)
-print("Ibis compiles the expression to SQL")
-print("=" * 60)
 print(ibis.to_sql(ibis_expression(parquet_path)))
 
-print("\n" + "=" * 60)
-print("Answers agree across engines")
-print("=" * 60)
+# ## Answers agree across engines
+
 results = {name: normalized(query(parquet_path)) for name, query in ENGINES.items()}
 reference = results['pandas']
 for name, frame in results.items():
@@ -175,13 +157,11 @@ print(answer.head(5))
 answer.write_csv(os.path.join(OUTPUT_DIR, 'engines_answer.csv'))
 print("Saved: engines_answer.csv")
 
-# =============================================================================
-# Timing (best of several runs; each run reads the Parquet file again)
-# =============================================================================
+# ## Timing (best of several runs; each run reads the Parquet file again)
+
 print("\n" + "=" * 60)
 print(f"Timing, best of {TIMING_RUNS} runs")
 print("=" * 60)
-
 
 def best_seconds(query, path: str) -> float:
     """Fastest wall-clock time of TIMING_RUNS calls."""
@@ -191,7 +171,6 @@ def best_seconds(query, path: str) -> float:
         query(path)
         durations.append(time.perf_counter() - started)
     return min(durations)
-
 
 timings = {name: round(best_seconds(query, parquet_path), 4) for name, query in ENGINES.items()}
 fastest = min(timings.values())
@@ -203,12 +182,7 @@ print("Saved: engines_timings.json")
 print("pandas reads every column into memory first; the other three prune columns and")
 print("filter inside the Parquet scan, then aggregate in parallel native code.")
 
-# =============================================================================
-# ADBC: Arrow tables in and out of a database without row conversion
-# =============================================================================
-print("\n" + "=" * 60)
-print("ADBC: Arrow In, Arrow Out (SQLite)")
-print("=" * 60)
+# ## ADBC: Arrow In, Arrow Out (SQLite)
 
 sqlite_path = os.path.join(OUTPUT_DIR, 'engines.sqlite')
 if os.path.exists(sqlite_path):

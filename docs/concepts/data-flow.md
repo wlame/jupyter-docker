@@ -20,7 +20,7 @@ flowchart TD
     gen --> lock["just lock<br/>re-resolve all 18 uv.lock files"]
     lock --> ci["just ci<br/>fast host gate (no Docker)"]
     ci --> build["just build &lt;t&gt;<br/>docker build one target"]
-    build --> test["just test &lt;t&gt;<br/>verify_imports + pytest examples"]
+    build --> test["just test &lt;t&gt;<br/>verify_imports + run example notebooks"]
     test --> push["Push to main"]
     push --> cicd["CI builds, tests, and<br/>publishes to GHCR"]
     cicd --> ghcr["ghcr.io/wlame/jupyter-docker:&lt;t&gt;"]
@@ -61,8 +61,8 @@ lockfile. BuildKit is required for the uv cache mounts (see
 ### 5. `just test <t>` — verify the image
 
 `build-all.sh --test-only <t>` runs the target's `verify_imports.py` inside the
-image to confirm every declared package imports, then runs the example tests
-marked `<t>` in `tests/test_examples.py`.
+image to confirm every declared package imports, then executes the example
+notebooks whose tests are marked `<t>` in `tests/test_examples.py`.
 
 ### 6. CI publishes to GHCR
 

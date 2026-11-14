@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""
-Object Detection with Ultralytics YOLO
-======================================
-Demonstrates object detection using Ultralytics YOLO26.
-
-Ultralytics: https://ultralytics.com/
-Documentation: https://docs.ultralytics.com/
-"""
+# # Object Detection with Ultralytics YOLO
+#
+# Demonstrates object detection using Ultralytics YOLO26.
+#
+# - [Ultralytics](https://ultralytics.com/)
+# - [Documentation](https://docs.ultralytics.com/)
 
 import os
 import numpy as np
@@ -14,15 +12,11 @@ from PIL import Image, ImageDraw
 from ultralytics import YOLO
 
 # Create output directory
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# YOLO Model Overview
-# =============================================================================
-print("=" * 60)
-print("Ultralytics YOLO Overview")
-print("=" * 60)
+# ## Ultralytics YOLO Overview
 
 print("""
 YOLO (You Only Look Once) is a state-of-the-art object detection model.
@@ -44,12 +38,7 @@ Task-specific models:
   - Oriented boxes: yolo26n-obb.pt
 """)
 
-# =============================================================================
-# Create Sample Image with Objects
-# =============================================================================
-print("=" * 60)
-print("Creating Sample Image")
-print("=" * 60)
+# ## Creating Sample Image
 
 # Create a sample scene image
 width, height = 640, 480
@@ -91,15 +80,10 @@ sample_image.save(sample_path)
 print(f"Sample scene created: {sample_path}")
 print(f"Size: {sample_image.size}")
 
-# =============================================================================
-# Load YOLO Model
-# =============================================================================
-print("\n" + "=" * 60)
-print("Loading YOLO Model")
-print("=" * 60)
+# ## Loading YOLO Model
 
-# Load pretrained YOLO26 nano model (smallest, fastest). Prefer a pre-baked
-# copy (present in the vision/full images) so this runs offline; otherwise
+# Load the pretrained YOLO26 nano model (smallest, fastest). Prefer the pre-baked
+# weights (present in the vision and full images) so this runs offline; otherwise
 # ultralytics downloads it on first use.
 print("Loading YOLO26n model (this may download the model on first run)...")
 _baked_yolo = os.path.expanduser("~/.cache/ultralytics/yolo26n.pt")
@@ -109,24 +93,14 @@ print(f"Model loaded successfully!")
 print(f"Model type: {type(model).__name__}")
 print(f"Task: {model.task}")
 
-# =============================================================================
-# Model Information
-# =============================================================================
-print("\n" + "=" * 60)
-print("Model Information")
-print("=" * 60)
+# ## Model Information
 
 # Get class names
 class_names = model.names
 print(f"Number of classes: {len(class_names)}")
 print(f"Sample classes: {list(class_names.values())[:10]}...")
 
-# =============================================================================
-# Run Inference
-# =============================================================================
-print("\n" + "=" * 60)
-print("Running Inference on Sample Image")
-print("=" * 60)
+# ## Running Inference on Sample Image
 
 # Run inference
 results = model(sample_path, verbose=False)
@@ -152,12 +126,7 @@ else:
     print("No objects detected in the simple drawn image.")
     print("(YOLO is trained on real photos, not simple drawings)")
 
-# =============================================================================
-# Save Annotated Image
-# =============================================================================
-print("\n" + "=" * 60)
-print("Saving Results")
-print("=" * 60)
+# ## Saving Results
 
 # Save annotated image
 annotated_path = os.path.join(OUTPUT_DIR, "yolo_annotated.png")
@@ -165,12 +134,7 @@ annotated_img = result.plot()  # Returns numpy array with annotations
 Image.fromarray(annotated_img).save(annotated_path)
 print(f"Annotated image saved: {annotated_path}")
 
-# =============================================================================
-# Using YOLO with NumPy Arrays
-# =============================================================================
-print("\n" + "=" * 60)
-print("Using YOLO with NumPy Arrays")
-print("=" * 60)
+# ## Using YOLO with NumPy Arrays
 
 # Convert PIL image to numpy array
 img_array = np.array(sample_image)
@@ -180,12 +144,7 @@ print(f"Input array shape: {img_array.shape}")
 results_np = model(img_array, verbose=False)
 print(f"Inference on numpy array: {len(results_np[0].boxes)} detections")
 
-# =============================================================================
-# Batch Processing Example
-# =============================================================================
-print("\n" + "=" * 60)
-print("Batch Processing Example")
-print("=" * 60)
+# ## Batch Processing Example
 
 # Create multiple images for batch processing
 batch_images = []
@@ -203,12 +162,7 @@ print(f"Processed {len(batch_results)} images in batch")
 for i, res in enumerate(batch_results):
     print(f"  Image {i+1}: {len(res.boxes)} detections")
 
-# =============================================================================
-# Export Model (Information)
-# =============================================================================
-print("\n" + "=" * 60)
-print("Model Export Options")
-print("=" * 60)
+# ## Model Export Options
 
 print("""
 YOLO models can be exported to various formats for deployment:
@@ -226,12 +180,7 @@ Supported export formats:
   - TF.js, PaddlePaddle, ncnn
 """)
 
-# =============================================================================
-# Training Information
-# =============================================================================
-print("\n" + "=" * 60)
-print("Training Custom Models")
-print("=" * 60)
+# ## Training Custom Models
 
 print("""
 To train YOLO on custom data:
@@ -262,12 +211,7 @@ To train YOLO on custom data:
    results = model('image.jpg')
 """)
 
-# =============================================================================
-# Available Tasks
-# =============================================================================
-print("\n" + "=" * 60)
-print("YOLO Task Examples")
-print("=" * 60)
+# ## YOLO Task Examples
 
 print("""
 Detection (default):

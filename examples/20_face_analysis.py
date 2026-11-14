@@ -1,36 +1,28 @@
 #!/usr/bin/env python3
-"""
-Face Analysis
-=============
-Demonstrates face detection, recognition, and landmark extraction.
-
-deepface: https://github.com/serengil/deepface
-dlib: http://dlib.net/
-face-alignment: https://github.com/1adrianb/face-alignment
-mtcnn: https://github.com/ipazc/mtcnn
-
-Uses synthetically generated images — no external files required.
-"""
+# # Face Analysis
+#
+# Demonstrates face detection, recognition, and landmark extraction.
+#
+# - [deepface](https://github.com/serengil/deepface)
+# - [dlib](http://dlib.net/)
+# - [face-alignment](https://github.com/1adrianb/face-alignment)
+# - [mtcnn](https://github.com/ipazc/mtcnn)
+#
+# Uses synthetically generated images — no external files required.
 
 import os
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 from PIL import Image, ImageDraw
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# Generate Synthetic Test Images
-# =============================================================================
-print("=" * 60)
-print("Generating Synthetic Test Images")
-print("=" * 60)
+# ## Generating Synthetic Test Images
 
 # Create a simple face-like image using geometric shapes
 img_size = 256
@@ -65,12 +57,7 @@ print(f"Image size   : {img_size}x{img_size}")
 print(f"Image shape  : {img_array.shape}")
 print(f"Saved        : {input_path}")
 
-# =============================================================================
-# dlib — HOG Face Detection
-# =============================================================================
-print("\n" + "=" * 60)
-print("dlib — HOG Face Detection")
-print("=" * 60)
+# ## dlib — HOG Face Detection
 
 try:
     import dlib
@@ -111,8 +98,7 @@ try:
     detection_path = os.path.join(OUTPUT_DIR, 'face_detection.png')
     plt.savefig(detection_path, dpi=150)
     print(f"Saved: {detection_path}")
-    plt.close()
-
+    plt.show()
 except Exception as e:
     print(f"dlib detection skipped: {e}")
     # Create placeholder
@@ -122,14 +108,9 @@ except Exception as e:
     ax.axis('off')
     detection_path = os.path.join(OUTPUT_DIR, 'face_detection.png')
     plt.savefig(detection_path, dpi=150)
-    plt.close()
+    plt.show()
 
-# =============================================================================
-# face-alignment — Landmark Extraction
-# =============================================================================
-print("\n" + "=" * 60)
-print("face-alignment — Landmark Extraction")
-print("=" * 60)
+# ## face-alignment — Landmark Extraction
 
 # torch-based; runs before DeepFace loads TensorFlow. This image excludes triton,
 # whose import after TensorFlow segfaults, so the order is a second guard.
@@ -188,14 +169,9 @@ plt.tight_layout()
 landmarks_path = os.path.join(OUTPUT_DIR, 'face_landmarks.png')
 plt.savefig(landmarks_path, dpi=150)
 print(f"Saved: {landmarks_path}")
-plt.close()
+plt.show()
 
-# =============================================================================
-# DeepFace — Attribute Analysis
-# =============================================================================
-print("\n" + "=" * 60)
-print("DeepFace — Attribute Analysis")
-print("=" * 60)
+# ## DeepFace — Attribute Analysis
 
 try:
     from deepface import DeepFace
@@ -224,16 +200,10 @@ try:
                 print(f"    {emotion:12s}: {score:6.2f}% {bar}")
     else:
         print("  No analysis results (synthetic image may not be recognized as face)")
-
 except Exception as e:
     print(f"DeepFace analysis skipped: {e}")
 
-# =============================================================================
-# Library Version Summary
-# =============================================================================
-print("\n" + "=" * 60)
-print("Library Versions")
-print("=" * 60)
+# ## Library Versions
 
 libraries = [
     ('numpy', 'numpy'),
@@ -258,9 +228,8 @@ for module_name, display_name in libraries:
     except ImportError:
         print(f"  {display_name:25s}: not installed")
 
-# =============================================================================
-# Summary
-# =============================================================================
+# ## Summary
+
 print("\n" + "=" * 60)
 print("Face analysis complete!")
 print("Outputs: face_synthetic_input.png, face_detection.png,")

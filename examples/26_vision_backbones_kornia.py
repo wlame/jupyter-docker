@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
-"""
-Vision Building Blocks: timm, kornia, supervision, OpenCLIP, onnxruntime
-========================================================================
-Builds image backbones with timm and OpenCLIP (architectures only: pass
-`pretrained=True` / a `pretrained` tag to download weights), runs
-differentiable image ops and augmentations with kornia, and draws detections
-with supervision — the annotation toolkit that pairs with Ultralytics YOLO.
-
-timm:        https://huggingface.co/docs/timm/
-kornia:      https://kornia.readthedocs.io/
-supervision: https://supervision.roboflow.com/
-OpenCLIP:    https://github.com/mlfoundations/open_clip
-onnxruntime: https://onnxruntime.ai/docs/
-"""
+# # Vision Building Blocks: timm, kornia, supervision, OpenCLIP, onnxruntime
+#
+# Builds image backbones with timm and OpenCLIP (architectures only: pass
+# `pretrained=True` / a `pretrained` tag to download weights), runs
+# differentiable image ops and augmentations with kornia, and draws detections
+# with supervision — the annotation toolkit that pairs with Ultralytics YOLO.
+#
+# - [timm](https://huggingface.co/docs/timm/)
+# - [kornia](https://kornia.readthedocs.io/)
+# - [supervision](https://supervision.roboflow.com/)
+# - [OpenCLIP](https://github.com/mlfoundations/open_clip)
+# - [onnxruntime](https://onnxruntime.ai/docs/)
 
 import os
 
@@ -26,7 +24,8 @@ import supervision as sv
 import timm
 import torch
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 torch.manual_seed(0)
@@ -39,12 +38,7 @@ scene[:] = np.linspace(40, 200, width, dtype=np.uint8)[None, :, None]
 cv2.rectangle(scene, (30, 40), (130, 160), (220, 60, 60), thickness=-1)
 cv2.circle(scene, (230, 140), 55, (60, 180, 90), thickness=-1)
 
-# =============================================================================
-# timm — backbone architectures and feature maps
-# =============================================================================
-print("=" * 60)
-print("timm: Backbones")
-print("=" * 60)
+# ## timm: Backbones
 
 print(f"timm offers {len(timm.list_models())} architectures, e.g. {timm.list_models('convnext*')[:3]}")
 backbone = timm.create_model('resnet18', pretrained=False, features_only=True, out_indices=(2, 3, 4))
@@ -54,12 +48,7 @@ with torch.no_grad():
     feature_maps = backbone(batch)
 print("Feature map shapes:", [tuple(f.shape) for f in feature_maps])
 
-# =============================================================================
-# kornia — differentiable image processing and augmentation
-# =============================================================================
-print("\n" + "=" * 60)
-print("kornia: Edges and Augmentations")
-print("=" * 60)
+# ## kornia: Edges and Augmentations
 
 gray = kornia.color.rgb_to_grayscale(batch)
 edges = kornia.filters.sobel(gray)
@@ -73,7 +62,6 @@ augmented = augment(batch)
 print(f"Edge magnitude range: {edges.min().item():.3f}..{edges.max().item():.3f}; "
       f"augmented batch {tuple(augmented.shape)}")
 
-
 def to_uint8(tensor: torch.Tensor) -> np.ndarray:
     """(1, C, H, W) float tensor in [0, 1] -> (H, W, 3) uint8 image."""
     image = tensor[0].clamp(0, 1).permute(1, 2, 0).numpy()
@@ -81,18 +69,12 @@ def to_uint8(tensor: torch.Tensor) -> np.ndarray:
         image = np.repeat(image, 3, axis=2)
     return (image * 255).astype(np.uint8)
 
-
 edge_view = to_uint8(edges / edges.max())
 panel = np.concatenate([scene, to_uint8(blurred), edge_view, to_uint8(augmented)], axis=1)
 cv2.imwrite(os.path.join(OUTPUT_DIR, 'kornia_ops.png'), cv2.cvtColor(panel, cv2.COLOR_RGB2BGR))
 print("Saved: kornia_ops.png (original | blur | edges | augmented)")
 
-# =============================================================================
-# supervision — annotate detections
-# =============================================================================
-print("\n" + "=" * 60)
-print("supervision: Draw Detections")
-print("=" * 60)
+# ## supervision: Draw Detections
 
 detections = sv.Detections(
     xyxy=np.array([[30, 40, 130, 160], [175, 85, 285, 195]], dtype=float),
@@ -106,12 +88,7 @@ cv2.imwrite(os.path.join(OUTPUT_DIR, 'supervision_annotated.png'), cv2.cvtColor(
 print(f"{len(detections)} detections, areas {detections.area.astype(int).tolist()}")
 print("Saved: supervision_annotated.png")
 
-# =============================================================================
-# OpenCLIP — image/text embedding model (architecture only)
-# =============================================================================
-print("\n" + "=" * 60)
-print("OpenCLIP: Image and Text Towers")
-print("=" * 60)
+# ## OpenCLIP: Image and Text Towers
 
 clip_model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32', pretrained=None)
 tokenizer = open_clip.get_tokenizer('ViT-B-32')
@@ -122,12 +99,8 @@ with torch.no_grad():
 print(f"Image embedding {tuple(image_features.shape)}, text embeddings {tuple(text_features.shape)}")
 print(f"{len(open_clip.list_pretrained())} pretrained checkpoints are available by name")
 
-# =============================================================================
-# onnxruntime — inference engine for exported models
-# =============================================================================
-print("\n" + "=" * 60)
-print("onnxruntime")
-print("=" * 60)
+# ## onnxruntime
+
 print(f"onnxruntime {ort.__version__}, providers: {ort.get_available_providers()}")
 print("Export a YOLO model to ONNX and run it here with ort.InferenceSession(path).")
 

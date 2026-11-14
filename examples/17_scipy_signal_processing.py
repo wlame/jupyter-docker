@@ -1,34 +1,26 @@
 #!/usr/bin/env python3
-"""
-SciPy: Signal Processing and Optimization
-==========================================
-Demonstrates signal processing, FFT, filtering, and optimization with SciPy.
-
-SciPy Signal: https://docs.scipy.org/doc/scipy/tutorial/signal.html
-SciPy FFT:    https://docs.scipy.org/doc/scipy/tutorial/fft.html
-SciPy Optim.: https://docs.scipy.org/doc/scipy/tutorial/optimize.html
-SciPy Stats:  https://docs.scipy.org/doc/scipy/tutorial/stats.html
-"""
+# # SciPy: Signal Processing and Optimization
+#
+# Demonstrates signal processing, FFT, filtering, and optimization with SciPy.
+#
+# - [SciPy Signal](https://docs.scipy.org/doc/scipy/tutorial/signal.html)
+# - [SciPy FFT](https://docs.scipy.org/doc/scipy/tutorial/fft.html)
+# - [SciPy Optim.](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
+# - [SciPy Stats](https://docs.scipy.org/doc/scipy/tutorial/stats.html)
 
 import os
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from scipy import signal, fft, optimize, stats, interpolate
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 rng = np.random.default_rng(seed=0)
 
-# =============================================================================
-# Signal Generation — Composite Noisy Signal
-# =============================================================================
-print("=" * 60)
-print("Signal Generation")
-print("=" * 60)
+# ## Signal Generation
 
 fs = 1000        # Sampling rate (Hz)
 T = 2.0          # Duration (s)
@@ -49,12 +41,7 @@ print(f"Signal freqs  : {freq1} Hz + {freq2} Hz")
 print(f"Noise std     : {noise_std}")
 print(f"SNR           : {10 * np.log10((clean**2).mean() / noise_std**2):.1f} dB")
 
-# =============================================================================
-# FFT Analysis
-# =============================================================================
-print("\n" + "=" * 60)
-print("FFT Analysis")
-print("=" * 60)
+# ## FFT Analysis
 
 N = len(t)
 freqs = fft.rfftfreq(N, d=1 / fs)
@@ -91,14 +78,9 @@ axes[1].legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'scipy_fft.png'), dpi=150)
 print("Saved: scipy_fft.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Digital Filtering — Lowpass, Highpass, Bandpass, Notch
-# =============================================================================
-print("\n" + "=" * 60)
-print("Digital Filtering")
-print("=" * 60)
+# ## Digital Filtering
 
 def apply_butter(data: np.ndarray, cutoff, fs: int, btype: str, order: int = 5) -> np.ndarray:
     """Zero-phase Butterworth filter via forward-backward filtering."""
@@ -147,14 +129,9 @@ plt.suptitle("Digital Filtering Results", fontsize=13)
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'scipy_filters.png'), dpi=150)
 print("Saved: scipy_filters.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Spectrogram — Short-Time Fourier Transform
-# =============================================================================
-print("\n" + "=" * 60)
-print("Spectrogram (STFT)")
-print("=" * 60)
+# ## Spectrogram (STFT)
 
 # Chirp signal: frequency sweeps from 50 to 300 Hz
 chirp_signal = signal.chirp(t, f0=50, f1=300, t1=T, method='linear')
@@ -195,14 +172,9 @@ plt.colorbar(im, ax=axes[1], label="Power (dB)")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'scipy_spectrogram.png'), dpi=150)
 print("Saved: scipy_spectrogram.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Optimization: minimize scalar and multivariate functions
-# =============================================================================
-print("\n" + "=" * 60)
-print("Optimization")
-print("=" * 60)
+# ## Optimization
 
 # --- 1D: Rosenbrock-like curved valley
 def rosenbrock_1d(x: np.ndarray) -> float:
@@ -277,14 +249,9 @@ axes[1].legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'scipy_optimization.png'), dpi=150)
 print("Saved: scipy_optimization.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Statistics: Hypothesis Tests and Distributions
-# =============================================================================
-print("\n" + "=" * 60)
-print("Statistical Analysis")
-print("=" * 60)
+# ## Statistical Analysis
 
 # Generate two groups with slightly different distributions
 group_a = rng.normal(loc=100, scale=15, size=80)
@@ -366,14 +333,9 @@ axes[2].set_title(f"Correlation: Pearson r={pearson_r:.3f}")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'scipy_statistics.png'), dpi=150)
 print("Saved: scipy_statistics.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Interpolation
-# =============================================================================
-print("\n" + "=" * 60)
-print("Interpolation")
-print("=" * 60)
+# ## Interpolation
 
 x_sparse = np.array([0, 1, 2, 3, 5, 7, 8, 9, 10], dtype=float)
 y_sparse = np.sin(x_sparse) + rng.normal(scale=0.05, size=len(x_sparse))
@@ -407,11 +369,10 @@ ax.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'scipy_interpolation.png'), dpi=150)
 print("Saved: scipy_interpolation.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Summary
-# =============================================================================
+# ## Summary
+
 print("\n" + "=" * 60)
 print("SciPy signal processing and optimization complete!")
 print("Outputs: scipy_fft.png, scipy_filters.png, scipy_spectrogram.png,")

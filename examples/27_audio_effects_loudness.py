@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
-"""
-Audio Effects, Loudness, Augmentation, and Phonetics
-====================================================
-Processes a synthetic voice-like signal with Spotify's pedalboard (studio
-effects, augmentation for audio ML, and audio file I/O), measures and
-normalizes loudness to a broadcast target with pyloudnorm, removes noise with
-noisereduce, and measures pitch and formants with Praat through parselmouth.
-
-pedalboard:      https://spotify.github.io/pedalboard/
-pyloudnorm:      https://github.com/csteinmetz1/pyloudnorm
-noisereduce:     https://github.com/timsainb/noisereduce
-parselmouth:     https://parselmouth.readthedocs.io/
-"""
+# # Audio Effects, Loudness, Augmentation, and Phonetics
+#
+# Processes a synthetic voice-like signal with Spotify's pedalboard (studio
+# effects, augmentation for audio ML, and audio file I/O), measures and
+# normalizes loudness to a broadcast target with pyloudnorm, removes noise with
+# noisereduce, and measures pitch and formants with Praat through parselmouth.
+#
+# - [pedalboard](https://spotify.github.io/pedalboard/)
+# - [pyloudnorm](https://github.com/csteinmetz1/pyloudnorm)
+# - [noisereduce](https://github.com/timsainb/noisereduce)
+# - [parselmouth](https://parselmouth.readthedocs.io/)
 
 import os
 
-import matplotlib
+import matplotlib.pyplot as plt
 import noisereduce as nr
 import numpy as np
 import parselmouth
@@ -23,21 +21,14 @@ import pyloudnorm as pyln
 from pedalboard import Chorus, Compressor, Gain, HighpassFilter, Pedalboard, PitchShift, Reverb, time_stretch
 from pedalboard.io import AudioFile
 
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 rng = np.random.default_rng(seed=0)
 sr = 16_000
 
-# =============================================================================
-# A synthetic vowel: glottal pulse train shaped by two formant resonances
-# =============================================================================
-print("=" * 60)
-print("Synthetic Vowel")
-print("=" * 60)
+# ## Synthetic Vowel
 
 duration = 2.0
 t = np.arange(int(sr * duration)) / sr
@@ -56,12 +47,7 @@ for formant, bandwidth in [(700, 110), (1220, 120)]:  # roughly an /a/
 vowel = (vowel / np.max(np.abs(vowel)) * 0.5).astype(np.float32)
 print(f"{duration:.1f} s at {sr} Hz, mean pitch {f0.mean():.1f} Hz")
 
-# =============================================================================
-# pedalboard — effects chain and file I/O
-# =============================================================================
-print("\n" + "=" * 60)
-print("pedalboard: Effects Chain")
-print("=" * 60)
+# ## pedalboard: Effects Chain
 
 board = Pedalboard([
     HighpassFilter(cutoff_frequency_hz=80),
@@ -77,24 +63,14 @@ with AudioFile(fx_path, 'w', sr, num_channels=1) as f:
 with AudioFile(fx_path) as f:
     print(f"Wrote {f.duration:.2f} s, {f.num_channels} channel(s) at {f.samplerate} Hz -> pedalboard_fx.wav")
 
-# =============================================================================
-# pyloudnorm — integrated loudness (ITU-R BS.1770)
-# =============================================================================
-print("\n" + "=" * 60)
-print("pyloudnorm: Loudness Normalization")
-print("=" * 60)
+# ## pyloudnorm: Loudness Normalization
 
 meter = pyln.Meter(sr)
 loudness = meter.integrated_loudness(processed.astype(np.float64))
 normalized = pyln.normalize.loudness(processed.astype(np.float64), loudness, -23.0)
 print(f"Integrated loudness {loudness:.1f} LUFS -> {meter.integrated_loudness(normalized):.1f} LUFS (EBU R128 target -23)")
 
-# =============================================================================
-# pedalboard — randomized augmentations for training data
-# =============================================================================
-print("\n" + "=" * 60)
-print("pedalboard: Augmentations")
-print("=" * 60)
+# ## pedalboard: Augmentations
 
 for i in range(3):
     semitones = float(rng.uniform(-2, 2))
@@ -104,30 +80,18 @@ for i in range(3):
     noisy_aug = stretched + rng.normal(scale=0.005, size=stretched.shape).astype(np.float32)
     print(f"variant {i}: pitch {semitones:+.2f} st, speed x{stretch:.2f} -> {len(noisy_aug)} samples")
 
-# =============================================================================
-# noisereduce — spectral gating
-# =============================================================================
-print("\n" + "=" * 60)
-print("noisereduce: Denoise")
-print("=" * 60)
+# ## noisereduce: Denoise
 
 noisy = vowel + rng.normal(scale=0.05, size=vowel.shape).astype(np.float32)
 denoised = nr.reduce_noise(y=noisy, sr=sr)
-
 
 def snr_db(clean: np.ndarray, test: np.ndarray) -> float:
     """Signal-to-noise ratio of `test` against the clean reference, in dB."""
     return float(10 * np.log10(np.sum(clean**2) / np.sum((clean - test) ** 2)))
 
-
 print(f"SNR noisy {snr_db(vowel, noisy):.1f} dB -> denoised {snr_db(vowel, denoised):.1f} dB")
 
-# =============================================================================
-# parselmouth — Praat pitch and formants
-# =============================================================================
-print("\n" + "=" * 60)
-print("parselmouth: Pitch and Formants")
-print("=" * 60)
+# ## parselmouth: Pitch and Formants
 
 sound = parselmouth.Sound(vowel.astype(np.float64), sampling_frequency=sr)
 pitch = sound.to_pitch()
@@ -150,7 +114,7 @@ axes[1].set_xlabel('time (s)')
 fig.suptitle('Denoising and Praat pitch track')
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'audio_effects.png'), dpi=120)
-plt.close()
+plt.show()
 print("Saved: audio_effects.png")
 
 print("\nDone.")

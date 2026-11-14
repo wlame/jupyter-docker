@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-"""
-Image Processing Basics
-=======================
-Demonstrates image processing with PIL, OpenCV, scikit-image, and imageio.
-
-Pillow: https://pillow.readthedocs.io/
-OpenCV: https://docs.opencv.org/
-scikit-image: https://scikit-image.org/
-imageio: https://imageio.readthedocs.io/
-"""
+# # Image Processing Basics
+#
+# Demonstrates image processing with PIL, OpenCV, scikit-image, and imageio.
+#
+# - [Pillow](https://pillow.readthedocs.io/)
+# - [OpenCV](https://docs.opencv.org/)
+# - [scikit-image](https://scikit-image.org/)
+# - [imageio](https://imageio.readthedocs.io/)
 
 import os
 import numpy as np
@@ -19,15 +17,11 @@ from skimage.draw import disk, rectangle
 import imageio.v3 as iio
 
 # Create output directory
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# Create Sample Image
-# =============================================================================
-print("=" * 60)
-print("Creating Sample Image")
-print("=" * 60)
+# ## Creating Sample Image
 
 # Create a sample image using PIL
 width, height = 400, 300
@@ -53,12 +47,7 @@ print(f"Sample image created: {sample_path}")
 print(f"Size: {sample_image.size}")
 print(f"Mode: {sample_image.mode}")
 
-# =============================================================================
-# PIL (Pillow) Operations
-# =============================================================================
-print("\n" + "=" * 60)
-print("PIL (Pillow) Operations")
-print("=" * 60)
+# ## PIL (Pillow) Operations
 
 # Load and basic info
 img = Image.open(sample_path)
@@ -106,12 +95,7 @@ thumbnail.thumbnail((100, 100))
 thumbnail.save(os.path.join(OUTPUT_DIR, "pil_thumbnail.png"))
 print(f"Created thumbnail: {thumbnail.size}")
 
-# =============================================================================
-# OpenCV Operations
-# =============================================================================
-print("\n" + "=" * 60)
-print("OpenCV Operations")
-print("=" * 60)
+# ## OpenCV Operations
 
 print(f"OpenCV version: {cv2.__version__}")
 
@@ -168,12 +152,7 @@ cv2.putText(cv_draw, "OpenCV", (150, 280), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0
 cv2.imwrite(os.path.join(OUTPUT_DIR, "cv_drawing.png"), cv_draw)
 print("Drew shapes and text")
 
-# =============================================================================
-# scikit-image Operations
-# =============================================================================
-print("\n" + "=" * 60)
-print("scikit-image Operations")
-print("=" * 60)
+# ## scikit-image Operations
 
 # Load image
 ski_img = io.imread(sample_path)
@@ -226,12 +205,7 @@ ski_corners = feature.corner_harris(ski_gray)
 ski_corners_peaks = feature.corner_peaks(ski_corners, min_distance=10)
 print(f"Detected {len(ski_corners_peaks)} corners using Harris detector")
 
-# =============================================================================
-# imageio Operations
-# =============================================================================
-print("\n" + "=" * 60)
-print("imageio Operations")
-print("=" * 60)
+# ## imageio Operations
 
 # Read image
 iio_img = iio.imread(sample_path)
@@ -257,12 +231,7 @@ gif_path = os.path.join(OUTPUT_DIR, "iio_animation.gif")
 iio.imwrite(gif_path, frames, duration=100, loop=0)
 print(f"Created animated GIF with {len(frames)} frames: {gif_path}")
 
-# =============================================================================
-# Summary
-# =============================================================================
-print("\n" + "=" * 60)
-print("Summary - Output Files Created")
-print("=" * 60)
+# ## Summary - Output Files Created
 
 output_files = sorted(os.listdir(OUTPUT_DIR))
 for f in output_files:

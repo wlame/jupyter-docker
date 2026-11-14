@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-"""
-Matplotlib and Seaborn Visualization
-====================================
-Demonstrates static visualizations with Matplotlib and Seaborn.
-
-Matplotlib: https://matplotlib.org/
-Seaborn: https://seaborn.pydata.org/
-
-Note: Run this in Jupyter for interactive plots, or use plt.savefig() to save.
-"""
+# # Matplotlib and Seaborn Visualization
+#
+# Demonstrates static visualizations with Matplotlib and Seaborn.
+#
+# - [Matplotlib](https://matplotlib.org/)
+# - [Seaborn](https://seaborn.pydata.org/)
+#
+# Note: Run this in Jupyter for interactive plots, or use plt.savefig() to save.
 
 import numpy as np
 import pandas as pd
@@ -16,19 +14,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Set style
 plt.style.use("seaborn-v0_8-whitegrid")
 sns.set_palette("husl")
 
-# =============================================================================
-# Matplotlib Basics
-# =============================================================================
-print("=" * 60)
-print("Matplotlib Basic Plots")
-print("=" * 60)
+# ## Matplotlib Basic Plots
 
 # Line plot
 fig, axes = plt.subplots(2, 2, figsize=(12, 10))
@@ -84,14 +78,9 @@ axes[1, 1].legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "matplotlib_basics.png"), dpi=150, bbox_inches="tight")
 print("Saved: matplotlib_basics.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Seaborn Statistical Visualizations
-# =============================================================================
-print("\n" + "=" * 60)
-print("Seaborn Statistical Visualizations")
-print("=" * 60)
+# ## Seaborn Statistical Visualizations
 
 # Create sample dataset
 np.random.seed(42)
@@ -136,14 +125,9 @@ axes[1, 2].set_title("Count Plot")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "seaborn_stats.png"), dpi=150, bbox_inches="tight")
 print("Saved: seaborn_stats.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Heatmaps and Correlation
-# =============================================================================
-print("\n" + "=" * 60)
-print("Heatmaps and Correlation Matrices")
-print("=" * 60)
+# ## Heatmaps and Correlation Matrices
 
 # Create correlation data
 np.random.seed(42)
@@ -174,14 +158,9 @@ axes[1].set_title("General Heatmap")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "heatmaps.png"), dpi=150, bbox_inches="tight")
 print("Saved: heatmaps.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Time Series Visualization
-# =============================================================================
-print("\n" + "=" * 60)
-print("Time Series Visualization")
-print("=" * 60)
+# ## Time Series Visualization
 
 # Create time series data
 dates = pd.date_range("2024-01-01", periods=365, freq="D")
@@ -224,7 +203,7 @@ axes[1].set_title("Monthly Aggregation with Error Bars")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "timeseries_viz.png"), dpi=150, bbox_inches="tight")
 print("Saved: timeseries_viz.png")
-plt.close()
+plt.show()
 
 print("\n" + "=" * 60)
 print("Matplotlib/Seaborn examples complete!")

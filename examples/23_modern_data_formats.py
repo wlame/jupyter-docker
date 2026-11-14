@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
-"""
-Modern Data Formats: Delta Lake, Excel, SPSS, Zarr, netCDF, Fast SQL Loading
-=============================================================================
-Round-trips a dataset through the formats data work runs into: Delta Lake
-tables (deltalake, no Spark), formatted Excel (xlsxwriter) read back with the
-fast calamine engine, SPSS/SAS/Stata files (pyreadstat), chunked arrays (zarr),
-netCDF (netCDF4), and database-to-DataFrame loading with connectorx.
-
-The cloud filesystems (s3fs, gcsfs, adlfs) and database drivers (psycopg,
-pymysql) need real endpoints, so this example only names them: every
-fsspec-aware reader accepts `s3://`, `gs://`, and `abfs://` URLs once the
-matching package is installed, and SQLAlchemy uses psycopg/pymysql through
-`postgresql+psycopg://` and `mysql+pymysql://` URLs.
-
-deltalake:  https://delta-io.github.io/delta-rs/
-calamine:   https://github.com/dimastbk/python-calamine
-pyreadstat: https://github.com/Roche/pyreadstat
-zarr:       https://zarr.readthedocs.io/
-netCDF4:    https://unidata.github.io/netcdf4-python/
-connectorx: https://sfu-db.github.io/connector-x/
-"""
+# # Modern Data Formats: Delta Lake, Excel, SPSS, Zarr, netCDF, Fast SQL Loading
+#
+# Round-trips a dataset through the formats data work runs into: Delta Lake
+# tables (deltalake, no Spark), formatted Excel (xlsxwriter) read back with the
+# fast calamine engine, SPSS/SAS/Stata files (pyreadstat), chunked arrays (zarr),
+# netCDF (netCDF4), and database-to-DataFrame loading with connectorx.
+#
+# The cloud filesystems (s3fs, gcsfs, adlfs) and database drivers (psycopg,
+# pymysql) need real endpoints, so this example only names them: every
+# fsspec-aware reader accepts `s3://`, `gs://`, and `abfs://` URLs once the
+# matching package is installed, and SQLAlchemy uses psycopg/pymysql through
+# `postgresql+psycopg://` and `mysql+pymysql://` URLs.
+#
+# - [deltalake](https://delta-io.github.io/delta-rs/)
+# - [calamine](https://github.com/dimastbk/python-calamine)
+# - [pyreadstat](https://github.com/Roche/pyreadstat)
+# - [zarr](https://zarr.readthedocs.io/)
+# - [netCDF4](https://unidata.github.io/netcdf4-python/)
+# - [connectorx](https://sfu-db.github.io/connector-x/)
 
 import os
 import shutil
@@ -35,7 +33,8 @@ import pyreadstat
 import zarr
 from deltalake import DeltaTable, write_deltalake
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 rng = np.random.default_rng(seed=0)
@@ -48,12 +47,7 @@ survey = pd.DataFrame({
     'income': rng.normal(42_000, 9_000, size=500).round(0),
 })
 
-# =============================================================================
-# Delta Lake — versioned tables without Spark
-# =============================================================================
-print("=" * 60)
-print("deltalake: Versioned Table")
-print("=" * 60)
+# ## deltalake: Versioned Table
 
 delta_path = os.path.join(OUTPUT_DIR, 'delta_survey')
 shutil.rmtree(delta_path, ignore_errors=True)
@@ -71,12 +65,7 @@ by_region = duckdb.sql(
 ).df()
 print(by_region.to_string(index=False))
 
-# =============================================================================
-# Excel — write with xlsxwriter, read back with calamine
-# =============================================================================
-print("\n" + "=" * 60)
-print("Excel: xlsxwriter + calamine")
-print("=" * 60)
+# ## Excel: xlsxwriter + calamine
 
 xlsx_path = os.path.join(OUTPUT_DIR, 'survey_report.xlsx')
 with pd.ExcelWriter(xlsx_path, engine='xlsxwriter') as writer:
@@ -90,12 +79,7 @@ read_back = pd.read_excel(xlsx_path, engine='calamine')
 print(f"Read {len(read_back)} rows with the calamine engine; columns match: "
       f"{list(read_back.columns) == list(survey.columns)}")
 
-# =============================================================================
-# SPSS — pyreadstat with value labels
-# =============================================================================
-print("\n" + "=" * 60)
-print("pyreadstat: SPSS with Value Labels")
-print("=" * 60)
+# ## pyreadstat: SPSS with Value Labels
 
 sav_path = os.path.join(OUTPUT_DIR, 'survey.sav')
 pyreadstat.write_sav(
@@ -108,12 +92,7 @@ frame, meta = pyreadstat.read_sav(sav_path, apply_value_formats=True)
 print(f"Column label: {meta.column_names_to_labels['satisfaction']}")
 print(frame['satisfaction'].value_counts().sort_index().to_string())
 
-# =============================================================================
-# Zarr — chunked N-D arrays
-# =============================================================================
-print("\n" + "=" * 60)
-print("zarr: Chunked Array Store")
-print("=" * 60)
+# ## zarr: Chunked Array Store
 
 zarr_path = os.path.join(OUTPUT_DIR, 'measurements.zarr')
 shutil.rmtree(zarr_path, ignore_errors=True)
@@ -122,12 +101,7 @@ store[:] = rng.normal(size=(365, 100, 100)).astype('float32')
 reopened = zarr.open_array(zarr_path, mode='r')
 print(f"Shape {reopened.shape}, chunks {reopened.chunks}, January mean {float(reopened[:31].mean()):.4f}")
 
-# =============================================================================
-# netCDF — self-describing scientific files
-# =============================================================================
-print("\n" + "=" * 60)
-print("netCDF4: Write and Read")
-print("=" * 60)
+# ## netCDF4: Write and Read
 
 nc_path = os.path.join(OUTPUT_DIR, 'temperature.nc')
 with netCDF4.Dataset(nc_path, 'w') as nc:
@@ -140,12 +114,7 @@ with netCDF4.Dataset(nc_path) as nc:
     values = nc.variables['temperature']
     print(f"Variable shape {values.shape}, units {values.units}, max {float(values[:].max()):.2f}")
 
-# =============================================================================
-# connectorx — fast SQL into DataFrames
-# =============================================================================
-print("\n" + "=" * 60)
-print("connectorx: SQL to DataFrame")
-print("=" * 60)
+# ## connectorx: SQL to DataFrame
 
 db_path = os.path.join(OUTPUT_DIR, 'survey.sqlite')
 if os.path.exists(db_path):

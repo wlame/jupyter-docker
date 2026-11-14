@@ -1,24 +1,22 @@
 #!/usr/bin/env python3
-"""
-Rasters, Hexagons, and Street Networks: rasterio, rioxarray, H3, mapclassify, OSMnx
-===================================================================================
-Writes a georeferenced elevation raster with rasterio, reprojects it with
-rioxarray, indexes points into Uber H3 hexagons, classifies values for a
-choropleth with mapclassify, builds a street-network graph with OSMnx, and
-prepares a GPU-rendered lonboard map layer.
-
-contextily (basemap tiles), geodatasets (sample data), and OSMnx's download
-functions need network access, so they are only named here:
-`contextily.add_basemap(ax)`, `geodatasets.get_path('nybb')`,
-`osmnx.graph_from_place('Piedmont, California')`.
-
-rasterio:    https://rasterio.readthedocs.io/
-rioxarray:   https://corteva.github.io/rioxarray/
-H3:          https://h3geo.org/
-mapclassify: https://pysal.org/mapclassify/
-OSMnx:       https://osmnx.readthedocs.io/
-lonboard:    https://developmentseed.org/lonboard/
-"""
+# # Rasters, Hexagons, and Street Networks: rasterio, rioxarray, H3, mapclassify, OSMnx
+#
+# Writes a georeferenced elevation raster with rasterio, reprojects it with
+# rioxarray, indexes points into Uber H3 hexagons, classifies values for a
+# choropleth with mapclassify, builds a street-network graph with OSMnx, and
+# prepares a GPU-rendered lonboard map layer.
+#
+# contextily (basemap tiles), geodatasets (sample data), and OSMnx's download
+# functions need network access, so they are only named here:
+# `contextily.add_basemap(ax)`, `geodatasets.get_path('nybb')`,
+# `osmnx.graph_from_place('Piedmont, California')`.
+#
+# - [rasterio](https://rasterio.readthedocs.io/)
+# - [rioxarray](https://corteva.github.io/rioxarray/)
+# - [H3](https://h3geo.org/)
+# - [mapclassify](https://pysal.org/mapclassify/)
+# - [OSMnx](https://osmnx.readthedocs.io/)
+# - [lonboard](https://developmentseed.org/lonboard/)
 
 import os
 
@@ -26,7 +24,7 @@ import geopandas as gpd
 import h3
 import lonboard
 import mapclassify
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import osmnx as ox
 import pandas as pd
@@ -35,20 +33,13 @@ import rioxarray
 from rasterio.transform import from_origin
 from shapely.geometry import LineString, Point, Polygon
 
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 rng = np.random.default_rng(seed=0)
 
-# =============================================================================
-# rasterio — write and read a georeferenced GeoTIFF
-# =============================================================================
-print("=" * 60)
-print("rasterio: Elevation GeoTIFF")
-print("=" * 60)
+# ## rasterio: Elevation GeoTIFF
 
 rows, cols = 200, 300
 x, y = np.meshgrid(np.linspace(-3, 3, cols), np.linspace(-2, 2, rows))
@@ -65,12 +56,7 @@ with rasterio.open(tif_path) as src:
     lon, lat = src.xy(summit_row, summit_col)
     print(f"Highest cell at lon {lon:.3f}, lat {lat:.3f}")
 
-# =============================================================================
-# rioxarray — reproject the raster to a metric CRS
-# =============================================================================
-print("\n" + "=" * 60)
-print("rioxarray: Reproject to UTM")
-print("=" * 60)
+# ## rioxarray: Reproject to UTM
 
 raster = rioxarray.open_rasterio(tif_path).squeeze('band', drop=True)
 utm = raster.rio.reproject('EPSG:32632')
@@ -84,15 +70,10 @@ utm.where(utm != utm.rio.nodata).plot(ax=axes[1], cmap='terrain')
 axes[1].set_title('EPSG:32632 (metres)')
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'raster_reprojected.png'), dpi=110)
-plt.close()
+plt.show()
 print("Saved: raster_reprojected.png")
 
-# =============================================================================
-# H3 — hexagonal indexing
-# =============================================================================
-print("\n" + "=" * 60)
-print("H3: Hexagon Aggregation")
-print("=" * 60)
+# ## H3: Hexagon Aggregation
 
 stations = pd.DataFrame({
     'lat': 47.5 - rng.uniform(0, 1.0, size=500),
@@ -106,12 +87,7 @@ print(f"{len(stations)} stations fall into {len(per_cell)} resolution-6 cells "
 neighbours = h3.grid_disk(per_cell['cell'].iloc[0], 1)
 print(f"A cell and its ring-1 neighbours: {len(neighbours)} cells")
 
-# =============================================================================
-# mapclassify — choropleth classes
-# =============================================================================
-print("\n" + "=" * 60)
-print("mapclassify: Classification Schemes")
-print("=" * 60)
+# ## mapclassify: Classification Schemes
 
 for scheme in (mapclassify.Quantiles, mapclassify.NaturalBreaks, mapclassify.EqualInterval):
     classes = scheme(per_cell['mean'], k=5)
@@ -127,15 +103,10 @@ ax = hexagons.plot(column='mean', scheme='NaturalBreaks', k=5, cmap='viridis', l
 ax.set_title('Mean reading per H3 cell (natural breaks)')
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'h3_choropleth.png'), dpi=110)
-plt.close()
+plt.show()
 print("Saved: h3_choropleth.png")
 
-# =============================================================================
-# OSMnx — a street network graph from local geometries
-# =============================================================================
-print("\n" + "=" * 60)
-print("OSMnx: Graph from GeoDataFrames")
-print("=" * 60)
+# ## OSMnx: Graph from GeoDataFrames
 
 coords = {1: (8.540, 47.370), 2: (8.545, 47.372), 3: (8.548, 47.368), 4: (8.542, 47.366)}
 nodes = gpd.GeoDataFrame(
@@ -156,12 +127,7 @@ route = ox.routing.shortest_path(graph, 2, 4, weight='length')
 print(f"Graph with {graph.number_of_nodes()} nodes and {graph.number_of_edges()} edges; "
       f"shortest path 2 -> 4: {route}")
 
-# =============================================================================
-# lonboard — GPU-rendered map layer (displays as a widget in JupyterLab)
-# =============================================================================
-print("\n" + "=" * 60)
-print("lonboard: Scatterplot Layer")
-print("=" * 60)
+# ## lonboard: Scatterplot Layer
 
 points = gpd.GeoDataFrame(stations, geometry=gpd.points_from_xy(stations['lon'], stations['lat']), crs='EPSG:4326')
 layer = lonboard.ScatterplotLayer.from_geopandas(points, get_radius=200, radius_units='meters')

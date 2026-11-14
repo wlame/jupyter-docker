@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
-"""
-Data I/O and Serialization
-==========================
-Demonstrates data reading, writing, and serialization with various formats.
-
-JSON: orjson, ujson, simplejson (fast JSON libraries)
-XML: lxml, xmltodict, ElementTree
-YAML: PyYAML
-Excel: openpyxl, xlrd
-Parquet: pyarrow, fastparquet
-HDF5: h5py, tables (PyTables)
-HTTP: requests, httpx
-"""
+# # Data I/O and Serialization
+#
+# Demonstrates data reading, writing, and serialization with various formats.
+#
+# JSON: orjson, ujson, simplejson (fast JSON libraries)
+# XML: lxml, xmltodict, ElementTree
+# YAML: PyYAML
+# Excel: openpyxl, xlrd
+# Parquet: pyarrow, fastparquet
+# HDF5: h5py, tables (PyTables)
+# HTTP: requests, httpx
 
 import json
 import numpy as np
@@ -19,12 +17,7 @@ import pandas as pd
 import tempfile
 import os
 
-# =============================================================================
-# JSON Libraries Comparison
-# =============================================================================
-print("=" * 60)
-print("JSON Libraries")
-print("=" * 60)
+# ## JSON Libraries
 
 import orjson
 import ujson
@@ -65,12 +58,7 @@ print(f"\nsimplejson output: {simplejson_str[:100]}...")
 parsed = orjson.loads(orjson_bytes)
 print(f"\nParsed data keys: {list(parsed.keys())}")
 
-# =============================================================================
-# XML Libraries
-# =============================================================================
-print("\n" + "=" * 60)
-print("XML Libraries")
-print("=" * 60)
+# ## XML Libraries
 
 from lxml import etree
 import xmltodict
@@ -117,12 +105,7 @@ for book in et_root.findall("book"):
     author = book.find("author").text
     print(f"  Book {book_id}: by {author}")
 
-# =============================================================================
-# YAML
-# =============================================================================
-print("\n" + "=" * 60)
-print("YAML Processing")
-print("=" * 60)
+# ## YAML Processing
 
 import yaml
 
@@ -156,12 +139,7 @@ print(f"  Features enabled: {config['features']['enabled']}")
 output_yaml = yaml.dump(config, default_flow_style=False)
 print(f"\nDumped YAML:\n{output_yaml[:200]}...")
 
-# =============================================================================
-# Excel Files
-# =============================================================================
-print("\n" + "=" * 60)
-print("Excel File Handling")
-print("=" * 60)
+# ## Excel File Handling
 
 import openpyxl
 
@@ -194,12 +172,7 @@ print(f"Max row: {ws.max_row}, Max col: {ws.max_column}")
 
 os.unlink(excel_path)
 
-# =============================================================================
-# Parquet Files
-# =============================================================================
-print("\n" + "=" * 60)
-print("Parquet File Handling")
-print("=" * 60)
+# ## Parquet File Handling
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -243,12 +216,7 @@ print(f"\nFastparquet read shape: {df_fp.shape}")
 
 os.unlink(parquet_path)
 
-# =============================================================================
-# HDF5 Files
-# =============================================================================
-print("\n" + "=" * 60)
-print("HDF5 File Handling")
-print("=" * 60)
+# ## HDF5 File Handling
 
 import h5py
 import tables
@@ -298,12 +266,7 @@ print(f"Read back shape: {df_hdf.shape}")
 
 os.unlink(hdf_pandas_path)
 
-# =============================================================================
-# HTTP Clients
-# =============================================================================
-print("\n" + "=" * 60)
-print("HTTP Client Libraries")
-print("=" * 60)
+# ## HTTP Client Libraries
 
 import requests
 import httpx
@@ -325,12 +288,7 @@ session = requests.Session()
 session.headers.update({"User-Agent": "DataScience-Notebook/1.0"})
 print(f"\nSession headers: {dict(session.headers)}")
 
-# =============================================================================
-# CSV and Other Pandas I/O
-# =============================================================================
-print("\n" + "=" * 60)
-print("Pandas I/O Capabilities")
-print("=" * 60)
+# ## Pandas I/O Capabilities
 
 # Create sample data
 df_sample = pd.DataFrame(

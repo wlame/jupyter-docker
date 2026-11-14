@@ -1,14 +1,15 @@
 """
 Pytest configuration for example smoke tests.
 
-Each test runs a .py example script as a subprocess and verifies:
-  1. Exit code is 0
+Each test executes an example notebook (.ipynb) top to bottom in a Jupyter kernel,
+the way a user runs it in JupyterLab, and verifies:
+  1. Every cell runs without an error
   2. Expected output files were created (for examples that produce them)
 """
 
-import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -27,20 +28,22 @@ def run_example(
     timeout: int = 180,
 ) -> None:
     """
-    Run an example script and assert it passes.
+    Execute an example notebook and assert it passes.
 
     Removes ``expected_outputs`` before running so their existence afterward
-    proves the script actively created them in this run.
+    proves the notebook actively created them in this run.
 
     Parameters
     ----------
     name:
-        Filename of the example, e.g. ``'01_numpy_scipy_basics.py'``.
+        Filename of the example source, e.g. ``'01_numpy_scipy_basics.py'``; the
+        paired ``.ipynb`` is what runs.
     expected_outputs:
         List of filenames (relative to ``output/``) that must be created.
     timeout:
-        Maximum seconds to allow the script to run.
+        Maximum seconds to allow the whole notebook to run.
     """
+    notebook = EXAMPLES_DIR / Path(name).with_suffix('.ipynb')
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # Delete stale copies of expected outputs so we can verify fresh creation.
@@ -49,33 +52,33 @@ def run_example(
         if target.exists():
             target.unlink()
 
-    env = os.environ.copy()
-    # Force non-interactive matplotlib backend for all examples.
-    env['MPLBACKEND'] = 'Agg'
-
-    try:
-        result = subprocess.run(
-            [sys.executable, str(EXAMPLES_DIR / name)],
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=timeout,
-            cwd=str(EXAMPLES_DIR),
-            env=env,
-        )
-    except subprocess.TimeoutExpired:
-        pytest.fail(f"{name} timed out after {timeout}s")
+    with tempfile.TemporaryDirectory() as executed_dir:
+        # The kernel starts in the notebook's directory, as in JupyterLab.
+        command = [
+            sys.executable, '-m', 'jupyter', 'nbconvert', '--to', 'notebook', '--execute',
+            '--ExecutePreprocessor.timeout=-1', f'--output-dir={executed_dir}', str(notebook),
+        ]
+        try:
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=timeout,
+                cwd=str(EXAMPLES_DIR),
+            )
+        except subprocess.TimeoutExpired:
+            pytest.fail(f"{notebook.name} timed out after {timeout}s")
 
     if result.returncode != 0:
         pytest.fail(
-            f"{name} exited with code {result.returncode}\n"
-            f"--- stdout (last 3000 chars) ---\n{result.stdout[-3000:]}\n"
-            f"--- stderr (last 2000 chars) ---\n{result.stderr[-2000:]}"
+            f"{notebook.name} failed (exit code {result.returncode})\n"
+            f"--- nbconvert output (last 4000 chars) ---\n{result.stderr[-4000:]}"
         )
 
     missing = [f for f in (expected_outputs or []) if not (OUTPUT_DIR / f).exists()]
     if missing:
         pytest.fail(
-            f"{name} ran successfully but did not create expected output files:\n"
+            f"{notebook.name} ran successfully but did not create expected output files:\n"
             + "".join(f"  - {f}\n" for f in missing)
         )

@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-"""
-Bokeh and HoloViews Visualizations
-==================================
-Demonstrates interactive visualizations with Bokeh and HoloViews.
-
-Bokeh: https://bokeh.org/
-HoloViews: https://holoviews.org/
-hvPlot: https://hvplot.holoviz.org/
-Panel: https://panel.holoviz.org/
-
-Note: Best viewed in Jupyter notebooks for full interactivity.
-"""
+# # Bokeh and HoloViews Visualizations
+#
+# Demonstrates interactive visualizations with Bokeh and HoloViews.
+#
+# - [Bokeh](https://bokeh.org/)
+# - [HoloViews](https://holoviews.org/)
+# - [hvPlot](https://hvplot.holoviz.org/)
+# - [Panel](https://panel.holoviz.org/)
+#
+# Note: Best viewed in Jupyter notebooks for full interactivity.
 
 import numpy as np
 import pandas as pd
@@ -26,17 +24,13 @@ import holoviews as hv
 from holoviews import opts
 import os
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 hv.extension("bokeh")
 
-# =============================================================================
-# Bokeh Basics
-# =============================================================================
-print("=" * 60)
-print("Bokeh Basic Plots")
-print("=" * 60)
+# ## Bokeh Basic Plots
 
 # Create sample data
 np.random.seed(42)
@@ -111,12 +105,7 @@ p.xaxis.major_label_orientation = 0.5
 save(p)
 print("Saved: bokeh_bar.html")
 
-# =============================================================================
-# Bokeh Dashboard Layout
-# =============================================================================
-print("\n" + "=" * 60)
-print("Bokeh Dashboard Layout")
-print("=" * 60)
+# ## Bokeh Dashboard Layout
 
 output_file(os.path.join(OUTPUT_DIR, "bokeh_dashboard.html"))
 
@@ -150,12 +139,7 @@ layout = column(row(p1, p2), row(p3, p4))
 save(layout)
 print("Saved: bokeh_dashboard.html")
 
-# =============================================================================
-# HoloViews Declarative Visualization
-# =============================================================================
-print("\n" + "=" * 60)
-print("HoloViews Declarative Visualization")
-print("=" * 60)
+# ## HoloViews Declarative Visualization
 
 # Create sample DataFrame
 df = pd.DataFrame(
@@ -202,12 +186,7 @@ layout = (bars + hist).opts(shared_axes=False)
 hv.save(layout, os.path.join(OUTPUT_DIR, "holoviews_layout.html"))
 print("Saved: holoviews_layout.html")
 
-# =============================================================================
-# hvPlot - Pandas Integration
-# =============================================================================
-print("\n" + "=" * 60)
-print("hvPlot - Pandas Integration")
-print("=" * 60)
+# ## hvPlot - Pandas Integration
 
 import hvplot.pandas  # noqa
 

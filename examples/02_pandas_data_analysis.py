@@ -1,22 +1,15 @@
 #!/usr/bin/env python3
-"""
-Pandas Data Analysis
-====================
-Demonstrates data manipulation and analysis with Pandas.
-
-Pandas: https://pandas.pydata.org/
-"""
+# # Pandas Data Analysis
+#
+# Demonstrates data manipulation and analysis with Pandas.
+#
+# - [Pandas](https://pandas.pydata.org/)
 
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 
-# =============================================================================
-# Creating DataFrames
-# =============================================================================
-print("=" * 60)
-print("Creating DataFrames")
-print("=" * 60)
+# ## Creating DataFrames
 
 # From dictionary
 data = {
@@ -33,12 +26,7 @@ print(f"\nShape: {df.shape}")
 print(f"Columns: {list(df.columns)}")
 print(f"Data types:\n{df.dtypes}")
 
-# =============================================================================
-# Data Selection and Filtering
-# =============================================================================
-print("\n" + "=" * 60)
-print("Data Selection and Filtering")
-print("=" * 60)
+# ## Data Selection and Filtering
 
 # Select columns
 print("Names column:")
@@ -59,12 +47,7 @@ result = df.query("department == 'Marketing' and salary > 60000")
 print("\nMarketing with salary > 60000:")
 print(result)
 
-# =============================================================================
-# Aggregation and Grouping
-# =============================================================================
-print("\n" + "=" * 60)
-print("Aggregation and Grouping")
-print("=" * 60)
+# ## Aggregation and Grouping
 
 # Basic aggregation
 print("Salary statistics:")
@@ -86,12 +69,7 @@ summary = df.groupby("department").apply(
 print("\nCustom summary by department:")
 print(summary)
 
-# =============================================================================
-# Data Transformation
-# =============================================================================
-print("\n" + "=" * 60)
-print("Data Transformation")
-print("=" * 60)
+# ## Data Transformation
 
 # Add new columns
 df["salary_category"] = pd.cut(
@@ -110,12 +88,7 @@ df["salary_normalized"] = df.groupby("department")["salary"].transform(
 print("\nWith normalized salary:")
 print(df[["name", "department", "salary", "salary_normalized"]])
 
-# =============================================================================
-# Pivot Tables
-# =============================================================================
-print("\n" + "=" * 60)
-print("Pivot Tables")
-print("=" * 60)
+# ## Pivot Tables
 
 # Create sample sales data
 sales_data = pd.DataFrame(
@@ -133,12 +106,7 @@ pivot = pd.pivot_table(
 print("Sales pivot table:")
 print(pivot)
 
-# =============================================================================
-# Time Series Operations
-# =============================================================================
-print("\n" + "=" * 60)
-print("Time Series Operations")
-print("=" * 60)
+# ## Time Series Operations
 
 # Create time series
 dates = pd.date_range("2024-01-01", periods=100, freq="D")
@@ -157,12 +125,7 @@ rolling = ts.rolling(window=7).mean()
 print("\n7-day rolling mean (last 5):")
 print(rolling.tail())
 
-# =============================================================================
-# Data Cleaning
-# =============================================================================
-print("\n" + "=" * 60)
-print("Data Cleaning")
-print("=" * 60)
+# ## Data Cleaning
 
 # Create messy data
 messy = pd.DataFrame(

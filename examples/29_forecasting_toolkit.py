@@ -1,24 +1,22 @@
 #!/usr/bin/env python3
-"""
-Forecasting Toolkit: statsforecast, mlforecast, skforecast, arch, tslearn
-=========================================================================
-Forecasts a seasonal monthly series three ways — fast statistical models
-(statsforecast AutoETS/AutoARIMA), gradient boosting on lag features
-(mlforecast + LightGBM), and a recursive scikit-learn forecaster
-(skforecast) — then models return volatility with a GARCH(1,1) from arch and
-clusters series shapes with dynamic time warping in tslearn.
-
-statsforecast: https://nixtlaverse.nixtla.io/statsforecast/
-mlforecast:    https://nixtlaverse.nixtla.io/mlforecast/
-skforecast:    https://skforecast.org/
-arch:          https://arch.readthedocs.io/
-tslearn:       https://tslearn.readthedocs.io/
-"""
+# # Forecasting Toolkit: statsforecast, mlforecast, skforecast, arch, tslearn
+#
+# Forecasts a seasonal monthly series three ways — fast statistical models
+# (statsforecast AutoETS/AutoARIMA), gradient boosting on lag features
+# (mlforecast + LightGBM), and a recursive scikit-learn forecaster
+# (skforecast) — then models return volatility with a GARCH(1,1) from arch and
+# clusters series shapes with dynamic time warping in tslearn.
+#
+# - [statsforecast](https://nixtlaverse.nixtla.io/statsforecast/)
+# - [mlforecast](https://nixtlaverse.nixtla.io/mlforecast/)
+# - [skforecast](https://skforecast.org/)
+# - [arch](https://arch.readthedocs.io/)
+# - [tslearn](https://tslearn.readthedocs.io/)
 
 import os
 
 import lightgbm as lgb
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from arch import arch_model
@@ -30,20 +28,13 @@ from statsforecast.models import AutoARIMA, AutoETS
 from tslearn.clustering import TimeSeriesKMeans
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 rng = np.random.default_rng(seed=0)
 
-# =============================================================================
-# A seasonal monthly series with trend
-# =============================================================================
-print("=" * 60)
-print("Monthly Series")
-print("=" * 60)
+# ## Monthly Series
 
 months = pd.date_range('2014-01-01', periods=144, freq='MS')
 values = (200 + 1.5 * np.arange(144) + 25 * np.sin(2 * np.pi * months.month / 12)
@@ -53,30 +44,18 @@ horizon = 12
 train, test = series.iloc[:-horizon], series.iloc[-horizon:]
 print(f"{len(train)} training months, {horizon}-month holdout")
 
-
 def mape(actual: np.ndarray, forecast: np.ndarray) -> float:
     """Mean absolute percentage error, in percent."""
     return float(np.mean(np.abs((actual - forecast) / actual)) * 100)
 
-
-# =============================================================================
-# statsforecast — AutoETS and AutoARIMA
-# =============================================================================
-print("\n" + "=" * 60)
-print("statsforecast: AutoETS and AutoARIMA")
-print("=" * 60)
+# ## statsforecast: AutoETS and AutoARIMA
 
 stats = StatsForecast(models=[AutoETS(season_length=12), AutoARIMA(season_length=12)], freq='MS')
 stats_fc = stats.forecast(df=train, h=horizon)
 for model in ('AutoETS', 'AutoARIMA'):
     print(f"{model:10} MAPE {mape(test['y'].to_numpy(), stats_fc[model].to_numpy()):.2f}%")
 
-# =============================================================================
-# mlforecast — LightGBM on lag and calendar features
-# =============================================================================
-print("\n" + "=" * 60)
-print("mlforecast: LightGBM with Lags")
-print("=" * 60)
+# ## mlforecast: LightGBM with Lags
 
 ml = MLForecast(
     models={'lightgbm': lgb.LGBMRegressor(n_estimators=200, learning_rate=0.05, verbose=-1)},
@@ -88,12 +67,7 @@ ml.fit(train)
 ml_fc = ml.predict(h=horizon)
 print(f"lightgbm   MAPE {mape(test['y'].to_numpy(), ml_fc['lightgbm'].to_numpy()):.2f}%")
 
-# =============================================================================
-# skforecast — recursive multi-step forecaster
-# =============================================================================
-print("\n" + "=" * 60)
-print("skforecast: Recursive Ridge Forecaster")
-print("=" * 60)
+# ## skforecast: Recursive Ridge Forecaster
 
 y_train = train.set_index('ds')['y'].asfreq('MS')
 forecaster = ForecasterRecursive(Ridge(alpha=1.0), lags=12)
@@ -112,15 +86,10 @@ ax.legend(ncol=3, fontsize=8)
 ax.set_title(f'{horizon}-month forecasts')
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'forecast_toolkit.png'), dpi=120)
-plt.close()
+plt.show()
 print("Saved: forecast_toolkit.png")
 
-# =============================================================================
-# arch — GARCH(1,1) volatility
-# =============================================================================
-print("\n" + "=" * 60)
-print("arch: GARCH(1,1) Volatility")
-print("=" * 60)
+# ## arch: GARCH(1,1) Volatility
 
 n_days = 1_000
 volatility = np.empty(n_days)
@@ -137,12 +106,7 @@ print(f"Estimated omega {params['omega']:.3f}, alpha {params['alpha[1]']:.3f}, b
 next_var = fitted.forecast(horizon=5).variance.iloc[-1].to_numpy()
 print(f"5-day variance forecast: {np.round(next_var, 3).tolist()}")
 
-# =============================================================================
-# tslearn — DTW k-means on series shapes
-# =============================================================================
-print("\n" + "=" * 60)
-print("tslearn: DTW Clustering")
-print("=" * 60)
+# ## tslearn: DTW Clustering
 
 grid = np.linspace(0, 2 * np.pi, 50)
 shapes = [np.sin(grid), np.abs(np.sin(grid)), np.linspace(-1, 1, 50)]

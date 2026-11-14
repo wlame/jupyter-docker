@@ -1,43 +1,39 @@
 #!/usr/bin/env python3
-"""
-Optimization: Assignment, Vehicle Routing, Portfolios, and Production Planning
-==============================================================================
-Solves four classic operations-research problems with the tool that fits each:
-an assignment problem twice (SciPy's Hungarian algorithm and a PuLP integer
-program, which must agree), capacitated vehicle routing with OR-Tools, a
-mean-variance portfolio frontier with CVXPY, and a production plan as a
-mixed-integer program in Pyomo.
-
-Solvers in this image: OR-Tools embeds CP-SAT, SCIP, CBC, HiGHS, GLOP, and
-PDLP (reach them through `ortools.linear_solver.pywraplp` or `ortools.math_opt`);
-CVXPY brings Clarabel, OSQP, and SCS, and uses SciPy's HiGHS for integer
-problems; PuLP and Pyomo call the `cbc` command from the coinor-cbc system
-package. The highspy package is left out on purpose: it cannot share a process
-with OR-Tools (both ship a libhighs.so.1).
-
-PuLP:      https://coin-or.github.io/pulp/
-OR-Tools:  https://developers.google.com/optimization
-CVXPY:     https://www.cvxpy.org/
-Pyomo:     https://pyomo.readthedocs.io/
-CBC:       https://github.com/coin-or/Cbc
-"""
+# # Optimization: Assignment, Vehicle Routing, Portfolios, and Production Planning
+#
+# Solves four classic operations-research problems with the tool that fits each:
+# an assignment problem twice (SciPy's Hungarian algorithm and a PuLP integer
+# program, which must agree), capacitated vehicle routing with OR-Tools, a
+# mean-variance portfolio frontier with CVXPY, and a production plan as a
+# mixed-integer program in Pyomo.
+#
+# Solvers in this image: OR-Tools embeds CP-SAT, SCIP, CBC, HiGHS, GLOP, and
+# PDLP (reach them through `ortools.linear_solver.pywraplp` or `ortools.math_opt`);
+# CVXPY brings Clarabel, OSQP, and SCS, and uses SciPy's HiGHS for integer
+# problems; PuLP and Pyomo call the `cbc` command from the coinor-cbc system
+# package. The highspy package is left out on purpose: it cannot share a process
+# with OR-Tools (both ship a libhighs.so.1).
+#
+# - [PuLP](https://coin-or.github.io/pulp/)
+# - [OR-Tools](https://developers.google.com/optimization)
+# - [CVXPY](https://www.cvxpy.org/)
+# - [Pyomo](https://pyomo.readthedocs.io/)
+# - [CBC](https://github.com/coin-or/Cbc)
 
 import json
 import os
 import shutil
 
 import cvxpy as cp
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pulp
 import pyomo.environ as pyo
 from ortools.constraint_solver import pywrapcp, routing_enums_pb2
 from scipy.optimize import linear_sum_assignment
 
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 if shutil.which('cbc') is None:
@@ -46,12 +42,7 @@ if shutil.which('cbc') is None:
 rng = np.random.default_rng(seed=0)
 summary: dict[str, object] = {}
 
-# =============================================================================
-# Assignment: SciPy and a PuLP integer program must agree
-# =============================================================================
-print("=" * 60)
-print("Assignment: 8 Workers, 8 Tasks")
-print("=" * 60)
+# ## Assignment: 8 Workers, 8 Tasks
 
 n_workers = 8
 cost = rng.integers(10, 100, size=(n_workers, n_workers))
@@ -75,12 +66,7 @@ if scipy_total != pulp_total:
     raise SystemExit("assignment solvers disagree")
 summary['assignment_cost'] = scipy_total
 
-# =============================================================================
-# Capacitated vehicle routing with OR-Tools
-# =============================================================================
-print("\n" + "=" * 60)
-print("OR-Tools: Capacitated Vehicle Routing")
-print("=" * 60)
+# ## OR-Tools: Capacitated Vehicle Routing
 
 n_customers, n_vehicles, capacity = 20, 4, 40
 locations = np.vstack([[50, 50], rng.uniform(0, 100, size=(n_customers, 2))])  # index 0 is the depot
@@ -90,16 +76,13 @@ distances = np.rint(np.linalg.norm(locations[:, None] - locations[None, :], axis
 manager = pywrapcp.RoutingIndexManager(len(locations), n_vehicles, 0)
 routing = pywrapcp.RoutingModel(manager)
 
-
 def distance_callback(from_index: int, to_index: int) -> int:
     """Road distance between two routing indices (Euclidean, rounded)."""
     return int(distances[manager.IndexToNode(from_index), manager.IndexToNode(to_index)])
 
-
 def demand_callback(from_index: int) -> int:
     """Load picked up at a routing index."""
     return demands[manager.IndexToNode(from_index)]
-
 
 routing.SetArcCostEvaluatorOfAllVehicles(routing.RegisterTransitCallback(distance_callback))
 routing.AddDimensionWithVehicleCapacity(
@@ -136,15 +119,10 @@ ax.set(title=f'OR-Tools routes, total distance {total_distance}', aspect='equal'
 ax.legend(fontsize=8)
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'optimization_routes.png'), dpi=120)
-plt.close()
+plt.show()
 print("Saved: optimization_routes.png")
 
-# =============================================================================
-# Mean-variance portfolio frontier with CVXPY
-# =============================================================================
-print("\n" + "=" * 60)
-print("CVXPY: Mean-Variance Efficient Frontier")
-print("=" * 60)
+# ## CVXPY: Mean-Variance Efficient Frontier
 
 n_assets = 8
 expected_returns = rng.uniform(0.02, 0.15, size=n_assets)
@@ -176,15 +154,10 @@ ax.set(xlabel='risk (standard deviation)', ylabel='expected return', title='Long
 ax.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'optimization_frontier.png'), dpi=120)
-plt.close()
+plt.show()
 print("Saved: optimization_frontier.png")
 
-# =============================================================================
-# Production planning as a MILP in Pyomo, solved by CBC
-# =============================================================================
-print("\n" + "=" * 60)
-print("Pyomo + CBC: Production Planning")
-print("=" * 60)
+# ## Pyomo + CBC: Production Planning
 
 products = {'chair': 45, 'table': 80, 'desk': 110, 'shelf': 30}  # profit per unit
 hours = {  # resource hours per unit

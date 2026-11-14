@@ -135,7 +135,8 @@ For each target, testing runs two steps against the built `ds-<target>` image:
     docker run --rm ds-<target> uv run --no-project python /home/jupyter/scripts/verify_<target>.py
     ```
 
-2. **Example smoke tests** — runs the example scripts under pytest, selecting the
+2. **Example tests** — executes each example notebook top to bottom in a Jupyter
+   kernel (`jupyter nbconvert --execute`), the way a user runs it, selecting the
    target's mark (`full` runs every target's mark):
 
     ```bash

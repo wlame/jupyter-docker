@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
-"""
-Grammar of Graphics, Tables, and Big-Data Rendering
-===================================================
-Demonstrates plotnine (ggplot2 grammar), great-tables (publication tables),
-itables (sortable, searchable tables), datashader (rasterizing millions of
-points), and vl-convert (static export of Altair charts without a browser).
-ipympl and jupyter-bokeh are JupyterLab widget renderers: use
-`%matplotlib widget` for interactive matplotlib, and `jupyter_bokeh.BokehModel`
-to embed Bokeh/Panel objects as live widgets. In a notebook,
-`itables.init_notebook_mode(all_interactive=True)` makes every DataFrame
-display as an interactive table.
-
-plotnine:      https://plotnine.org/
-great-tables:  https://posit-dev.github.io/great-tables/
-itables:       https://mwouts.github.io/itables/
-datashader:    https://datashader.org/
-vl-convert:    https://github.com/vega/vl-convert
-"""
+# # Grammar of Graphics, Tables, and Big-Data Rendering
+#
+# Demonstrates plotnine (ggplot2 grammar), great-tables (publication tables),
+# itables (sortable, searchable tables), datashader (rasterizing millions of
+# points), and vl-convert (static export of Altair charts without a browser).
+# ipympl and jupyter-bokeh are JupyterLab widget renderers: use
+# `%matplotlib widget` for interactive matplotlib, and `jupyter_bokeh.BokehModel`
+# to embed Bokeh/Panel objects as live widgets. In a notebook,
+# `itables.init_notebook_mode(all_interactive=True)` makes every DataFrame
+# display as an interactive table.
+#
+# - [plotnine](https://plotnine.org/)
+# - [great-tables](https://posit-dev.github.io/great-tables/)
+# - [itables](https://mwouts.github.io/itables/)
+# - [datashader](https://datashader.org/)
+# - [vl-convert](https://github.com/vega/vl-convert)
 
 import os
 
@@ -30,17 +28,13 @@ import vl_convert as vlc
 from great_tables import GT, loc, style
 from plotnine import aes, facet_wrap, geom_point, geom_smooth, ggplot, labs, theme_minimal
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 rng = np.random.default_rng(seed=0)
 
-# =============================================================================
-# plotnine — layered grammar of graphics
-# =============================================================================
-print("=" * 60)
-print("plotnine: Faceted Scatter with Trend Lines")
-print("=" * 60)
+# ## plotnine: Faceted Scatter with Trend Lines
 
 n = 300
 cars = pd.DataFrame({
@@ -61,12 +55,7 @@ plot = (
 plot.save(os.path.join(OUTPUT_DIR, 'plotnine_efficiency.png'), width=9, height=3.5, dpi=120, verbose=False)
 print("Saved: plotnine_efficiency.png")
 
-# =============================================================================
-# great-tables — presentation-quality summary table
-# =============================================================================
-print("\n" + "=" * 60)
-print("great-tables: Summary Table")
-print("=" * 60)
+# ## great-tables: Summary Table
 
 summary = (
     cars.groupby('fuel')
@@ -85,12 +74,7 @@ with open(os.path.join(OUTPUT_DIR, 'great_tables_summary.html'), 'w') as f:
 print(summary.to_string(index=False))
 print("Saved: great_tables_summary.html")
 
-# =============================================================================
-# itables — an interactive table in a standalone HTML page
-# =============================================================================
-print("\n" + "=" * 60)
-print("itables: Sortable, Searchable Table")
-print("=" * 60)
+# ## itables: Sortable, Searchable Table
 
 # connected=True loads the table script from a CDN, so the page works outside
 # Jupyter; inside JupyterLab itables serves its bundled copy offline.
@@ -105,12 +89,7 @@ with open(os.path.join(OUTPUT_DIR, 'itables_cars.html'), 'w') as f:
 print(f"{len(cars)} rows written as an interactive table")
 print("Saved: itables_cars.html")
 
-# =============================================================================
-# datashader — two million points rendered to a raster
-# =============================================================================
-print("\n" + "=" * 60)
-print("datashader: 2 Million Points")
-print("=" * 60)
+# ## datashader: 2 Million Points
 
 n_points = 2_000_000
 centers = np.array([[0, 0], [3, 3], [-3, 2]])
@@ -124,12 +103,7 @@ image.to_pil().save(os.path.join(OUTPUT_DIR, 'datashader_points.png'))
 print(f"Aggregated {n_points:,} points into a {aggregate.shape} grid")
 print("Saved: datashader_points.png")
 
-# =============================================================================
-# vl-convert — static PNG/SVG export of an Altair chart
-# =============================================================================
-print("\n" + "=" * 60)
-print("vl-convert: Static Altair Export")
-print("=" * 60)
+# ## vl-convert: Static Altair Export
 
 chart = (
     alt.Chart(summary)

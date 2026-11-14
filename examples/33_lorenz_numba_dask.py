@@ -1,28 +1,26 @@
 #!/usr/bin/env python3
-"""
-Lorenz Attractor: SymPy, Numba, FFT, and Dask
-=============================================
-Explores the Lorenz system, the classic example of deterministic chaos. SymPy
-finds its fixed points exactly, Numba compiles a Runge-Kutta integrator to
-machine code, an FFT shows the dominant oscillation, and Dask runs an ensemble
-of nearly identical trajectories in parallel to measure how fast they diverge
-(the largest Lyapunov exponent, about 0.9 for these parameters).
-
-In a notebook, `Client()` shows a link to the Dask dashboard. The images serve
-it through Jupyter at /proxy/8787/status (jupyter-server-proxy), so it works
-without publishing another port.
-
-SymPy:   https://docs.sympy.org/
-Numba:   https://numba.readthedocs.io/
-SciPy:   https://docs.scipy.org/doc/scipy/
-Dask:    https://docs.dask.org/
-xarray:  https://docs.xarray.dev/
-"""
+# # Lorenz Attractor: SymPy, Numba, FFT, and Dask
+#
+# Explores the Lorenz system, the classic example of deterministic chaos. SymPy
+# finds its fixed points exactly, Numba compiles a Runge-Kutta integrator to
+# machine code, an FFT shows the dominant oscillation, and Dask runs an ensemble
+# of nearly identical trajectories in parallel to measure how fast they diverge
+# (the largest Lyapunov exponent, about 0.9 for these parameters).
+#
+# In a notebook, `Client()` shows a link to the Dask dashboard. The images serve
+# it through Jupyter at /proxy/8787/status (jupyter-server-proxy), so it works
+# without publishing another port.
+#
+# - [SymPy](https://docs.sympy.org/)
+# - [Numba](https://numba.readthedocs.io/)
+# - [SciPy](https://docs.scipy.org/doc/scipy/)
+# - [Dask](https://docs.dask.org/)
+# - [xarray](https://docs.xarray.dev/)
 
 import os
 import time
 
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
 import xarray as xr
@@ -31,10 +29,8 @@ from numba import njit
 from scipy.integrate import solve_ivp
 from scipy.signal import find_peaks
 
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 SIGMA, RHO, BETA = 10.0, 28.0, 8.0 / 3.0
@@ -44,12 +40,7 @@ ENSEMBLE_SIZE = 32
 PERTURBATION = 1e-9
 KNOWN_LYAPUNOV = 0.906
 
-# =============================================================================
-# SymPy: fixed points and their stability
-# =============================================================================
-print("=" * 60)
-print("SymPy: Fixed Points of the Lorenz System")
-print("=" * 60)
+# ## SymPy: Fixed Points of the Lorenz System
 
 x, y, z = sp.symbols('x y z', real=True)
 sigma, rho, beta = sp.symbols('sigma rho beta', positive=True)
@@ -63,10 +54,8 @@ for point in fixed_points:
     print(f"  {exact}")
     print(f"     largest real eigenvalue at rho=28: {eigenvalues.real.max():+.3f} (unstable if > 0)")
 
+# ## Numba: a compiled RK4 integrator
 
-# =============================================================================
-# Numba: a compiled RK4 integrator
-# =============================================================================
 @njit(nogil=True)
 def lorenz_rk4(state0: np.ndarray, steps: int, dt: float) -> np.ndarray:
     """Integrate the Lorenz system with fourth-order Runge-Kutta; returns (steps + 1, 3)."""
@@ -85,10 +74,7 @@ def lorenz_rk4(state0: np.ndarray, steps: int, dt: float) -> np.ndarray:
         path[i + 1] = s + dt / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
     return path
 
-
-print("\n" + "=" * 60)
-print("Numba: Compiled Runge-Kutta Integrator")
-print("=" * 60)
+# ## Numba: Compiled Runge-Kutta Integrator
 
 steps = 40_000
 lorenz_rk4(START_STATE, 10, DT)  # first call compiles; keep it out of the timing
@@ -121,15 +107,10 @@ ax.plot(settled[:, 0], settled[:, 1], settled[:, 2], lw=0.3, color='#1f4e79')
 ax.set(xlabel='x', ylabel='y', zlabel='z', title='Lorenz attractor (rho=28)')
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'lorenz_attractor.png'), dpi=120)
-plt.close()
+plt.show()
 print("Saved: lorenz_attractor.png")
 
-# =============================================================================
-# FFT: the dominant oscillation of z(t)
-# =============================================================================
-print("\n" + "=" * 60)
-print("FFT: Spectrum of z(t)")
-print("=" * 60)
+# ## FFT: Spectrum of z(t)
 
 z_signal = settled[:, 2] - settled[:, 2].mean()
 power = np.abs(np.fft.rfft(z_signal * np.hanning(len(z_signal)))) ** 2
@@ -145,15 +126,10 @@ ax.set(xlim=(0, 5), xlabel='frequency (cycles per time unit)', ylabel='power', t
 ax.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'lorenz_spectrum.png'), dpi=120)
-plt.close()
+plt.show()
 print("Saved: lorenz_spectrum.png")
 
-# =============================================================================
-# Dask: an ensemble of nearby trajectories, in parallel
-# =============================================================================
-print("\n" + "=" * 60)
-print("Dask: Ensemble Divergence and the Lyapunov Exponent")
-print("=" * 60)
+# ## Dask: Ensemble Divergence and the Lyapunov Exponent
 
 ensemble_steps = 6_000  # 30 time units
 origin = settled[0]
@@ -188,7 +164,7 @@ ax.set(xlabel='time', ylabel='ln |delta|', title=f'Divergence of {ENSEMBLE_SIZE}
 ax.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'lorenz_divergence.png'), dpi=120)
-plt.close()
+plt.show()
 print("Saved: lorenz_divergence.png")
 
 print("\nDone.")

@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-"""
-Machine Learning Examples
-=========================
-Demonstrates machine learning with scikit-learn, XGBoost, and LightGBM.
-
-Scikit-learn: https://scikit-learn.org/
-XGBoost: https://xgboost.readthedocs.io/
-LightGBM: https://lightgbm.readthedocs.io/
-"""
+# # Machine Learning Examples
+#
+# Demonstrates machine learning with scikit-learn, XGBoost, and LightGBM.
+#
+# - [Scikit-learn](https://scikit-learn.org/)
+# - [XGBoost](https://xgboost.readthedocs.io/)
+# - [LightGBM](https://lightgbm.readthedocs.io/)
 
 import numpy as np
 import pandas as pd
@@ -38,15 +36,11 @@ import xgboost as xgb
 import lightgbm as lgb
 import os
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# Classification Example
-# =============================================================================
-print("=" * 60)
-print("Classification with Multiple Models")
-print("=" * 60)
+# ## Classification with Multiple Models
 
 # Generate classification dataset
 X, y = make_classification(
@@ -107,12 +101,7 @@ print("\n" + "=" * 60)
 print("Model Comparison:")
 print(results_df.to_string(index=False))
 
-# =============================================================================
-# Detailed Classification Report
-# =============================================================================
-print("\n" + "=" * 60)
-print("Detailed Classification Report (XGBoost)")
-print("=" * 60)
+# ## Detailed Classification Report (XGBoost)
 
 # Best model detailed analysis
 xgb_model = xgb.XGBClassifier(n_estimators=100, random_state=42, eval_metric="logloss")
@@ -150,14 +139,9 @@ axes[1].set_xlabel("Importance")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "ml_classification.png"), dpi=150)
 print("\nSaved: ml_classification.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Regression Example
-# =============================================================================
-print("\n" + "=" * 60)
-print("Regression Example")
-print("=" * 60)
+# ## Regression Example
 
 # Generate regression dataset
 X_reg, y_reg = make_regression(
@@ -189,12 +173,7 @@ for name, model in reg_models.items():
 
     print(f"{name}: RMSE={rmse:.2f}, R2={r2:.4f}")
 
-# =============================================================================
-# Hyperparameter Tuning
-# =============================================================================
-print("\n" + "=" * 60)
-print("Hyperparameter Tuning with GridSearchCV")
-print("=" * 60)
+# ## Hyperparameter Tuning with GridSearchCV
 
 # Define parameter grid for Random Forest
 param_grid = {
@@ -211,12 +190,7 @@ print(f"Best parameters: {grid_search.best_params_}")
 print(f"Best CV score: {grid_search.best_score_:.4f}")
 print(f"Test accuracy: {grid_search.score(X_test, y_test):.4f}")
 
-# =============================================================================
-# Clustering Example
-# =============================================================================
-print("\n" + "=" * 60)
-print("Clustering with K-Means")
-print("=" * 60)
+# ## Clustering with K-Means
 
 # Load Iris dataset for clustering
 iris = load_iris()
@@ -257,14 +231,9 @@ axes[1].set_ylabel("PC2")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "ml_clustering.png"), dpi=150)
 print("Saved: ml_clustering.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Dimensionality Reduction
-# =============================================================================
-print("\n" + "=" * 60)
-print("Dimensionality Reduction")
-print("=" * 60)
+# ## Dimensionality Reduction
 
 # PCA analysis
 pca_full = PCA()
@@ -292,7 +261,7 @@ axes[1].legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "ml_pca.png"), dpi=150)
 print("Saved: ml_pca.png")
-plt.close()
+plt.show()
 
 # Find number of components for 95% variance
 n_components_95 = np.argmax(cumvar >= 0.95) + 1

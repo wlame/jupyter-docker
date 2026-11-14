@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-"""
-Geospatial Data Analysis
-========================
-Demonstrates geospatial analysis and mapping with Cartopy, GeoPandas, and Folium.
-
-Cartopy: https://scitools.org.uk/cartopy/
-GeoPandas: https://geopandas.org/
-Folium: https://python-visualization.github.io/folium/
-Shapely: https://shapely.readthedocs.io/
-
-Note: Some examples require matplotlib backend for static maps.
-"""
+# # Geospatial Data Analysis
+#
+# Demonstrates geospatial analysis and mapping with Cartopy, GeoPandas, and Folium.
+#
+# - [Cartopy](https://scitools.org.uk/cartopy/)
+# - [GeoPandas](https://geopandas.org/)
+# - [Folium](https://python-visualization.github.io/folium/)
+# - [Shapely](https://shapely.readthedocs.io/)
+#
+# Note: Some examples require matplotlib backend for static maps.
 
 import numpy as np
 import pandas as pd
@@ -25,15 +23,11 @@ import folium
 from folium.plugins import HeatMap, MarkerCluster
 import os
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# Cartopy - Map Projections and Features
-# =============================================================================
-print("=" * 60)
-print("Cartopy Map Projections")
-print("=" * 60)
+# ## Cartopy Map Projections
 
 # Create figure with different projections
 fig = plt.figure(figsize=(15, 10))
@@ -78,14 +72,9 @@ ax4.set_title("Robinson Projection")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "cartopy_projections.png"), dpi=150, bbox_inches="tight")
 print("Saved: cartopy_projections.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Cartopy - Plotting Data on Maps
-# =============================================================================
-print("\n" + "=" * 60)
-print("Cartopy Data Visualization")
-print("=" * 60)
+# ## Cartopy Data Visualization
 
 # Sample city data
 cities = pd.DataFrame(
@@ -147,14 +136,9 @@ plt.colorbar(scatter, label="Population (millions)", shrink=0.5)
 ax.set_title("Major World Cities by Population", fontsize=14)
 plt.savefig(os.path.join(OUTPUT_DIR, "cartopy_cities.png"), dpi=150, bbox_inches="tight")
 print("Saved: cartopy_cities.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# GeoPandas - Vector Data Operations
-# =============================================================================
-print("\n" + "=" * 60)
-print("GeoPandas Vector Operations")
-print("=" * 60)
+# ## GeoPandas Vector Operations
 
 # Create GeoDataFrame from points
 geometry = [Point(lon, lat) for lon, lat in zip(cities["lon"], cities["lat"])]
@@ -176,7 +160,6 @@ def create_bbox(point, size=2):
             (point.x - size, point.y + size),
         ]
     )
-
 
 gdf_cities["bbox"] = gdf_cities.geometry.apply(create_bbox)
 
@@ -213,14 +196,9 @@ ax.set_xlabel("Longitude")
 ax.set_ylabel("Latitude")
 plt.savefig(os.path.join(OUTPUT_DIR, "geopandas_cities.png"), dpi=150, bbox_inches="tight")
 print("Saved: geopandas_cities.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Folium - Interactive Web Maps
-# =============================================================================
-print("\n" + "=" * 60)
-print("Folium Interactive Maps")
-print("=" * 60)
+# ## Folium Interactive Maps
 
 # Basic map centered on a location
 m = folium.Map(location=[40, -95], zoom_start=4, tiles="OpenStreetMap")

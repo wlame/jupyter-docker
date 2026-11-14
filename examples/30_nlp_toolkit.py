@@ -1,26 +1,24 @@
 #!/usr/bin/env python3
-"""
-NLP Toolkit: rapidfuzz, lingua, Hugging Face datasets, PEFT, KeyBERT, SentencePiece
-====================================================================================
-Matches messy strings with rapidfuzz, detects languages with lingua (models
-ship inside the package), builds a dataset pipeline with Hugging Face
-`datasets`, attaches a LoRA adapter to a small transformer with PEFT,
-extracts keywords with KeyBERT on the MiniLM sentence-embedding model, and
-trains a tiny subword tokenizer with SentencePiece.
-
-tiktoken (OpenAI tokenizers), evaluate (metrics), and BERTopic (topic models)
-are installed too; they download encodings/metrics on first use or need a
-larger corpus, so this example only names them:
-`tiktoken.get_encoding('cl100k_base')`, `evaluate.load('accuracy')`,
-`BERTopic().fit_transform(documents)`.
-
-rapidfuzz: https://rapidfuzz.github.io/RapidFuzz/
-lingua:    https://github.com/pemistahl/lingua-py
-datasets:  https://huggingface.co/docs/datasets/
-PEFT:      https://huggingface.co/docs/peft/
-KeyBERT:   https://maartengr.github.io/KeyBERT/
-SentencePiece: https://github.com/google/sentencepiece
-"""
+# # NLP Toolkit: rapidfuzz, lingua, Hugging Face datasets, PEFT, KeyBERT, SentencePiece
+#
+# Matches messy strings with rapidfuzz, detects languages with lingua (models
+# ship inside the package), builds a dataset pipeline with Hugging Face
+# `datasets`, attaches a LoRA adapter to a small transformer with PEFT,
+# extracts keywords with KeyBERT on the MiniLM sentence-embedding model, and
+# trains a tiny subword tokenizer with SentencePiece.
+#
+# tiktoken (OpenAI tokenizers), evaluate (metrics), and BERTopic (topic models)
+# are installed too; they download encodings/metrics on first use or need a
+# larger corpus, so this example only names them:
+# `tiktoken.get_encoding('cl100k_base')`, `evaluate.load('accuracy')`,
+# `BERTopic().fit_transform(documents)`.
+#
+# - [rapidfuzz](https://rapidfuzz.github.io/RapidFuzz/)
+# - [lingua](https://github.com/pemistahl/lingua-py)
+# - [datasets](https://huggingface.co/docs/datasets/)
+# - [PEFT](https://huggingface.co/docs/peft/)
+# - [KeyBERT](https://maartengr.github.io/KeyBERT/)
+# - [SentencePiece](https://github.com/google/sentencepiece)
 
 import io
 import json
@@ -36,18 +34,14 @@ from rapidfuzz import fuzz, process
 from sentence_transformers import SentenceTransformer
 from transformers import BertConfig, BertForSequenceClassification
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 torch.manual_seed(0)
 results: dict[str, object] = {}
 
-# =============================================================================
-# rapidfuzz — fuzzy string matching
-# =============================================================================
-print("=" * 60)
-print("rapidfuzz: Fuzzy Matching")
-print("=" * 60)
+# ## rapidfuzz: Fuzzy Matching
 
 companies = ['Acme Corporation', 'Globex Inc.', 'Initech LLC', 'Umbrella Corp', 'Hooli', 'Vandelay Industries']
 queries = ['acme corp', 'Globex Incorporated', 'initech', 'vandelay ind.']
@@ -59,12 +53,7 @@ for query in queries:
 print(f"token_sort_ratio('Corp Umbrella', 'Umbrella Corp') = {fuzz.token_sort_ratio('Corp Umbrella', 'Umbrella Corp'):.0f}")
 results['fuzzy_matches'] = matches
 
-# =============================================================================
-# lingua — language detection
-# =============================================================================
-print("\n" + "=" * 60)
-print("lingua: Language Detection")
-print("=" * 60)
+# ## lingua: Language Detection
 
 detector = LanguageDetectorBuilder.from_languages(
     Language.ENGLISH, Language.GERMAN, Language.FRENCH, Language.SPANISH, Language.ITALIAN
@@ -83,12 +72,7 @@ for text in samples:
     print(f"{language.name:8} ({confidence:.2f})  {text}")
 results['languages'] = languages
 
-# =============================================================================
-# datasets — a processing pipeline
-# =============================================================================
-print("\n" + "=" * 60)
-print("datasets: Map, Filter, Split")
-print("=" * 60)
+# ## datasets: Map, Filter, Split
 
 reviews = Dataset.from_dict({
     'text': [
@@ -107,12 +91,7 @@ print(processed)
 processed.save_to_disk(os.path.join(OUTPUT_DIR, 'reviews_dataset'))
 print("Saved: reviews_dataset/ (Arrow files)")
 
-# =============================================================================
-# PEFT — LoRA adapter on a small transformer
-# =============================================================================
-print("\n" + "=" * 60)
-print("PEFT: LoRA Adapter")
-print("=" * 60)
+# ## PEFT: LoRA Adapter
 
 config = BertConfig(vocab_size=2000, hidden_size=64, num_hidden_layers=2, num_attention_heads=2,
                     intermediate_size=128, num_labels=2)
@@ -126,12 +105,7 @@ with torch.no_grad():
 print(f"Forward pass logits: {tuple(logits.shape)}")
 results['lora_trainable_fraction'] = round(trainable / total, 4)
 
-# =============================================================================
-# KeyBERT — keywords from sentence embeddings
-# =============================================================================
-print("\n" + "=" * 60)
-print("KeyBERT: Keyword Extraction")
-print("=" * 60)
+# ## KeyBERT: Keyword Extraction
 
 # Pre-baked in the nlp image; downloads (~80 MB) on first use elsewhere.
 embedder = SentenceTransformer('all-MiniLM-L6-v2')
@@ -145,12 +119,7 @@ for phrase, score in keywords:
     print(f"{score:.3f}  {phrase}")
 results['keywords'] = [phrase for phrase, _ in keywords]
 
-# =============================================================================
-# SentencePiece — train a subword tokenizer in memory
-# =============================================================================
-print("\n" + "=" * 60)
-print("SentencePiece: Train a Subword Tokenizer")
-print("=" * 60)
+# ## SentencePiece: Train a Subword Tokenizer
 
 corpus = [
     'Supervised learning trains models on labeled examples.',

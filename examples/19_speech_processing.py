@@ -1,36 +1,28 @@
 #!/usr/bin/env python3
-"""
-Speech Processing
-=================
-Demonstrates speech recognition (ASR) and text-to-speech (TTS) capabilities.
-
-openai-whisper: https://github.com/openai/whisper
-gTTS: https://gtts.readthedocs.io/
-torchaudio: https://pytorch.org/audio/
-SpeechRecognition: https://github.com/Uberi/speech_recognition
-
-Uses synthetically generated audio — no external files required.
-"""
+# # Speech Processing
+#
+# Demonstrates speech recognition (ASR) and text-to-speech (TTS) capabilities.
+#
+# - [openai-whisper](https://github.com/openai/whisper)
+# - [gTTS](https://gtts.readthedocs.io/)
+# - [torchaudio](https://pytorch.org/audio/)
+# - [SpeechRecognition](https://github.com/Uberi/speech_recognition)
+#
+# Uses synthetically generated audio — no external files required.
 
 import os
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import torch
 import torchaudio
 import soundfile as sf
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# Generate Synthetic Audio (sine wave with harmonics)
-# =============================================================================
-print("=" * 60)
-print("Generating Synthetic Audio")
-print("=" * 60)
+# ## Generating Synthetic Audio
 
 sample_rate = 16000
 duration = 3.0
@@ -61,12 +53,7 @@ print(f"Frequencies  : {frequencies} Hz")
 print(f"Signal shape : {signal.shape}")
 print(f"Saved        : {audio_path}")
 
-# =============================================================================
-# Whisper ASR — Transcribe with tiny model
-# =============================================================================
-print("\n" + "=" * 60)
-print("Whisper ASR — Tiny Model")
-print("=" * 60)
+# ## Whisper ASR — Tiny Model
 
 try:
     import whisper
@@ -89,16 +76,10 @@ try:
             print(f"  [{seg['start']:.1f}s - {seg['end']:.1f}s] {seg['text'].strip()!r}")
 
     print("\nNote: Synthetic tones produce minimal transcription — this verifies the pipeline works.")
-
 except Exception as e:
     print(f"Whisper transcription skipped: {e}")
 
-# =============================================================================
-# gTTS — Text to Speech
-# =============================================================================
-print("\n" + "=" * 60)
-print("gTTS — Google Text-to-Speech")
-print("=" * 60)
+# ## gTTS — Google Text-to-Speech
 
 # gTTS calls Google's TTS endpoint, so it only works with network access.
 # Network problems are reported and skipped; any other error is a real bug
@@ -118,16 +99,10 @@ try:
     print(f"Language     : en")
     print(f"Saved        : {gtts_path}")
     print(f"File size    : {os.path.getsize(gtts_path)} bytes")
-
 except (gTTSError, requests.RequestException) as e:
     print(f"gTTS synthesis skipped (network/service unavailable): {e}")
 
-# =============================================================================
-# torchaudio — Waveform Analysis and Transforms
-# =============================================================================
-print("\n" + "=" * 60)
-print("torchaudio — Waveform Analysis")
-print("=" * 60)
+# ## torchaudio — Waveform Analysis
 
 waveform = torch.tensor(signal, dtype=torch.float32).unsqueeze(0)
 print(f"Waveform tensor : {waveform.shape}, dtype={waveform.dtype}")
@@ -151,12 +126,7 @@ to_db = torchaudio.transforms.AmplitudeToDB(stype='power', top_db=80)
 spec_db = to_db(spec)
 mel_db = to_db(mel_spec)
 
-# =============================================================================
-# SpeechRecognition — Library Verification
-# =============================================================================
-print("\n" + "=" * 60)
-print("SpeechRecognition — Library Info")
-print("=" * 60)
+# ## SpeechRecognition — Library Info
 
 try:
     import speech_recognition as sr
@@ -170,16 +140,10 @@ try:
     with sr.AudioFile(audio_path) as source:
         audio_data = recognizer.record(source)
     print(f"Audio duration  : {len(audio_data.frame_data) / audio_data.sample_rate / audio_data.sample_width:.2f} s")
-
 except Exception as e:
     print(f"SpeechRecognition verification skipped: {e}")
 
-# =============================================================================
-# Visualization — Waveform and Spectrogram
-# =============================================================================
-print("\n" + "=" * 60)
-print("Visualization — Waveform and Spectrogram")
-print("=" * 60)
+# ## Visualization — Waveform and Spectrogram
 
 fig, axes = plt.subplots(3, 1, figsize=(12, 10))
 
@@ -218,11 +182,10 @@ plt.tight_layout()
 plot_path = os.path.join(OUTPUT_DIR, 'speech_waveforms.png')
 plt.savefig(plot_path, dpi=150)
 print(f"Saved: {plot_path}")
-plt.close()
+plt.show()
 
-# =============================================================================
-# Summary
-# =============================================================================
+# ## Summary
+
 print("\n" + "=" * 60)
 print("Speech processing complete!")
 print("Outputs: speech_synthetic_audio.wav, speech_gtts_output.mp3,")

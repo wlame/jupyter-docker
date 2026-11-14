@@ -1,23 +1,19 @@
 #!/usr/bin/env python3
-"""
-NLP Text Analysis
-=================
-Demonstrates natural language processing with spaCy, NLTK, and sentence-transformers.
-
-spaCy: https://spacy.io/
-NLTK: https://www.nltk.org/
-Sentence Transformers: https://www.sbert.net/
-
-Note: spaCy model required — run once inside the container:
-    python -m spacy download en_core_web_sm
-Sentence transformer models download automatically on first use (~80 MB).
-"""
+# # NLP Text Analysis
+#
+# Demonstrates natural language processing with spaCy, NLTK, and sentence-transformers.
+#
+# - [spaCy](https://spacy.io/)
+# - [NLTK](https://www.nltk.org/)
+# - [Sentence Transformers](https://www.sbert.net/)
+#
+# Note: spaCy model required — run once inside the container:
+#     python -m spacy download en_core_web_sm
+# Sentence transformer models download automatically on first use (~80 MB).
 
 import os
 
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import nltk
 
@@ -43,7 +39,6 @@ def _nltk_present(lookup):
             continue
     return False
 
-
 for _resource, _lookup in _NLTK_RESOURCES:
     if not _nltk_present(_lookup):
         nltk.download(_resource, quiet=True)
@@ -53,12 +48,12 @@ from nltk.corpus import stopwords, wordnet
 from nltk.stem import WordNetLemmatizer, PorterStemmer
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# =============================================================================
-# Sample Texts
-# =============================================================================
+# ## Sample Texts
+
 TEXTS = [
     "Apple Inc. was founded by Steve Jobs, Steve Wozniak, and Ronald Wayne in Cupertino, California in 1976.",
     "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
@@ -84,12 +79,7 @@ QUERIES = [
     "What did Einstein develop?",
 ]
 
-# =============================================================================
-# spaCy: Named Entity Recognition & Dependency Parsing
-# =============================================================================
-print("=" * 60)
-print("spaCy: NER and Dependency Parsing")
-print("=" * 60)
+# ## spaCy: NER and Dependency Parsing
 
 try:
     import spacy
@@ -138,16 +128,10 @@ try:
                 f"  {token.text:20s} {token.lemma_:20s} "
                 f"{token.pos_:8s} {str(token.is_stop):8s}"
             )
-
 except ImportError:
     print("spaCy not installed — skipping NER/dependency examples.")
 
-# =============================================================================
-# NLTK: Tokenization, Lemmatization, and Stopword Removal
-# =============================================================================
-print("\n" + "=" * 60)
-print("NLTK: Tokenization and Text Preprocessing")
-print("=" * 60)
+# ## NLTK: Tokenization and Text Preprocessing
 
 stop_words = set(stopwords.words('english'))
 lemmatizer = WordNetLemmatizer()
@@ -171,12 +155,7 @@ stemmed = [stemmer.stem(w.lower()) for w in filtered]
 print(f"Lemmatized: {lemmatized}")
 print(f"Stemmed:    {stemmed}")
 
-# =============================================================================
-# NLTK: VADER Sentiment Analysis
-# =============================================================================
-print("\n" + "=" * 60)
-print("NLTK: VADER Sentiment Analysis")
-print("=" * 60)
+# ## NLTK: VADER Sentiment Analysis
 
 sia = SentimentIntensityAnalyzer()
 
@@ -223,14 +202,9 @@ axes[1].set_title("Per-Review Compound Scores")
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'nlp_sentiment.png'), dpi=150)
 print("\nSaved: nlp_sentiment.png")
-plt.close()
+plt.show()
 
-# =============================================================================
-# NLTK: WordNet — Synonyms, Antonyms, Definitions
-# =============================================================================
-print("\n" + "=" * 60)
-print("NLTK: WordNet Lexical Database")
-print("=" * 60)
+# ## NLTK: WordNet Lexical Database
 
 words_to_explore = ['happy', 'fast', 'beautiful']
 
@@ -251,12 +225,7 @@ for word in words_to_explore:
     if antonyms:
         print(f"  Antonyms: {', '.join(sorted(antonyms))}")
 
-# =============================================================================
-# Sentence Transformers: Semantic Similarity and Search
-# =============================================================================
-print("\n" + "=" * 60)
-print("Sentence Transformers: Semantic Similarity & Search")
-print("=" * 60)
+# ## Sentence Transformers: Semantic Similarity & Search
 
 try:
     from sentence_transformers import SentenceTransformer
@@ -301,7 +270,7 @@ try:
     plt.tight_layout()
     plt.savefig(os.path.join(OUTPUT_DIR, 'nlp_similarity_heatmap.png'), dpi=150)
     print("\nSaved: nlp_similarity_heatmap.png")
-    plt.close()
+    plt.show()
 
     # Semantic clustering of reviews
     print("\nSemantic Clustering of Reviews:")
@@ -319,13 +288,11 @@ try:
             if label == cluster_id:
                 compound = sentiments[idx]['compound']
                 print(f"    [{compound:+.3f}] {REVIEWS[idx][:65]}")
-
 except ImportError:
     print("sentence-transformers not installed — skipping semantic search examples.")
 
-# =============================================================================
-# Summary
-# =============================================================================
+# ## Summary
+
 print("\n" + "=" * 60)
 print("NLP text analysis complete!")
 print("Outputs: nlp_sentiment.png, nlp_similarity_heatmap.png")

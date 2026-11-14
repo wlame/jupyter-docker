@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-"""
-Bayesian Modeling: PreliZ, PyMC, nutpie, NumPyro, ArviZ, and Bambi
-==================================================================
-Chooses a prior with PreliZ, then estimates a coin's bias from 50 flips with
-PyMC and checks the posterior against the exact (conjugate) answer, sampling
-it three ways: PyMC's own NUTS, nutpie (a Rust sampler), and NumPyro (JAX).
-A hierarchical model of the classic "eight schools" data follows, summarized
-and plotted with ArviZ, and Bambi fits a regression from an R-style formula.
-
-PyMC compiles models with Numba (PyTensor's default backend), so no C compiler
-is needed in the image.
-
-PreliZ:  https://preliz.readthedocs.io/
-PyMC:    https://www.pymc.io/
-nutpie:  https://pymc-devs.github.io/nutpie/
-NumPyro: https://num.pyro.ai/
-ArviZ:   https://python.arviz.org/
-Bambi:   https://bambinos.github.io/bambi/
-"""
+# # Bayesian Modeling: PreliZ, PyMC, nutpie, NumPyro, ArviZ, and Bambi
+#
+# Chooses a prior with PreliZ, then estimates a coin's bias from 50 flips with
+# PyMC and checks the posterior against the exact (conjugate) answer, sampling
+# it three ways: PyMC's own NUTS, nutpie (a Rust sampler), and NumPyro (JAX).
+# A hierarchical model of the classic "eight schools" data follows, summarized
+# and plotted with ArviZ, and Bambi fits a regression from an R-style formula.
+#
+# PyMC compiles models with Numba (PyTensor's default backend), so no C compiler
+# is needed in the image.
+#
+# - [PreliZ](https://preliz.readthedocs.io/)
+# - [PyMC](https://www.pymc.io/)
+# - [nutpie](https://pymc-devs.github.io/nutpie/)
+# - [NumPyro](https://num.pyro.ai/)
+# - [ArviZ](https://python.arviz.org/)
+# - [Bambi](https://bambinos.github.io/bambi/)
 
 import json
 import os
@@ -25,17 +23,15 @@ import time
 
 import arviz as az
 import bambi as bmb
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import preliz as pz
 import pymc as pm
 from scipy import stats
 
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 FLIPS, HEADS = 50, 36
@@ -46,21 +42,15 @@ SAMPLERS = ['pymc', 'nutpie', 'numpyro']
 SAMPLE_ARGS = {'draws': 1_000, 'tune': 1_000, 'chains': 2, 'cores': 1, 'progressbar': False, 'random_seed': 1}
 summary: dict[str, object] = {}
 
-# =============================================================================
-# PreliZ: turn a belief into a prior
-# =============================================================================
-print("=" * 60)
-print("PreliZ: Eliciting a Prior")
-print("=" * 60)
+# ## PreliZ: Eliciting a Prior
 
 # "I'm 90% sure the coin's heads probability lies between 0.3 and 0.7."
 prior = pz.maxent(pz.Beta(), lower=0.3, upper=0.7, mass=0.9, plot=False)
 alpha, beta = float(prior.alpha), float(prior.beta)
 print(f"Maximum-entropy Beta with 90% of its mass in [0.3, 0.7]: Beta({alpha:.2f}, {beta:.2f})")
 
-# =============================================================================
-# The coin: three samplers against the exact posterior
-# =============================================================================
+# ## The coin: three samplers against the exact posterior
+
 print("\n" + "=" * 60)
 print(f"Coin Flips: {HEADS} heads in {FLIPS}")
 print("=" * 60)
@@ -96,15 +86,10 @@ ax.set(xlabel='probability of heads', ylabel='density', title=f'{HEADS} heads in
 ax.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'bayes_coin.png'), dpi=120)
-plt.close()
+plt.show()
 print("Saved: bayes_coin.png")
 
-# =============================================================================
-# Hierarchical model: eight schools
-# =============================================================================
-print("\n" + "=" * 60)
-print("PyMC + ArviZ: Eight Schools (Hierarchical)")
-print("=" * 60)
+# ## PyMC + ArviZ: Eight Schools (Hierarchical)
 
 schools = list('ABCDEFGH')
 effects = np.array([28.0, 8.0, -3.0, 7.0, -1.0, 1.0, 18.0, 12.0])  # estimated treatment effects
@@ -129,15 +114,10 @@ summary['eight_schools_divergences'] = divergences
 
 forest = az.plot_forest(schools_idata, var_names=['theta'])
 forest.savefig(os.path.join(OUTPUT_DIR, 'bayes_eight_schools.png'))
-plt.close('all')
+plt.show()
 print("Saved: bayes_eight_schools.png (each school's effect, pulled toward the shared mean)")
 
-# =============================================================================
-# Bambi: a regression from a formula
-# =============================================================================
-print("\n" + "=" * 60)
-print("Bambi: y ~ x + group")
-print("=" * 60)
+# ## Bambi: y ~ x + group
 
 rng = np.random.default_rng(seed=0)
 data = pd.DataFrame({'x': rng.normal(size=300), 'group': rng.choice(['control', 'treated'], size=300)})

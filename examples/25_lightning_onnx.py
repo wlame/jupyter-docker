@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-"""
-Training Loops and Deployment: Lightning, torchmetrics, Accelerate, einops, ONNX
-=================================================================================
-Trains a small classifier with PyTorch Lightning (metrics from torchmetrics,
-logs for TensorBoard), runs the same model through a hand-written Accelerate
-loop, reshapes tensors with einops, then writes the trained weights into an
-ONNX graph and checks onnxruntime reproduces the PyTorch predictions.
-
-Lightning:    https://lightning.ai/docs/pytorch/stable/
-torchmetrics: https://lightning.ai/docs/torchmetrics/stable/
-Accelerate:   https://huggingface.co/docs/accelerate/
-einops:       https://einops.rocks/
-ONNX:         https://onnx.ai/onnx/   onnxruntime: https://onnxruntime.ai/docs/
-"""
+# # Training Loops and Deployment: Lightning, torchmetrics, Accelerate, einops, ONNX
+#
+# Trains a small classifier with PyTorch Lightning (metrics from torchmetrics,
+# logs for TensorBoard), runs the same model through a hand-written Accelerate
+# loop, reshapes tensors with einops, then writes the trained weights into an
+# ONNX graph and checks onnxruntime reproduces the PyTorch predictions.
+#
+# - [Lightning](https://lightning.ai/docs/pytorch/stable/)
+# - [torchmetrics](https://lightning.ai/docs/torchmetrics/stable/)
+# - [Accelerate](https://huggingface.co/docs/accelerate/)
+# - [einops](https://einops.rocks/)
+# ONNX:         https://onnx.ai/onnx/   onnxruntime: https://onnxruntime.ai/docs/
 
 import os
 
 import lightning as L
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import onnx
 import onnxruntime as ort
@@ -30,18 +28,15 @@ from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.utils.tensorboard import SummaryWriter
 
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
+# Outputs go to ./output next to the notebook (the kernel's working directory).
+OUTPUT_DIR = os.path.abspath('output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 L.seed_everything(0, verbose=False)
 rng = np.random.default_rng(seed=0)
 
-# =============================================================================
-# Synthetic three-class data
-# =============================================================================
+# ## Synthetic three-class data
+
 n_per_class, n_features = 400, 8
 centers = rng.normal(scale=2.5, size=(3, n_features))
 X = np.concatenate([c + rng.normal(size=(n_per_class, n_features)) for c in centers]).astype('float32')
@@ -52,19 +47,11 @@ split = int(0.8 * len(y))
 train_ds = TensorDataset(torch.from_numpy(X[:split]), torch.from_numpy(y[:split]))
 val_ds = TensorDataset(torch.from_numpy(X[split:]), torch.from_numpy(y[split:]))
 
-
 def make_mlp() -> nn.Sequential:
     """Two-layer MLP shared by the Lightning and Accelerate sections."""
     return nn.Sequential(nn.Linear(n_features, 16), nn.ReLU(), nn.Linear(16, 3))
 
-
-# =============================================================================
-# Lightning + torchmetrics + TensorBoard
-# =============================================================================
-print("=" * 60)
-print("Lightning: Train with torchmetrics")
-print("=" * 60)
-
+# ## Lightning: Train with torchmetrics
 
 class Classifier(L.LightningModule):
     """Wraps the MLP with loss, accuracy, and an optimizer."""
@@ -101,7 +88,6 @@ class Classifier(L.LightningModule):
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=1e-2)
 
-
 model = Classifier()
 trainer = L.Trainer(
     max_epochs=8,
@@ -124,15 +110,10 @@ ax.legend()
 ax.set_title('Lightning training curve')
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'lightning_training.png'), dpi=120)
-plt.close()
+plt.show()
 print("Saved: lightning_training.png")
 
-# =============================================================================
-# Accelerate — the same model in a plain training loop
-# =============================================================================
-print("\n" + "=" * 60)
-print("Accelerate: Device-Agnostic Loop")
-print("=" * 60)
+# ## Accelerate: Device-Agnostic Loop
 
 accelerator = Accelerator(cpu=True)
 net = make_mlp()
@@ -152,24 +133,14 @@ for epoch in range(5):
 writer.close()
 print(f"Device: {accelerator.device}; final epoch loss {total / len(loader):.4f} (logged for TensorBoard)")
 
-# =============================================================================
-# einops — readable tensor reshapes
-# =============================================================================
-print("\n" + "=" * 60)
-print("einops: Patches and Pooling")
-print("=" * 60)
+# ## einops: Patches and Pooling
 
 images = torch.randn(4, 3, 32, 32)
 patches = rearrange(images, 'b c (h p1) (w p2) -> b (h w) (p1 p2 c)', p1=8, p2=8)
 pooled = reduce(images, 'b c (h 2) (w 2) -> b c h w', 'max')
 print(f"Images {tuple(images.shape)} -> patches {tuple(patches.shape)}, 2x2 max-pool {tuple(pooled.shape)}")
 
-# =============================================================================
-# ONNX + onnxruntime — the trained MLP as a portable graph
-# =============================================================================
-print("\n" + "=" * 60)
-print("ONNX: Build, Check, and Run with onnxruntime")
-print("=" * 60)
+# ## ONNX: Build, Check, and Run with onnxruntime
 
 first, second = model.net[0], model.net[2]
 weights = [

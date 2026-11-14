@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-"""
-PyTorch Deep Learning Basics
-============================
-Demonstrates fundamental operations with PyTorch.
-
-PyTorch: https://pytorch.org/
-TorchVision: https://pytorch.org/vision/
-TorchAudio: https://pytorch.org/audio/
-"""
+# # PyTorch Deep Learning Basics
+#
+# Demonstrates fundamental operations with PyTorch.
+#
+# - [PyTorch](https://pytorch.org/)
+# - [TorchVision](https://pytorch.org/vision/)
+# - [TorchAudio](https://pytorch.org/audio/)
 
 import torch
 import torch.nn as nn
@@ -15,12 +13,7 @@ import torch.optim as optim
 import torchvision.transforms as transforms
 import torchaudio
 
-# =============================================================================
-# Tensor Basics
-# =============================================================================
-print("=" * 60)
-print("PyTorch Tensor Basics")
-print("=" * 60)
+# ## PyTorch Tensor Basics
 
 # Check device availability
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -46,12 +39,7 @@ print(f"Element-wise multiplication:\n{a * b}")
 print(f"Sum: {a.sum()}")
 print(f"Mean: {a.mean()}")
 
-# =============================================================================
-# Autograd - Automatic Differentiation
-# =============================================================================
-print("\n" + "=" * 60)
-print("Autograd - Automatic Differentiation")
-print("=" * 60)
+# ## Autograd - Automatic Differentiation
 
 # Create tensor with gradient tracking
 x = torch.tensor([2.0, 3.0], requires_grad=True)
@@ -63,13 +51,7 @@ print(f"x = {x.data}")
 print(f"y = x^2 + 3x + 1 = {y.data}")
 print(f"dy/dx = 2x + 3 = {x.grad}")
 
-# =============================================================================
-# Simple Neural Network
-# =============================================================================
-print("\n" + "=" * 60)
-print("Simple Neural Network")
-print("=" * 60)
-
+# ## Simple Neural Network
 
 class SimpleNet(nn.Module):
     """A simple feedforward neural network."""
@@ -86,7 +68,6 @@ class SimpleNet(nn.Module):
         x = self.fc2(x)
         return x
 
-
 # Create model
 model = SimpleNet(input_size=10, hidden_size=20, output_size=2)
 print(f"Model architecture:\n{model}")
@@ -95,17 +76,11 @@ print(f"Model architecture:\n{model}")
 total_params = sum(p.numel() for p in model.parameters())
 print(f"\nTotal parameters: {total_params}")
 
-# =============================================================================
-# Training Loop Example
-# =============================================================================
-print("\n" + "=" * 60)
-print("Training Loop Example (XOR Problem)")
-print("=" * 60)
+# ## Training Loop Example (XOR Problem)
 
 # XOR dataset
 X = torch.tensor([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=torch.float32)
 y = torch.tensor([[0], [1], [1], [0]], dtype=torch.float32)
-
 
 # Simple network for XOR
 class XORNet(nn.Module):
@@ -119,7 +94,6 @@ class XORNet(nn.Module):
         x = torch.relu(self.fc1(x))
         x = self.sigmoid(self.fc2(x))
         return x
-
 
 xor_model = XORNet()
 criterion = nn.BCELoss()
@@ -147,12 +121,7 @@ with torch.no_grad():
     for i in range(len(X)):
         print(f"  {X[i].tolist()} -> {predictions[i].item():.4f} (expected: {y[i].item()})")
 
-# =============================================================================
-# TorchVision Transforms
-# =============================================================================
-print("\n" + "=" * 60)
-print("TorchVision Transforms")
-print("=" * 60)
+# ## TorchVision Transforms
 
 # Define a transform pipeline
 transform = transforms.Compose([
@@ -165,12 +134,7 @@ print("  - Resize to 224x224")
 print("  - Convert to tensor")
 print("  - Normalize with ImageNet stats")
 
-# =============================================================================
-# TorchAudio Basics
-# =============================================================================
-print("\n" + "=" * 60)
-print("TorchAudio Basics")
-print("=" * 60)
+# ## TorchAudio Basics
 
 print(f"TorchAudio version: {torchaudio.__version__}")
 
