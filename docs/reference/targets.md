@@ -264,10 +264,6 @@ elicitation), on top of the inherited JAX stack, so PyMC can also sample with
 NumPyro (`pm.sample(nuts_sampler="numpyro")`). PyTensor compiles models with Numba,
 so no C compiler is needed.
 
-!!! note "numba 0.67"
-    PyTensor 3.3 caps numba at 0.67.0, so this target (and `full`) holds numba
-    0.67.0 while the other targets run 0.68.
-
 ## nlp
 
 **Inherits from:** `base`
@@ -368,8 +364,8 @@ Because it merges every stack in one environment, `full` carries the same
 constraint-driven pins as the individual targets — OpenCV 4.13 (from `face`) and
 transformers 4.57.6 (from `speech`) — plus the holds transformers 4 forces on its
 neighbours here: tokenizers 0.22, diffusers 0.39, sentence-transformers 5.2, and
-spaCy 3.8.14. It also holds pandas 2.3.3 (from `timeseries`), numba 0.67.0 (from
-`probabilistic`), and protobuf 6.33 without highspy (from `optimization`). Every
+spaCy 3.8.14. It also holds pandas 2.3.3 (from `timeseries`), datasets 5.0.1 (for the held
+transformers), and protobuf 6.33 without highspy (from `optimization`). Every
 target's model weights (YOLO26n, NLTK + MiniLM, SmolLM2-135M-Instruct, Whisper tiny,
 face-alignment) are pre-baked. See [Configuration](configuration.md)
 for the complete override table.

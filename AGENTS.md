@@ -34,7 +34,7 @@ any drift between them, the lockfiles, and the matrix.
 - Keep `exclude-newer` a full UTC timestamp (`…T00:00:00Z`); the generator
   rejects bare dates, which uv reads in the local timezone. A package may carry
   its own later `exclude-newer` for an urgent fix, with a comment saying when to
-  drop it (currently pedalboard).
+  drop it (none at the moment).
 - A package that needs optional dependencies lists them in `extras` (rendered
   as `name[extra]==version`). Point its `module` at the part those extras enable
   (`ibis.backends.duckdb`, `dask.dataframe`), so the verify script catches a

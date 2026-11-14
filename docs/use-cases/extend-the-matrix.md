@@ -105,7 +105,7 @@ target that changed — if you added to `base`, higher targets pick it up too.
 
 !!! warning "The `exclude-newer` supply-chain guard"
     `[settings].exclude-newer` in the matrix refuses to resolve any package
-    published after its fixed UTC timestamp (currently `2026-10-01T00:00:00Z`). If
+    published after its fixed UTC timestamp (currently `2026-11-07T00:00:00Z`). If
     you pin a version newer than that, `just lock` fails to find it — bump the
     timestamp in `[settings]` when upgrading to a fresh release, or give that one
     package its own later `exclude-newer`.

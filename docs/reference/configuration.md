@@ -33,13 +33,13 @@ Global values applied to every target.
 | Key | Meaning | Example |
 |-----|---------|---------|
 | `python` | Python versions targets are built for, newest first. The first is the **default**: the version behind the plain `:<target>` image tag. A target can narrow the list (see below). Each version becomes one `required-environments` entry, and the list sets the generated `requires-python` (`>=3.13,<3.15` for two versions, `==3.13.*` for one). | `["3.14", "3.13"]` |
-| `exclude-newer` | Supply-chain guard emitted into `[tool.uv]`. `uv` refuses to resolve any package published after this instant, so a freshly published malicious release can't slip in. Bump it when upgrading. Write a full UTC timestamp: uv reads a bare date in the machine's local timezone, so lockfiles would differ between machines and CI. | `"2026-10-01T00:00:00Z"` |
+| `exclude-newer` | Supply-chain guard emitted into `[tool.uv]`. `uv` refuses to resolve any package published after this instant, so a freshly published malicious release can't slip in. Bump it when upgrading. Write a full UTC timestamp: uv reads a bare date in the machine's local timezone, so lockfiles would differ between machines and CI. | `"2026-11-07T00:00:00Z"` |
 
 ```toml
 [settings]
 python = ["3.14", "3.13"]
 # Supply-chain guard: never resolve packages published after this instant.
-exclude-newer = "2026-10-01T00:00:00Z"
+exclude-newer = "2026-11-07T00:00:00Z"
 ```
 
 ## `[targets.<name>]`
@@ -188,22 +188,24 @@ because a downstream library caps a dependency.
 
 | Constraint | Reason | Where in the matrix |
 |-----------|--------|---------------------|
-| `transformers < 5` in speech/full | `coqui-tts` needs it (`isin_mps_friendly` removed in 5.0). | `transformers` override → `4.57.6` on `speech` and `full`; `nlp` stays on `5.18.0`. |
+| `transformers < 5` in speech/full | `coqui-tts` needs it (`isin_mps_friendly` removed in 5.0). | `transformers` override → `4.57.6` on `speech` and `full`; `nlp` stays on `5.22.2`. |
 | `sentence-transformers` held on 4-compatible release | Its 5.3+ requires `transformers` 5, which `full` can't ship. | `sentence-transformers` override → `5.2.0` on `full`. |
-| `tokenizers <= 0.23.0` in full | `transformers` 4.57.6 (held for coqui-tts) caps it. | `tokenizers` override → `0.22.2` on `full`; `nlp` ships `0.23.2`. |
+| `tokenizers <= 0.23.0` in full | `transformers` 4.57.6 (held for coqui-tts) caps it. | `tokenizers` override → `0.22.2` on `full`; `nlp` ships `0.23.3`. |
 | `diffusers` 0.39 in full | `diffusers` ≥ 0.40 needs `huggingface-hub` ≥ 1.23; `transformers` 4.57.6 needs `huggingface-hub` < 1.0. | `diffusers` override → `0.39.0` on `full`; `face` ships `0.40.0`. |
-| spaCy 3.8.14 in full | spaCy ≥ 3.8.15 needs `click` ≥ 8.2.1; `gtts` 2.5.4 needs `click` < 8.2. | `spacy` override → `3.8.14` on `full`; `nlp` ships `3.8.16`. |
-| `bokeh < 3.10` | `panel` 1.9.4 cap. | `bokeh` pinned to `3.9.2`. |
-| pedalboard newer than the cutoff | pedalboard ≤ 0.9.25 Linux x86_64 wheels crash with an illegal instruction on CPUs lacking the build machine's instructions; 0.9.26 (2026-10-07) fixes it. | `pedalboard` 0.9.26 with its own `exclude-newer = "2026-10-08T00:00:00Z"`; drop the exception once the global cutoff passes that date. |
-| `numba <= 0.67` in probabilistic/full | `pytensor` 3.3 (PyMC's backend) caps it. | `numba` override → `0.67.0` on `probabilistic` and `full`; every other target ships `0.68.0`. |
-| `pandas < 3` in timeseries/full | `statsforecast`, `mlforecast`, and `skforecast` cap it. | `pandas` override → `2.3.3` on `timeseries` and `full`; every other target ships `3.0.6`. |
-| Cloud filesystems held in full | `datasets` 5.0.1 (nlp) caps `fsspec` at 2026.6.0; `s3fs` pins `fsspec` exactly. | `s3fs` → `2026.6.0` and `gcsfs` → `2026.7.0` on `full`; `dataio` ships the newest. |
+| spaCy 3.8.14 in full | spaCy ≥ 3.8.15 needs `click` ≥ 8.2.1; `gtts` 2.5.4 needs `click` < 8.2. | `spacy` override → `3.8.14` on `full`; `nlp` ships `3.8.18`. |
+| `bokeh` 3.10.x | `panel` 1.10 requires bokeh ≥ 3.10, < 3.11. | `bokeh` and `panel` move together. |
+| pedalboard ≥ 0.9.26 | pedalboard ≤ 0.9.25 Linux x86_64 wheels crash with an illegal instruction on CPUs lacking the build machine's instructions. | Keep `pedalboard` at 0.9.26 or later. |
+| `numba` 0.68.0 | `pytensor` (PyMC's backend) caps numba at the release it was tested with (≤ 0.68.0 for 3.3.7). | `numba` pinned to `0.68.0`, not the newer 0.68.1. |
+| `python-dateutil` < 3 | `aiobotocore` (behind `s3fs` in `dataio`) caps it. | `python-dateutil` pinned to `2.9.0.post0`; 4.x waits for aiobotocore. |
+| `datasets` 5.0.1 in full | `datasets` ≥ 5.1 needs `huggingface-hub` ≥ 1.31; `transformers` 4.57.6 needs `huggingface-hub` < 1.0. | `datasets` override → `5.0.1` on `full`; `nlp` ships `5.1.0`. |
+| `pandas < 3` in timeseries/full | `statsforecast`, `mlforecast`, and `skforecast` cap it. | `pandas` override → `2.3.3` on `timeseries` and `full`; every other target ships `3.1.1`. |
+| Cloud filesystems held in full | `datasets` 5.x caps `fsspec` at 2026.7.0; `s3fs` pins `fsspec` exactly. | `s3fs` → `2026.6.0` and `gcsfs` → `2026.7.0` on `full`; `dataio` ships the newest. |
 | `h5py < 3.15` in full | `tensorflow` 2.21 cap; only `full` merges both stacks. | `h5py` override → `3.14.0` on `full`; `dataio` ships `3.16.0`. |
 | `highspy` excluded on optimization/full | highspy and OR-Tools each ship a `libhighs.so.1`; whichever loads first breaks the other's import. OR-Tools embeds HiGHS anyway, and CVXPY (which depends on highspy) imports it only for its HIGHS solver. | `exclude-dependencies = ["highspy"]` on `optimization`; `full` unions it. PuLP and Pyomo use the `cbc` command (system package `coinor-cbc`). |
 | `protobuf < 6.34` on optimization/full | OR-Tools 9.15 caps it. | No override; `optimization` and `full` resolve protobuf 6.33.x while other targets get 7.x. |
 | `triton` excluded on deeplearn/face/full | triton segfaults when TensorFlow is already loaded (any TensorFlow-first import followed by torchvision). torch.compile needs a C/C++ compiler the images don't ship, so triton is unusable there anyway. | `exclude-dependencies` includes `triton` on `deeplearn` and `face`; `full` unions it. |
 | `opencv-python-headless` 4.13 in face/full | OpenCV 5 dropped the bundled haarcascade files `deepface` needs. | `opencv-python-headless` override → `4.13.0.90` on `face` and `full`. |
-| GUI `opencv-python` / `opencv-contrib-python` excluded on vision/face | They double-install `cv2` over the pinned headless build (same paths, corrupted mix); `mediapipe` pulls the contrib build. | `exclude-dependencies` on `vision` (`opencv-python`) and `face` (both). |
+| Other OpenCV builds excluded on vision/face | GUI `opencv-python`, `opencv-contrib-python`, and `opencv-contrib-python-headless` each double-install `cv2` over the pinned headless build (same paths, corrupted mix); `mediapipe` pulls the contrib build, and `deepface` ≥ 0.0.102 and `retina-face` pull contrib-headless. | `exclude-dependencies` on `vision` (`opencv-python`) and `face` (all three); `full` unions them. |
 | `torchcodec` + FFmpeg only in audio/speech/full | `torchaudio` ≥ 2.10 delegates load/save to `torchcodec`, which needs FFmpeg shared libs present only in those stages. | `torchcodec` `introduced-by = ["audio", "speech"]` (and `full`). |
 | `nvidia-nccl-cu13` kept on ml/timeseries | `xgboost` ≥ 3.4 depends on it (~200 MB, distributed GPU only). Excluding it on `ml` would also remove it from `deeplearn` and `full`, where torch needs it. | No exclusion; the comment on `xgboost` explains the cost. |
 | Python 3.13 only for deeplearn/face/full | `tensorflow` 2.21 has no cp314 wheels (and `face` also needs `tf-keras` 2.22). | `python = ["3.13"]` on `deeplearn`, `face`, and `full`. |
