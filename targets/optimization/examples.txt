@@ -8,3 +8,5 @@
 33_lorenz_numba_dask
 34_optimization
 41_shift_scheduling
+50_reliable_api_client
+51_parse_web_and_config

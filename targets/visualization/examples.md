@@ -15,6 +15,8 @@ example writes go to `output/` in this folder. Your own data belongs in
 | [05_bokeh_holoviews](05_bokeh_holoviews.ipynb) | Bokeh and HoloViews Visualizations | `visualization` |
 | [16_altair_panel_viz](16_altair_panel_viz.ipynb) | Altair and Panel: Declarative and Dashboard Visualization | `visualization` |
 | [22_plotnine_tables_datashader](22_plotnine_tables_datashader.ipynb) | Grammar of Graphics, Tables, and Big-Data Rendering | `visualization` |
+| [50_reliable_api_client](50_reliable_api_client.ipynb) | Calling an API Reliably: Retries, Validation, and Logging | `base` |
+| [51_parse_web_and_config](51_parse_web_and_config.ipynb) | Parsing the Formats Data Arrives In: HTML, XML, YAML, .env, and Dates | `base` |
 
 Each notebook has a matching `.py` file with the same code, which you can run
 with `python <name>.py` or open as a notebook through Jupytext.

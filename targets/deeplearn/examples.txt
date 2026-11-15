@@ -13,3 +13,5 @@
 33_lorenz_numba_dask
 38_tabular_ml_end_to_end
 42_same_network_torch_keras
+50_reliable_api_client
+51_parse_web_and_config

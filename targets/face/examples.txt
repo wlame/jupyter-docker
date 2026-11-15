@@ -3,3 +3,6 @@
 # Examples copied into this target's image: its own and its ancestors', one per line.
 20_face_analysis
 47_face_anonymization
+50_reliable_api_client
+51_parse_web_and_config
+54_face_recognition

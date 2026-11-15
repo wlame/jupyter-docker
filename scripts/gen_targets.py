@@ -439,11 +439,7 @@ def render_examples_readme(target: str, matrix: dict, examples_dir: Path) -> str
     ]
     stems = target_examples(target, matrix)
     if not stems:
-        lines += [
-            'This image carries the common utilities every other image builds on, and no',
-            'examples of its own. The `scientific` image is the smallest one with examples.',
-            '',
-        ]
+        lines += ['This image has no examples yet.', '']
         return '\n'.join(lines)
     lines += [
         'Open a notebook and run it top to bottom (**Run > Run All Cells**). Files an',

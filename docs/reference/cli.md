@@ -150,8 +150,7 @@ For each target, testing runs two steps against the built `ds-<target>` image:
 
 !!! note "pytest exit code 5 counts as success"
     Exit code `5` means "no tests collected" (a mark that isn't populated yet) and
-    is treated as a pass. The `base` target has no example tests, so step 2 is
-    skipped entirely for it.
+    is treated as a pass.
 
 ## `scripts/gen_targets.py`
 
@@ -200,7 +199,7 @@ The single positional argument selects which weights to download:
 | `nlp` | NLTK resources (punkt, stopwords, wordnet, taggers, …) into `~/nltk_data`, plus the `all-MiniLM-L6-v2` sentence-transformers model |
 | `speech` | Whisper `tiny` model |
 | `genai` | SmolLM2-135M-Instruct at a pinned revision (the image also inherits the `nlp` models) |
-| `face` | face-alignment detector + landmark nets (s3fd, 2DFAN) |
+| `face` | face-alignment detector + landmark nets (s3fd, 2DFAN), the InsightFace `buffalo_sc` model pack into `~/.insightface/models/`, and the Olivetti faces into `~/.cache/olivetti/`; the last two are verified against pinned SHA-256s |
 | `full` | Everything above — runs the `vision`, `nlp`, `genai`, `speech`, and `face` bakes in sequence |
 
 Any other target value is accepted and simply prints `no models to bake for target:
@@ -209,8 +208,9 @@ Any other target value is accepted and simply prints `no models to bake for targ
 !!! note "Invoked at build time, not from the justfile"
     This script has no `just` recipe. The Dockerfile runs it during the build
     (while the network is available) for the model-bearing stages, e.g.
-    `RUN bash /home/jupyter/scripts/bake_models.sh vision`. Only the standalone YOLO
-    weight file is checksum-verified; the library-managed caches (NLTK, HuggingFace,
+    `RUN bash /home/jupyter/scripts/bake_models.sh vision`. The files it downloads
+    itself (YOLO weights, the InsightFace pack, the Olivetti faces) are
+    checksum-verified; the library-managed caches (NLTK, HuggingFace,
     Whisper, torch hub) rely on each library's own integrity checks.
 
 ## `scripts/select_examples.sh`

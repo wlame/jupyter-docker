@@ -4,3 +4,5 @@
 14_nlp_text_analysis
 30_nlp_toolkit
 46_review_analysis
+50_reliable_api_client
+51_parse_web_and_config

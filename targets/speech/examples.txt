@@ -4,3 +4,5 @@
 19_speech_processing
 31_speech_metrics_vad
 48_speech_roundtrip
+50_reliable_api_client
+51_parse_web_and_config

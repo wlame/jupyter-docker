@@ -1,3 +1,5 @@
 # GENERATED FILE — do not edit by hand.
 # Source of truth: targets/matrix.toml (regenerate: python3 scripts/gen_targets.py).
 # Examples copied into this target's image: its own and its ancestors', one per line.
+50_reliable_api_client
+51_parse_web_and_config

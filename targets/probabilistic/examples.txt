@@ -9,3 +9,5 @@
 35_jax_jit_autodiff
 36_bayesian_modeling
 39_bayesian_ab_test
+50_reliable_api_client
+51_parse_web_and_config

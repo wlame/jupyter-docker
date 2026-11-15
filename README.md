@@ -524,6 +524,11 @@ it, and examples that take your own data read it from `/home/jupyter/data`:
 | `47_face_anonymization` | `face` | Detect faces and blur, pixelate, or box them |
 | `48_speech_roundtrip` | `speech` | Speak, transcribe with Whisper, score WER |
 | `49_messy_csv_to_parquet` | `dataio` | Clean and validate a messy CSV into Parquet |
+| `50_reliable_api_client` | `base` | Retries, validation, and logging against a flaky API |
+| `51_parse_web_and_config` | `base` | HTML, XML, YAML, .env, and time zones into clean JSON |
+| `52_files_anywhere` | `dataio` | Same code on local, in-memory, and cloud storage |
+| `53_databases` | `dataio` | Safe SQL, Arrow bulk loads, optional PostgreSQL and MySQL |
+| `54_face_recognition` | `face` | ArcFace embeddings: same person or not, closest match |
 
 ## Choosing the Right Target
 

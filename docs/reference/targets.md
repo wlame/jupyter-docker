@@ -333,7 +333,8 @@ builder stage and only the finished virtual environment ships in the runtime ima
 
 !!! note "Version overrides and pre-baked weights"
     DeepFace needs the Haar-cascade files removed in OpenCV 5, so this target uses
-    OpenCV 4.13. face-alignment weights are baked in; DeepFace's ~1.5 GB attribute
+    OpenCV 4.13. face-alignment weights, InsightFace's small `buffalo_sc` model pack
+    (about 15 MB), and the Olivetti faces are baked in; DeepFace's ~1.5 GB attribute
     models are intentionally not baked. See [Configuration](configuration.md).
 
 ??? note "Full package list (face)"

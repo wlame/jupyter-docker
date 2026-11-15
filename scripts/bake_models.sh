@@ -6,9 +6,9 @@
 # in its library's DEFAULT cache location under /home/jupyter, so nothing needs
 # a runtime environment variable — the libraries find their caches on their own.
 #
-# Only the standalone weight file we can pin (YOLO) is checksum-verified here;
-# the library-managed caches (NLTK, HuggingFace, Whisper, torch hub) rely on
-# each library's own integrity checks.
+# Standalone files we download ourselves (YOLO weights, the InsightFace pack, the
+# Olivetti faces) are checksum-verified here; the library-managed caches (NLTK,
+# HuggingFace, Whisper, torch hub) rely on each library's own integrity checks.
 #
 # Usage: bake_models.sh <target>     # vision | nlp | genai | speech | face | full
 # =============================================================================
@@ -56,9 +56,32 @@ bake_speech() {
     py -c "import whisper; whisper.load_model('tiny')"
 }
 
+# InsightFace's small model pack (detector + MobileFaceNet ArcFace) and the Olivetti
+# faces for the recognition example, both checksum-pinned. The Olivetti checksum is
+# the one scikit-learn's fetch_olivetti_faces verifies.
+INSIGHTFACE_URL="https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_sc.zip"
+INSIGHTFACE_SHA256="57d31b56b6ffa911c8a73cfc1707c73cab76efe7f13b675a05223bf42de47c72"
+OLIVETTI_URL="https://ndownloader.figshare.com/files/5976027"
+OLIVETTI_SHA256="b612fb967f2dc77c9c62d3e1266e0c73d5fca46a4b8906c18e454d41af987794"
+
+# Download a file and fail unless its SHA-256 matches.
+fetch_verified() {
+    local url="$1" sha="$2" dest="$3"
+    mkdir -p "$(dirname "${dest}")"
+    curl -fsSL --retry 3 -o "${dest}" "${url}"
+    echo "${sha}  ${dest}" | sha256sum -c -
+}
+
 bake_face() {
     echo "→ face-alignment detector + landmark nets (s3fd, 2DFAN)"
     py -c "import face_alignment; face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, device='cpu')"
+    echo "→ InsightFace buffalo_sc"
+    local pack="${HOME}/.insightface/models/buffalo_sc"
+    fetch_verified "${INSIGHTFACE_URL}" "${INSIGHTFACE_SHA256}" "${pack}.zip"
+    py -c "import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "${pack}.zip" "${pack}"
+    rm "${pack}.zip"
+    echo "→ Olivetti faces"
+    fetch_verified "${OLIVETTI_URL}" "${OLIVETTI_SHA256}" "${HOME}/.cache/olivetti/olivettifaces.mat"
 }
 
 target="${1:?usage: bake_models.sh <vision|nlp|genai|speech|face|full>}"

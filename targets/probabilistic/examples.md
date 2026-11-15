@@ -18,6 +18,8 @@ example writes go to `output/` in this folder. Your own data belongs in
 | [21_polars_duckdb_xarray](21_polars_duckdb_xarray.ipynb) | Modern Tabular and Array Tools: polars, DuckDB, Arrow, xarray, pint | `scientific` |
 | [33_lorenz_numba_dask](33_lorenz_numba_dask.ipynb) | Lorenz Attractor: SymPy, Numba, FFT, and Dask | `scientific` |
 | [35_jax_jit_autodiff](35_jax_jit_autodiff.ipynb) | JAX: JIT, Vectorization, Autodiff, Optax, Flax, and Equinox | `jax` |
+| [50_reliable_api_client](50_reliable_api_client.ipynb) | Calling an API Reliably: Retries, Validation, and Logging | `base` |
+| [51_parse_web_and_config](51_parse_web_and_config.ipynb) | Parsing the Formats Data Arrives In: HTML, XML, YAML, .env, and Dates | `base` |
 
 Each notebook has a matching `.py` file with the same code, which you can run
 with `python <name>.py` or open as a notebook through Jupytext.

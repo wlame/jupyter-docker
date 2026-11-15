@@ -5,3 +5,5 @@
 13_object_detection_yolo
 26_vision_backbones_kornia
 43_coins_and_superpixels
+50_reliable_api_client
+51_parse_web_and_config

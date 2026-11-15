@@ -59,6 +59,11 @@ example writes go to `output/` in this folder. Your own data belongs in
 | [47_face_anonymization](47_face_anonymization.ipynb) | Anonymize Faces in a Photo | `face` |
 | [48_speech_roundtrip](48_speech_roundtrip.ipynb) | Transcribe a Recording and Measure the Error Rate | `speech` |
 | [49_messy_csv_to_parquet](49_messy_csv_to_parquet.ipynb) | From a Messy CSV to Clean, Validated Parquet | `dataio` |
+| [50_reliable_api_client](50_reliable_api_client.ipynb) | Calling an API Reliably: Retries, Validation, and Logging | `base` |
+| [51_parse_web_and_config](51_parse_web_and_config.ipynb) | Parsing the Formats Data Arrives In: HTML, XML, YAML, .env, and Dates | `base` |
+| [52_files_anywhere](52_files_anywhere.ipynb) | One API for Local and Cloud Files | `dataio` |
+| [53_databases](53_databases.ipynb) | Working with Databases: SQL Safely, Arrow Fast, Servers Optional | `dataio` |
+| [54_face_recognition](54_face_recognition.ipynb) | Face Recognition by Similarity | `face` |
 
 Each notebook has a matching `.py` file with the same code, which you can run
 with `python <name>.py` or open as a notebook through Jupytext.

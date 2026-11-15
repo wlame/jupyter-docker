@@ -22,6 +22,8 @@ example writes go to `output/` in this folder. Your own data belongs in
 | [24_ml_explain_and_uncertainty](24_ml_explain_and_uncertainty.ipynb) | Explaining, Bounding, and Shipping Models: CatBoost, SHAP, MAPIE, UMAP, skrub, skops, ONNX | `ml` |
 | [33_lorenz_numba_dask](33_lorenz_numba_dask.ipynb) | Lorenz Attractor: SymPy, Numba, FFT, and Dask | `scientific` |
 | [38_tabular_ml_end_to_end](38_tabular_ml_end_to_end.ipynb) | Tabular ML End to End: Breast Cancer Diagnosis | `ml` |
+| [50_reliable_api_client](50_reliable_api_client.ipynb) | Calling an API Reliably: Retries, Validation, and Logging | `base` |
+| [51_parse_web_and_config](51_parse_web_and_config.ipynb) | Parsing the Formats Data Arrives In: HTML, XML, YAML, .env, and Dates | `base` |
 
 Each notebook has a matching `.py` file with the same code, which you can run
 with `python <name>.py` or open as a notebook through Jupytext.

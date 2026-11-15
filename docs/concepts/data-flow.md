@@ -106,11 +106,11 @@ environment variable is needed to locate them and the example tests run offline.
 
 What gets baked, by target:
 
-- **vision** → `yolo26n.pt` (the one checksum-pinned download)
+- **vision** → `yolo26n.pt` (checksum-pinned)
 - **nlp** → NLTK corpora and the sentence-transformers MiniLM model
 - **genai** → SmolLM2-135M-Instruct at a pinned revision (plus the inherited `nlp` models)
 - **speech** → Whisper `tiny`
-- **face** → face-alignment s3fd + 2DFAN weights
+- **face** → face-alignment s3fd + 2DFAN weights, plus the InsightFace `buffalo_sc` pack and the Olivetti faces (both checksum-pinned)
 - **full** → every target's weights
 
 DeepFace's large attribute models (~1.5 GB) are intentionally **not** baked — they

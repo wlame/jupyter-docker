@@ -9,3 +9,5 @@
 24_ml_explain_and_uncertainty
 33_lorenz_numba_dask
 38_tabular_ml_end_to_end
+50_reliable_api_client
+51_parse_web_and_config

@@ -179,25 +179,18 @@ test_target() {
         return 1
     fi
 
-    # --- Step 2: example smoke tests (run actual example scripts) ---
-    # base has no example tests; skip pytest for it.
-    if [ "${target}" = "base" ]; then
-        set_test_result "$target" "success"
-        print_success "Tests passed for ${image_name} (no examples for base target)"
-        return 0
-    fi
-
+    # --- Step 2: example tests (execute the example notebooks) ---
     # Build pytest -m expression: full runs all marks, others run their own mark.
     # Note: slow/network-dependent tests are INCLUDED; a target's mark selects
     # them too. Use pytest -m "<target> and not slow" manually to skip them.
     local pytest_marks
     if [ "${target}" = "full" ]; then
-        # Every target's mark except base (no examples) and full itself.
+        # Every target's mark except full itself.
         pytest_marks=""
         local t
         for t in "${ALL_TARGETS[@]}"; do
             case "${t}" in
-                base | full) ;;
+                full) ;;
                 *) pytest_marks="${pytest_marks:+${pytest_marks} or }${t}" ;;
             esac
         done

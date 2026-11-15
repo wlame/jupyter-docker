@@ -33,6 +33,10 @@ exclude-newer = "2026-11-07T00:00:00Z"
 [targets.base]
 parent = ""
 description = "Base Python environment with common utilities for data science"
+examples = [
+    "50_reliable_api_client",
+    "51_parse_web_and_config",
+]
 
 [targets.scientific]
 parent = "base"
@@ -65,6 +69,8 @@ examples = [
     "23_modern_data_formats",
     "32_dataframe_engines",
     "49_messy_csv_to_parquet",
+    "52_files_anywhere",
+    "53_databases",
 ]
 
 [targets.ml]
@@ -194,6 +200,7 @@ description = "Face detection, recognition, analysis, and generation"
 examples = [
     "20_face_analysis",
     "47_face_anonymization",
+    "54_face_recognition",
 ]
 # tensorflow 2.21 ships no cp314 wheels; widen once tensorflow 2.22 and
 # tf-keras 2.22 are released.

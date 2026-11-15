@@ -6,3 +6,7 @@
 23_modern_data_formats
 32_dataframe_engines
 49_messy_csv_to_parquet
+50_reliable_api_client
+51_parse_web_and_config
+52_files_anywhere
+53_databases

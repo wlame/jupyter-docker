@@ -6,3 +6,5 @@
 05_bokeh_holoviews
 16_altair_panel_viz
 22_plotnine_tables_datashader
+50_reliable_api_client
+51_parse_web_and_config

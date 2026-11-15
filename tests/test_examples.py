@@ -18,6 +18,34 @@ import pytest
 from conftest import run_example
 
 # =============================================================================
+# BASE target — httpx, tenacity, Pydantic, loguru, rich, BeautifulSoup, lxml, PyYAML
+# =============================================================================
+
+@pytest.mark.base
+def test_example_50_reliable_api_client():
+    """Retries with backoff on a simulated flaky API, Pydantic validation, rich summary."""
+    run_example(
+        '50_reliable_api_client.py',
+        expected_outputs=[
+            'api_readings.json',
+        ],
+        timeout=300,
+    )
+
+
+@pytest.mark.base
+def test_example_51_parse_web_and_config():
+    """HTML table, XML feed, YAML and .env settings, time zones, orjson output."""
+    run_example(
+        '51_parse_web_and_config.py',
+        expected_outputs=[
+            'parsed_report.json',
+        ],
+        timeout=300,
+    )
+
+
+# =============================================================================
 # SCIENTIFIC target — numpy, scipy, pandas, polars, duckdb, xarray, numba, dask
 # =============================================================================
 
@@ -213,6 +241,31 @@ def test_example_49_messy_csv_to_parquet():
             'orders_clean.parquet',
             'orders_rejected.csv',
             'orders_summary.json',
+        ],
+        timeout=300,
+    )
+
+
+@pytest.mark.dataio
+def test_example_52_files_anywhere():
+    """Same Parquet code on local and memory storage, DuckDB hive read, compression and caching; cloud skips."""
+    run_example(
+        '52_files_anywhere.py',
+        expected_outputs=[
+            'files_anywhere.json',
+        ],
+        timeout=300,
+    )
+
+
+@pytest.mark.dataio
+def test_example_53_databases():
+    """Safe SQL composition, Arrow bulk ingest into SQLite, portable SQLAlchemy report; servers skip."""
+    run_example(
+        '53_databases.py',
+        expected_outputs=[
+            'events.sqlite',
+            'databases_summary.json',
         ],
         timeout=300,
     )
@@ -729,4 +782,17 @@ def test_example_47_face_anonymization():
             'face_solid_box.png',
         ],
         timeout=300,
+    )
+
+
+@pytest.mark.face
+def test_example_54_face_recognition():
+    """ArcFace embeddings of the baked Olivetti faces: pair similarity, threshold, closest match."""
+    run_example(
+        '54_face_recognition.py',
+        expected_outputs=[
+            'face_similarity.png',
+            'face_recognition.json',
+        ],
+        timeout=600,
     )
