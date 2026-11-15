@@ -22,6 +22,18 @@ To review what changed, browse the commit history on GitHub:
 
 ## Notable changes
 
+### November 2026 — examples for base, cloud files, databases, and face recognition
+
+- `base` has examples for the first time: a sturdy API client (retries with
+  backoff, validation, logging) and parsing HTML, XML, YAML, `.env` files, and
+  time zones (50–51). The image tests now run `base`'s notebooks too.
+- `dataio` adds one-API file access across local, in-memory, and cloud storage,
+  and a databases notebook with safe SQL, Arrow bulk loading, and optional
+  PostgreSQL and MySQL sections that run when a server URL is set (52–53).
+- `face` adds face recognition with InsightFace embeddings on the Olivetti faces
+  (54); the image bakes the small `buffalo_sc` model pack and the dataset, both
+  checksum-pinned.
+
 ### November 2026 — runnable notebooks, 12 new examples, dependency refresh
 
 - Every example notebook now runs in JupyterLab as shipped. Before, 32 of 37
